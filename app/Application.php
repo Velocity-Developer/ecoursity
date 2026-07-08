@@ -4,6 +4,7 @@ namespace Ecoursity\App;
 
 use Ecoursity\App\Providers\PostTypeProvider;
 use Ecoursity\App\Providers\TaxonomyProvider;
+use Ecoursity\App\Providers\AdminServiceProvider;
 
 class Application
 {
@@ -11,5 +12,6 @@ class Application
     {
         (new PostTypeProvider())->boot();
         (new TaxonomyProvider())->boot();
+        (new AdminServiceProvider())->register();
     }
 }
