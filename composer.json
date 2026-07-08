@@ -1,0 +1,11 @@
+{
+    "name": "ecoursity/ecoursity",
+    "description": "WordPress LMS Plugin",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Ecoursity\\App\\": "app/"
+        }
+    },
+    "require": {}
+}

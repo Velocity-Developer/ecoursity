@@ -19,6 +19,8 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 if (! defined('ECOURSITY_FILE')) {
     define('ECOURSITY_FILE', __FILE__);
 }
@@ -62,3 +64,4 @@ register_activation_hook(__FILE__, [EcoursityPlugin::class, 'activate']);
 register_deactivation_hook(__FILE__, [EcoursityPlugin::class, 'deactivate']);
 
 (new EcoursityPlugin())->boot();
+(new Ecoursity\App\Application())->boot();
