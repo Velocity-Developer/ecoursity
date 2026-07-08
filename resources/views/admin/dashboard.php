@@ -1,11 +1,16 @@
 <div class="ecoursity-admin-layout">
-    <h1>Ecoursity</h1>
+    <h1>Dashboard Ecoursity</h1>
 
-    <div class="card">
+    <div class="ecoursity-flex">
+        <?php if ($stats) :
+            foreach ($stats as $key => $value) : ?>
+                <div class="card">
+                    <p><?php echo $value['title']; ?></p>
 
-        <h2>Total Course</h2>
-
-        <strong><?php echo $stats['courses']; ?></strong>
-
+                    <h2><?php echo $value['value']; ?></h2>
+                </div>
+        <?php endforeach;
+        endif; ?>
     </div>
+
 </div>

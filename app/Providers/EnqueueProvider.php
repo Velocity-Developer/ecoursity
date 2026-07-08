@@ -4,18 +4,35 @@ namespace Ecoursity\App\Providers;
 
 class EnqueueProvider
 {
-
-    private $resource_uri;
+    private string $resourceUri;
 
     public function __construct()
     {
-        $this->resource_uri = ECOURSITY_URL . 'resources/css/';
+        $this->resourceUri = ECOURSITY_URL . 'resources/css/';
     }
 
-    public function register()
+    public function register(): void
     {
-        add_action('admin_enqueue_scripts', function () {
-            wp_enqueue_style('ecoursity-admin-style', $this->resource_uri . '/ecoursity-admin.css');
+        add_action('admin_enqueue_scripts', function (): void {
+            wp_enqueue_style('ecoursity-admin-style', $this->resourceUri . '/ecoursity-admin.css');
+            wp_enqueue_script(
+                'alpinejs',
+                'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
+                [],
+                '3.14.9',
+                true
+            );
+        });
+
+        add_action('wp_enqueue_scripts', function (): void {
+            wp_enqueue_style('ecoursity-style', $this->resourceUri . '/ecoursity-public.css');
+            wp_enqueue_script(
+                'alpinejs',
+                'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
+                [],
+                '3.14.9',
+                true
+            );
         });
     }
 }

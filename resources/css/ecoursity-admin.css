@@ -1,9 +1,32 @@
+.ecoursity-admin-layout {
+    padding: .5rem .5rem;
+}
 .ecoursity-admin-layout .card {
     transition: all 0.3s ease-in-out;
     box-shadow: 0 0 0px rgba(0, 0, 0, 0.1);
+    min-width: auto;
+    width: 100%;
 }
 .ecoursity-admin-layout .card:hover {
     transition: all 0.3s ease-in-out;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     transform: translateY(-5px);
+}
+.ecoursity-flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+@media screen and (min-width: 768px) {
+    .ecoursity-admin-layout {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .ecoursity-flex {
+        flex-wrap: nowrap;
+    }
 }
