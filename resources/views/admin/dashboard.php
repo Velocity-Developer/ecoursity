@@ -1,11 +1,11 @@
-<h1>Dashboard Ecoursity</h1>
+<div class="ecoursity-admin-layout">
+    <h1>Ecoursity</h1>
 
-<div class="card">
+    <div class="card">
 
-    <h2>Total Course</h2>
+        <h2>Total Course</h2>
 
-    <strong><?php echo $stats['courses']; ?></strong>
+        <strong><?php echo $stats['courses']; ?></strong>
 
-    <pre><?php echo print_r($stats); ?></pre>
-
+    </div>
 </div>
