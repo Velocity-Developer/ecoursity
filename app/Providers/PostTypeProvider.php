@@ -16,6 +16,7 @@ class PostTypeProvider
             'public' => true,
             'has_archive' => true,
             'rewrite' => ['slug' => 'kursus'],
+            'show_in_menu' => false,
         ]);
     }
 

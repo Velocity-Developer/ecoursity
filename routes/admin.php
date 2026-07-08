@@ -19,8 +19,7 @@ return [
         'slug' => 'ecoursity-student',
         'controller' => Ecoursity\App\Http\Controllers\Admin\StudentController::class,
         'method' => 'index',
-        'icon' => 'dashicons-admin-users',
-        'position' => 25,
+        'parent_slug' => 'ecoursity-dashboard',
     ],
 
 ];
