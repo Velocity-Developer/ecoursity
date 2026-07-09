@@ -2,7 +2,6 @@
 
 namespace Ecoursity\App\Routes;
 
-use Ecoursity\App\Services\TemplateService;
 
 class AdminRoutes
 {

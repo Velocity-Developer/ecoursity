@@ -7,6 +7,7 @@ use Ecoursity\App\Providers\TaxonomyProvider;
 use Ecoursity\App\Providers\AdminServiceProvider;
 use Ecoursity\App\Providers\EnqueueProvider;
 use Ecoursity\App\Providers\UserServiceProvider;
+use Ecoursity\App\Providers\RestApiProvider;
 
 class Init
 {
@@ -17,5 +18,6 @@ class Init
         (new AdminServiceProvider())->register();
         (new EnqueueProvider())->register();
         (new UserServiceProvider())->boot();
+        (new RestApiProvider())->register();
     }
 }

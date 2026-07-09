@@ -4,7 +4,7 @@ namespace Ecoursity\App\Controllers\Admin;
 
 class DashboardController
 {
-    public function index(): string
+    public function index(): array
     {
         $stats = [
             'courses' => [
@@ -29,6 +29,6 @@ class DashboardController
             ],
         ];
 
-        return wp_json_encode($stats);
+        return $stats;
     }
 }
