@@ -4,7 +4,8 @@
     "license": "GPL-2.0-or-later",
     "autoload": {
         "psr-4": {
-            "Ecoursity\\App\\": "app/"
+            "Ecoursity\\App\\": "app/",
+            "Ecoursity\\Inc\\": "inc/"
         }
     },
     "require": {}

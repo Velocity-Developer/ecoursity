@@ -2,21 +2,18 @@
 
 namespace Ecoursity\App\Providers;
 
+use Ecoursity\App\Routes\AdminRoutes;
+use Ecoursity\App\Services\TemplateService;
+
 class AdminServiceProvider
 {
     public function register()
     {
-        $routes = require ECOURSITY_PATH . '/routes/admin.php';
 
-        add_action('admin_menu', function () use ($routes) {
-            foreach ($routes as $route) {
+        add_action('admin_menu', function () {
+            foreach ((new AdminRoutes())->routes() as $route) {
                 $callback = function () use ($route) {
-                    $controller = new $route['controller'];
-
-                    call_user_func([
-                        $controller,
-                        $route['method'],
-                    ]);
+                    TemplateService::view($route['view']);
                 };
 
                 if (isset($route['parent_slug'])) {

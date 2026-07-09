@@ -1,12 +1,10 @@
 <?php
 
-namespace Ecoursity\App\Http\Controllers\Admin;
-
-use Ecoursity\App\Helpers\LayoutHelper;
+namespace Ecoursity\App\Controllers\Admin;
 
 class DashboardController
 {
-    public function index()
+    public function index(): string
     {
         $stats = [
             'courses' => [
@@ -31,6 +29,6 @@ class DashboardController
             ],
         ];
 
-        return LayoutHelper::view('admin.dashboard', compact('stats'));
+        return wp_json_encode($stats);
     }
 }

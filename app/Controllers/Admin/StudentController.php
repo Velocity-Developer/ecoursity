@@ -2,14 +2,12 @@
 
 namespace Ecoursity\App\Http\Controllers\Admin;
 
-use Ecoursity\App\Helpers\LayoutHelper;
-
 class StudentController
 {
-    public function index(): void
+    public function index(): string
     {
         //get all user with role student
         $students = get_users(['role' => 'student']);
-        LayoutHelper::view('admin.student', compact('students'));
+        return wp_json_encode($students);
     }
 }

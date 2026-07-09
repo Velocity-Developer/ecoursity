@@ -8,7 +8,7 @@ use Ecoursity\App\Providers\AdminServiceProvider;
 use Ecoursity\App\Providers\EnqueueProvider;
 use Ecoursity\App\Providers\UserServiceProvider;
 
-class Application
+class Init
 {
     public function boot(): void
     {

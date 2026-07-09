@@ -64,4 +64,4 @@ register_activation_hook(__FILE__, [EcoursityPlugin::class, 'activate']);
 register_deactivation_hook(__FILE__, [EcoursityPlugin::class, 'deactivate']);
 
 (new EcoursityPlugin())->boot();
-(new Ecoursity\App\Application())->boot();
+(new Ecoursity\App\Init())->boot();

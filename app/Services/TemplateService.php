@@ -1,15 +1,15 @@
 <?php
 
-namespace Ecoursity\App\Helpers;
+namespace Ecoursity\App\Services;
 
-class LayoutHelper
+class TemplateService
 {
     public static function view(string $view, array $data = [])
     {
         extract($data);
 
         $file = ECOURSITY_PATH .
-            '/resources/views/' .
+            '/templates/' .
             str_replace('.', '/', $view) .
             '.php';
 
