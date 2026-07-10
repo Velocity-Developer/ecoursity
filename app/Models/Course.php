@@ -16,7 +16,30 @@ class Course
     public string $status = 'draft';
     public string $content = '';
     public string $excerpt = '';
+    public string $thumbnail = '';
     public int $author = 0;
+
+    public string $duration,
+        $level,
+        $max_students,
+        $price,
+        $price_sale,
+        $price_sale_start,
+        $price_sale_end,
+        $course_evaluation,
+        $passing_grade;
+
+    public array $meta_keys = [
+        '_ecoursity_duration',
+        '_ecoursity_level',
+        '_ecoursity_max_students',
+        '_ecoursity_price',
+        '_ecoursity_price_sale',
+        '_ecoursity_price_sale_start',
+        '_ecoursity_price_sale_end',
+        '_ecoursity_course_evaluation',
+        '_ecoursity_passing_grade',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -148,6 +171,11 @@ class Course
             'excerpt' => $post->post_excerpt,
             'status'  => $post->post_status,
             'author'  => (int) $post->post_author,
+            'duration' => $post->meta_value['duration'] ?? '',
+            'price' => $post->meta_value['price'] ?? '',
+            'price_sale' => $post->meta_value['price_sale'] ?? '',
+            'price_sale_start' => $post->meta_value['price_sale_start'] ?? '',
+            'price_sale_end' => $post->meta_value['price_sale_end'] ?? '',
         ]);
     }
 }
