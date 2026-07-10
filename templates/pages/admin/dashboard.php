@@ -17,6 +17,7 @@
                 <?php if ($stats) :
                     foreach ($stats as $key => $value) : ?>
                         <div class="card tw:min-w-35! tw:hover:shadow-md tw:hover:-translate-y-1.25">
+                            <i class="<?php echo $value['icon']; ?>"></i>
                             <p><?php echo $value['title']; ?></p>
 
                             <h2><?php echo $value['value']; ?></h2>
