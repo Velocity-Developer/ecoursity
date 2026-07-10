@@ -17,6 +17,8 @@ class PostTypeProvider
             'has_archive' => true,
             'rewrite' => ['slug' => 'kursus'],
             'show_in_menu' => false,
+            'show_in_rest' => false,
+            'supports' => ['title', 'editor', 'thumbnail', 'comments'],
         ]);
     }
 

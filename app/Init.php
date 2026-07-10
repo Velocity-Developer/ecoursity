@@ -17,7 +17,6 @@ class Init
         (new TaxonomyProvider())->boot();
         (new EnqueueProvider())->register();
         (new UserServiceProvider())->boot();
-        (new RestApiProvider())->register();
         (new AdminRoutes())->register();
     }
 }
