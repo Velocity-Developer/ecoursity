@@ -2,32 +2,40 @@
 
 namespace Ecoursity\App\Controllers\Admin;
 
+use Ecoursity\App\Models\Course;
 use Ecoursity\App\Services\TemplateService;
 
 class DashboardController
 {
     public function index()
     {
+        $courseCounts = wp_count_posts(Course::POST_TYPE);
+        $userCounts = count_users();
+        $roleCounts = $userCounts['avail_roles'] ?? [];
+
+        $publishedCourses = (int) ($courseCounts->publish ?? 0);
+        $draftCourses = (int) ($courseCounts->draft ?? 0);
+
         $stats = [
             'courses' => [
                 'title' => __('Total Kursus'),
-                'value' => 0,
+                'value' => $publishedCourses + $draftCourses,
             ],
             'courses_published' => [
                 'title' => __('Kursus Terbit'),
-                'value' => 0,
+                'value' => $publishedCourses,
             ],
             'courses_draft' => [
                 'title' => __('Kursus Draf'),
-                'value' => 0,
+                'value' => $draftCourses,
             ],
             'students' => [
                 'title' => __('Total Siswa'),
-                'value' => 0,
+                'value' => (int) ($roleCounts['ecoursity_student'] ?? 0),
             ],
             'instructors' => [
                 'title' => __('Total Guru'),
-                'value' => 0,
+                'value' => (int) ($roleCounts['ecoursity_instructor'] ?? 0),
             ],
         ];
 
