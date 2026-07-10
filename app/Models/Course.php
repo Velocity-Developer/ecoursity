@@ -174,11 +174,11 @@ class Course
             'excerpt' => $post->post_excerpt,
             'status'  => $post->post_status,
             'author'  => (int) $post->post_author,
-            'duration' => $post->meta_value['duration'] ?? '',
-            'price' => $post->meta_value['price'] ?? '',
-            'price_sale' => $post->meta_value['price_sale'] ?? '',
-            'price_sale_start' => $post->meta_value['price_sale_start'] ?? '',
-            'price_sale_end' => $post->meta_value['price_sale_end'] ?? '',
+            'duration' => $post->meta_value['_ecoursity_duration'] ?? '',
+            'price' => $post->meta_value['_ecoursity_price'] ?? 0,
+            'price_sale' => $post->meta_value['_ecoursity_price_sale'] ?? '',
+            'price_sale_start' => $post->meta_value['_ecoursity_price_sale_start'] ?? '',
+            'price_sale_end' => $post->meta_value['_ecoursity_price_sale_end'] ?? '',
         ]);
     }
 }

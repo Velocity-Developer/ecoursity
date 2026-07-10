@@ -12,9 +12,9 @@ class Instructor
 
     public ?int $id = null;
     public string $email = '';
-    public string $displayName = '';
-    public string $firstName = '';
-    public string $lastName = '';
+    public string $display_name = '';
+    public string $first_name = '';
+    public string $last_name = '';
     public array $roles = [];
 
     public function __construct(array $attributes = [])
@@ -58,9 +58,9 @@ class Instructor
         return new self([
             'id' => $user->ID,
             'email' => (string) $user->user_email,
-            'displayName' => (string) $user->display_name,
-            'firstName' => (string) $user->first_name,
-            'lastName' => (string) $user->last_name,
+            'display_name' => (string) $user->display_name,
+            'first_name' => (string) $user->first_name,
+            'last_name' => (string) $user->last_name,
             'roles' => $user->roles,
         ]);
     }

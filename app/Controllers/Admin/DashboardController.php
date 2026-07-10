@@ -3,7 +3,7 @@
 namespace Ecoursity\App\Controllers\Admin;
 
 use Ecoursity\App\Models\Course;
-use Ecoursity\App\Services\TemplateService;
+use Ecoursity\App\Template;
 
 class DashboardController
 {
@@ -46,6 +46,6 @@ class DashboardController
 
         $list_newest_courses = Course::all();
 
-        return TemplateService::view('pages/admin/dashboard', compact('stats', 'list_newest_courses'));
+        return Template::view('pages/admin/dashboard', compact('stats', 'list_newest_courses'));
     }
 }

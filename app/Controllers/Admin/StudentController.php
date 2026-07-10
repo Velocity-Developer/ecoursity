@@ -2,7 +2,7 @@
 
 namespace Ecoursity\App\Controllers\Admin;
 
-use Ecoursity\App\Services\TemplateService;
+use Ecoursity\App\Template;
 use Ecoursity\App\Models\Student;
 
 class StudentController
@@ -11,6 +11,6 @@ class StudentController
     {
         $students = Student::all();
 
-        return TemplateService::view('pages/admin/student', compact('students'));
+        return Template::view('pages/admin/student', compact('students'));
     }
 }
