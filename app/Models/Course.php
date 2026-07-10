@@ -19,8 +19,7 @@ class Course
     public string $thumbnail = '';
     public int $author = 0;
 
-    public string $duration,
-        $level,
+    public string $level,
         $max_students,
         $price,
         $price_sale,
@@ -28,6 +27,8 @@ class Course
         $price_sale_end,
         $course_evaluation,
         $passing_grade;
+
+    public array $duration;
 
     public array $meta_keys = [
         '_ecoursity_duration',

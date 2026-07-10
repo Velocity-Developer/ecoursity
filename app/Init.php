@@ -7,6 +7,7 @@ use Ecoursity\App\Providers\TaxonomyProvider;
 use Ecoursity\App\Providers\EnqueueProvider;
 use Ecoursity\App\Providers\UserServiceProvider;
 use Ecoursity\App\Providers\RestApiProvider;
+use Ecoursity\App\Providers\MetaboxPostProvider;
 use Ecoursity\App\Routes\AdminRoutes;
 
 class Init
@@ -18,5 +19,6 @@ class Init
         (new EnqueueProvider())->register();
         (new UserServiceProvider())->boot();
         (new AdminRoutes())->register();
+        (new MetaboxPostProvider())->boot();
     }
 }

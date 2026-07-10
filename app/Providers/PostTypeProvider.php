@@ -2,6 +2,8 @@
 
 namespace Ecoursity\App\Providers;
 
+use Ecoursity\App\Models\Course;
+
 class PostTypeProvider
 {
     public function boot()
@@ -11,7 +13,7 @@ class PostTypeProvider
 
     public function register(): void
     {
-        register_post_type('ecoursity_course', [
+        register_post_type(Course::POST_TYPE, [
             'labels' => $this->makeLabels(__('Kursus')),
             'public' => true,
             'has_archive' => true,
