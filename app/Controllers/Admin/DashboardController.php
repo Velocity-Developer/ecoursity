@@ -41,6 +41,6 @@ class DashboardController
 
         $list_newest_courses = Course::all();
 
-        return TemplateService::view('admin/dashboard', compact('stats', 'list_newest_courses'));
+        return TemplateService::view('pages/admin/dashboard', compact('stats', 'list_newest_courses'));
     }
 }

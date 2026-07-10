@@ -11,6 +11,6 @@ class StudentController
     {
         $students = Student::all();
 
-        return TemplateService::view('admin/student', compact('students'));
+        return TemplateService::view('pages/admin/student', compact('students'));
     }
 }
