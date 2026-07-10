@@ -2,33 +2,35 @@
 
 namespace Ecoursity\App\Controllers\Admin;
 
+use Ecoursity\App\Services\TemplateService;
+
 class DashboardController
 {
-    public function index(): array
+    public function index()
     {
         $stats = [
             'courses' => [
                 'title' => __('Total Kursus'),
-                'value' => 15,
+                'value' => 0,
             ],
             'courses_published' => [
                 'title' => __('Kursus Terbit'),
-                'value' => 5,
+                'value' => 0,
             ],
             'courses_draft' => [
                 'title' => __('Kursus Draf'),
-                'value' => 3,
+                'value' => 0,
             ],
             'students' => [
                 'title' => __('Total Siswa'),
-                'value' => 235,
+                'value' => 0,
             ],
             'instructors' => [
                 'title' => __('Total Guru'),
-                'value' => 12,
+                'value' => 0,
             ],
         ];
 
-        return $stats;
+        return TemplateService::view('admin/dashboard', compact('stats'));
     }
 }

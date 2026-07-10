@@ -4,10 +4,10 @@ namespace Ecoursity\App;
 
 use Ecoursity\App\Providers\PostTypeProvider;
 use Ecoursity\App\Providers\TaxonomyProvider;
-use Ecoursity\App\Providers\AdminServiceProvider;
 use Ecoursity\App\Providers\EnqueueProvider;
 use Ecoursity\App\Providers\UserServiceProvider;
 use Ecoursity\App\Providers\RestApiProvider;
+use Ecoursity\App\Routes\AdminRoutes;
 
 class Init
 {
@@ -15,9 +15,9 @@ class Init
     {
         (new PostTypeProvider())->boot();
         (new TaxonomyProvider())->boot();
-        (new AdminServiceProvider())->register();
         (new EnqueueProvider())->register();
         (new UserServiceProvider())->boot();
         (new RestApiProvider())->register();
+        (new AdminRoutes())->register();
     }
 }

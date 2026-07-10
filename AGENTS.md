@@ -86,7 +86,7 @@ ecoursity/
 ├── ecoursity.php
 ├── vendor/
 │
-├── src/
+├── app/
 │
 │   ├── Core/
 │   ├── Providers/

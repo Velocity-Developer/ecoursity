@@ -1,6 +1,6 @@
 <?php
 
-namespace Ecoursity\App\Http\Controllers\Admin;
+namespace Ecoursity\App\Controllers\Admin;
 
 class StudentController
 {
