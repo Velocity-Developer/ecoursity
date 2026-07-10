@@ -21,14 +21,16 @@ class Course
 
     public string $level,
         $max_students,
-        $price,
-        $price_sale,
         $price_sale_start,
         $price_sale_end,
         $course_evaluation,
         $passing_grade;
 
-    public array $duration;
+    public string $duration;
+
+    public string
+        $price,
+        $price_sale;
 
     public array $meta_keys = [
         '_ecoursity_duration',
