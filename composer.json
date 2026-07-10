@@ -8,5 +8,15 @@
             "Ecoursity\\Inc\\": "inc/"
         }
     },
-    "require": {}
+    "autoload-dev": {
+        "psr-4": {
+            "Ecoursity\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.24"
+    },
+    "scripts": {
+        "seed": "php tests/seed.php"
+    }
 }
