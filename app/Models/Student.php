@@ -15,6 +15,8 @@ class Student
     public string $displayName = '';
     public string $firstName = '';
     public string $lastName = '';
+    public string $userLogin = '';
+    public string $userRegistered = '';
     public array $roles = [];
 
     public function __construct(array $attributes = [])
@@ -58,10 +60,27 @@ class Student
         return new self([
             'id' => $user->ID,
             'email' => (string) $user->user_email,
+            'userLogin' => (string) $user->user_login,
+            'userRegistered' => (string) $user->user_registered,
             'displayName' => (string) $user->display_name,
             'firstName' => (string) $user->first_name,
             'lastName' => (string) $user->last_name,
             'roles' => $user->roles,
         ]);
+    }
+
+    //all
+    public static function all(): array
+    {
+        $users = get_users([
+            'role' => self::ROLE,
+            'orderby' => 'display_name',
+            'order' => 'ASC',
+            'count' => 25,
+        ]);
+
+        return array_map(function (WP_User $user) {
+            return self::fromUser($user);
+        }, $users);
     }
 }

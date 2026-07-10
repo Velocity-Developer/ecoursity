@@ -2,12 +2,15 @@
 
 namespace Ecoursity\App\Controllers\Admin;
 
+use Ecoursity\App\Services\TemplateService;
+use Ecoursity\App\Models\Student;
+
 class StudentController
 {
-    public function index(): string
+    public function index()
     {
-        //get all user with role student
-        $students = get_users(['role' => 'student']);
-        return wp_json_encode($students);
+        $students = Student::all();
+
+        return TemplateService::view('admin/student', compact('students'));
     }
 }
