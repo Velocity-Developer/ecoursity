@@ -2,6 +2,8 @@
 
 namespace Ecoursity\App\Providers;
 
+use Ecoursity\App\Template;
+
 class EnqueueProvider
 {
     private string $resourceUri;
@@ -35,6 +37,10 @@ class EnqueueProvider
                 '3.14.9',
                 true
             );
+        });
+
+        add_action('admin_footer', function (): void {
+            Template::component('UiModal');
         });
     }
 }
