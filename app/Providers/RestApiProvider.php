@@ -6,17 +6,16 @@ use Ecoursity\App\Routes\ApiRoutes;
 
 class RestApiProvider
 {
-    private $prefix = 'ecoursity';
-
-    public function register()
+    public function register(): void
     {
-        add_action('rest_api_init', function () {
+        $apiRoutes = new ApiRoutes();
 
-            $routes = (new ApiRoutes())->routes();
-            foreach ($routes as $route) {
-                register_rest_route($this->prefix, $route['route'], [
+        add_action('rest_api_init', static function () use ($apiRoutes): void {
+            foreach ($apiRoutes->routes() as $route) {
+                register_rest_route($apiRoutes->namespace(), $route['route'], [
                     'methods' => $route['methods'],
                     'callback' => $route['callback'],
+                    'permission_callback' => $route['permission_callback'],
                 ]);
             }
         });
