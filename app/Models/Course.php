@@ -63,7 +63,7 @@ class Course
         $query = new WP_Query(array_merge([
             'post_type'      => self::POST_TYPE,
             'post_status'    => 'publish',
-            'posts_per_page' => -1,
+            'posts_per_page' => 25,
         ], $args));
 
         return array_map(

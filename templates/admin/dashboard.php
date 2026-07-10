@@ -10,16 +10,53 @@
         Ecoursity
     </h1>
 
-    <div class="ecoursity-flex">
-        <?php if ($stats) :
-            foreach ($stats as $key => $value) : ?>
-                <div class="card">
-                    <p><?php echo $value['title']; ?></p>
+    <div class="tw:grid tw:grid-cols-6 tw:gap-4">
 
-                    <h2><?php echo $value['value']; ?></h2>
+        <div class="tw:col-span-6 tw:overflow-auto">
+            <div class="tw:flex! tw:item-center tw:justify-start tw:gap-4">
+                <?php if ($stats) :
+                    foreach ($stats as $key => $value) : ?>
+                        <div class="card tw:min-w-35! tw:hover:shadow-md tw:hover:-translate-y-1.25">
+                            <p><?php echo $value['title']; ?></p>
+
+                            <h2><?php echo $value['value']; ?></h2>
+                        </div>
+                <?php endforeach;
+                endif; ?>
+            </div>
+        </div>
+
+        <div class="tw:col-span-6 tw:md:col-span-4">
+            <div class="card tw:w-full tw:max-w-full! tw:min-h-100">
+                <div class="ecoursity-admin-card-title tw:text-lg tw:font-bold tw:mb-3">
+                    Grafik Pembelian Kursus 30 Hari Terakhir
                 </div>
-        <?php endforeach;
-        endif; ?>
-    </div>
+                <div class="ecoursity-admin-card-body tw:p-3 tw:rounded-xl tw:bg-amber-50 tw:min-h-100">
+                    ---- ---- ----
+                </div>
+            </div>
+        </div>
 
-</div>
+        <div class="tw:col-span-6 tw:md:col-span-2">
+            <div class="ecoursity-admin-card card tw:w-full tw:max-w-full! tw:min-h-100">
+                <div class="ecoursity-admin-card-title tw:text-lg tw:font-bold tw:mb-3">
+                    Kursus Terbaru
+                </div>
+                <div class="ecoursity-admin-card-body tw:min-h-100">
+                    <?php if ($list_newest_courses) : ?>
+                        <ol class="tw:list-decimal">
+                            <?php foreach ($list_newest_courses as $course) : ?>
+                                <li class="tw:mb-2">
+                                    <a href="<?php echo get_permalink($course->id); ?>">
+                                        <?php echo $course->title; ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ol>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
