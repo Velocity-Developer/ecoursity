@@ -2,331 +2,308 @@
 
 # Ecoursity Development Guide
 
-Ecoursity adalah plugin LMS (Learning Management System) modern untuk WordPress.
+## Project Overview
 
-Plugin ini dibangun sebagai aplikasi berbasis MVC dengan arsitektur yang terinspirasi Laravel, namun tetap mengikuti lifecycle WordPress.
+Ecoursity is a modern Learning Management System (LMS) plugin for WordPress.
 
-AI Agent wajib mengikuti seluruh aturan pada dokumen ini.
+The architecture prioritizes:
 
----
+- PSR-4 autoloading
+- REST API first
+- Alpine.js frontend
+- Custom Post Types for content
+- Custom Tables for transactional data
+- Service-oriented architecture
+- Separation of business logic from WordPress APIs
 
-# Philosophy
+WordPress acts primarily as the CMS and authentication layer, while all user interactions should occur through REST API endpoints.
 
-Ecoursity BUKAN plugin WordPress procedural.
-
-Ecoursity adalah aplikasi MVC yang berjalan di dalam WordPress.
-
-Gunakan prinsip:
-
-- Clean Architecture
-- SOLID
-- DRY
-- Single Responsibility
-- Dependency Injection
-- Service Layer
-- Repository Pattern bila diperlukan
-
-Jangan membuat kode procedural.
-
----
+***
 
 # Tech Stack
 
 Backend
 
-- PHP 8.2+
-- WordPress Latest
-- WP REST API
+- PHP >= 8.2
+- WordPress >= 6.8
 - Composer
-- PSR-4 Autoload
+- PSR-4
+- wpdb
+- WordPress REST API
 
 Frontend
 
-- AlpineJS
-- Vanilla ES Modules
-- CSS Custom Properties
-- Tanpa jQuery
+- Alpine.js
+- Fetch API
 
-Database
+***
 
-- wpdb
-- Custom Tables jika diperlukan
+# Coding Standards
 
----
+- Follow PSR-12.
+- Every class must have a single responsibility.
+- Avoid global functions whenever possible.
+- Avoid static classes except for Helpers.
+- Use dependency injection whenever possible.
+- Never place business logic inside Controllers.
+- Never access `$wpdb` directly from Controllers.
+- Never access CPT directly from Alpine components.
 
-# Folder Structure
-
-Gunakan struktur berikut.
-
-```
-ecousity/
-
-│
-├── app/
-│
-│   ├── Controllers/
-│   │
-│   ├── Models/
-│   │
-│   ├── Services/
-│   │
-│   ├── Repositories/
-│   │
-│   ├── Requests/
-│   │
-│   ├── Resources/
-│   │
-│   ├── Middleware/
-│   │
-│   ├── Policies/
-│   │
-│   ├── Validators/
-│   │
-│   ├── Traits/
-│   │
-│   ├── Helpers/
-│   │
-│   ├── Providers/
-│   │
-│   ├── Routes/
-│   │
-│   └── Core/
-│
-├── bootstrap/
-│
-├── config/
-│
-├── database/
-│
-│   ├── migrations/
-│   ├── seeders/
-│   └── factories/
-│
-├── resources/
-│
-│   ├── css/
-│   ├── js/
-│   ├── images/
-│   └── views/
-│
-├── routes/
-│
-│   └── api.php
-│
-├── storage/
-│
-│   ├── cache/
-│   ├── logs/
-│   └── temp/
-│
-├── vendor/
-│
-├── ecousity.php
-├── uninstall.php
-├── composer.json
-└── README.md
-```
-
----
+***
 
 # Architecture
 
-Request Flow
-
 ```
 Browser
-
-↓
-
-AlpineJS
-
-↓
-
-WP REST API
-
-↓
-
-Route
-
-↓
-
-Controller
-
-↓
-
-Request Validation
-
-↓
-
+    │
+    ▼
+Alpine.js
+    │
+Fetch API
+    │
+    ▼
+REST Controller
+    │
+    ▼
 Service
-
-↓
-
+    │
+    ▼
 Repository
-
-↓
-
-Model
-
-↓
-
-Database
+    │
+    ▼
+WordPress
+(CPT / wpdb)
 ```
 
-Controller tidak boleh berisi business logic.
+***
 
-Semua business logic berada pada Service.
+# Directory Structure
 
----
+```
+ecoursity/
 
-# Models
+├── composer.json
+├── ecoursity.php
+├── vendor/
+│
+├── src/
+│
+│   ├── Core/
+│   ├── Providers/
+│   ├── Controllers/
+│   ├── Services/
+│   ├── Repositories/
+│   ├── Models/
+│   ├── PostTypes/
+│   ├── Database/
+│   ├── Api/
+│   ├── Support/
+│   └── Helpers/
+│
+├── resources/
+│   ├── js/
+│   ├── css/
+│   └── images/
+│
+├── build/
+│
+├── templates/
+│
+└── languages/
+```
 
-Model hanya bertanggung jawab terhadap data.
+***
 
-Model tidak boleh melakukan:
+# Layer Responsibilities
 
-- rendering
-- request
-- redirect
+## Controller
 
-Model boleh:
+Responsible for:
 
-- query database
-- relasi
-- accessor
-- mutator
+- receiving HTTP requests
+- validating basic request format
+- calling Services
+- returning JSON responses
 
----
+Controllers MUST NOT:
 
-# Controllers
+- execute SQL
+- call wpdb directly
+- contain business logic
 
-Controller maksimal 100-150 baris.
+***
 
-Controller hanya:
+## Service
 
-- menerima request
-- memanggil validator
-- memanggil service
-- mengembalikan response
+Responsible for:
 
----
+- business rules
+- authorization
+- workflow
+- validation
+- transactions
 
-# Services
+Example:
 
-Semua business logic berada di Service.
+Enroll Student
 
-Contoh:
+```
+check login
 
+↓
+
+check course exists
+
+↓
+
+check enrollment
+
+↓
+
+create enrollment
+
+↓
+
+return DTO
+```
+
+***
+
+## Repository
+
+Responsible for:
+
+- database access
+- WordPress queries
+- wpdb
+- WP\_Query
+
+Repositories must not contain business logic.
+
+***
+
+## Models
+
+Models represent domain objects.
+
+Examples:
+
+- Course
+- Lesson
+- Enrollment
+- Progress
+
+Models should not know about HTTP.
+
+***
+
+## Providers
+
+Providers register:
+
+- CPT
+- REST Routes
+- Admin Hooks
+- Assets
+- Cron
+- Shortcodes (if needed)
+
+***
+
+# REST API First
+
+Every frontend interaction should use REST API.
+
+Preferred:
+
+```
+GET    /courses
+
+POST   /enrollments
+
+GET    /me/progress
+```
+
+Avoid:
+
+- admin-post.php
+- AJAX handlers
+- form submissions
+
+unless absolutely necessary.
+
+***
+
+# Custom Post Types
+
+Use CPT only for content.
+
+Examples
+
+- Course
+- Lesson
+
+Never store transactional data inside CPT.
+
+***
+
+# Custom Tables
+
+Use tables for:
+
+- enrollments
+- progress
+- quiz\_attempts
+- certificates
+- orders
+- logs
+- analytics
+
+***
+
+# Naming
+
+Classes
+
+```
 CourseService
-
-EnrollmentService
-
-QuizService
-
-LessonService
-
-CertificateService
-
-ProgressService
-
-OrderService
-
-StudentService
-
-InstructorService
-
----
-
-# Repository
-
-Repository digunakan untuk seluruh query kompleks.
-
-Contoh
-
-CourseRepository
-
 LessonRepository
-
-QuizRepository
-
-UserRepository
-
----
-
-# REST API
-
-Seluruh fitur menggunakan REST API.
-
-Tidak menggunakan admin-ajax.
-
-Namespace
-
-```
-ecousity/v1
+EnrollmentController
+ProgressRepository
 ```
 
-Contoh
-
-GET
+Interfaces
 
 ```
-/courses
+CourseRepositoryInterface
 ```
 
-POST
+Tables
 
 ```
-/courses
+wp_ecoursity_enrollments
+
+wp_ecoursity_progress
+
+wp_ecoursity_quiz_attempts
 ```
 
-GET
+REST Namespace
 
 ```
-/courses/{id}
+ecoursity/v1
 ```
 
-PATCH
+***
 
-```
-/courses/{id}
-```
-
-DELETE
-
-```
-/courses/{id}
-```
-
----
-
-# Validation
-
-Jangan melakukan validasi di Controller.
-
-Gunakan Request Class.
-
-Contoh
-
-```
-StoreCourseRequest
-
-UpdateCourseRequest
-
-StoreLessonRequest
-```
-
----
-
-# Response
-
-Gunakan format JSON yang konsisten.
+# API Response Format
 
 Success
 
 ```json
 {
     "success": true,
-    "message": "Course created.",
+    "message": "Enrollment created.",
     "data": {}
 }
 ```
@@ -336,239 +313,142 @@ Error
 ```json
 {
     "success": false,
-    "message": "Validation failed.",
+    "message": "Course not found.",
     "errors": {}
 }
 ```
 
----
+Always return consistent JSON.
 
-# AlpineJS
+***
 
-Semua interaksi UI menggunakan AlpineJS.
+# Database Rules
 
-Tidak menggunakan:
+Every custom table should have:
 
-- jQuery
-- Vue
-- React
+```
+id
 
-Gunakan:
+created_at
 
-- x-data
-- x-model
-- x-show
-- x-transition
-- x-bind
-- x-for
-- x-effect
+updated_at
+```
 
-Pisahkan state menjadi module kecil.
+If soft delete is needed:
 
----
+```
+deleted_at
+```
 
-# CSS
+Never delete data unless explicitly required.
 
-Gunakan CSS native.
-
-Gunakan:
-
-- CSS Variables
-- Flexbox
-- Grid
-
-Jangan menggunakan Bootstrap.
-
-Jangan menggunakan Tailwind.
-
----
-
-# Views
-
-View hanya berisi HTML.
-
-Business logic dilarang di view.
-
----
+***
 
 # Security
 
-Seluruh endpoint wajib:
+Always:
 
-permission_callback
+- sanitize input
+- escape output
+- verify capabilities
+- verify nonce when required
+- use prepare() for SQL
+- validate permissions
 
-nonce verification
+Never trust client input.
 
-capability check
+***
 
-sanitize
+# Alpine.js
 
-escape
+Frontend must remain lightweight.
 
----
+Rules:
 
-# Authentication
+- No business logic.
+- No SQL assumptions.
+- No duplicated validation.
+- Only consume REST API.
 
-Gunakan autentikasi bawaan WordPress.
-
-Jangan membuat sistem login sendiri.
-
-Gunakan:
-
-Current User
-
-Roles
-
-Capabilities
-
-Nonce
-
----
-
-# Database
-
-Gunakan custom table hanya jika memang diperlukan.
-
-Misalnya:
-
-courses
-
-lessons
-
-enrollments
-
-quiz_attempts
-
-course_progress
-
-certificates
-
-orders
-
-Jangan menyimpan data kompleks pada wp_options.
-
----
-
-# Naming Convention
-
-Controller
+Preferred flow:
 
 ```
-CourseController
+load()
+
+↓
+
+fetch()
+
+↓
+
+update state
+
+↓
+
+render
 ```
 
-Service
-
-```
-CourseService
-```
-
-Repository
-
-```
-CourseRepository
-```
-
-Model
-
-```
-Course
-```
-
-Request
-
-```
-StoreCourseRequest
-```
-
-Policy
-
-```
-CoursePolicy
-```
-
----
-
-# Coding Standard
-
-PHP
-
-PSR-12
-
-WordPress Coding Standard
-
-Gunakan
-
-typed property
-
-return type
-
-constructor promotion
-
-readonly jika memungkinkan
-
-enum jika diperlukan
-
----
+***
 
 # Dependency Injection
 
-Selalu gunakan constructor injection.
-
-Contoh
+Preferred
 
 ```php
-public function __construct(
-    CourseService $service
-) {}
+class CourseService
+{
+    public function __construct(
+        private CourseRepository $repository
+    ) {}
+}
 ```
 
----
+Avoid creating dependencies inside methods.
 
-# AI Rules
+***
 
-Saat menghasilkan kode:
+# Error Handling
 
-Jangan membuat kode procedural.
+Use Exceptions inside Services.
 
-Jangan membuat HTML di Controller.
+Controllers convert exceptions into JSON responses.
 
-Jangan membuat SQL di Controller.
+Never expose raw PHP errors.
 
-Jangan menggunakan admin-ajax.
+***
 
-Gunakan WP REST API.
+# Future Features
 
-Gunakan AlpineJS.
+Architecture should support:
 
-Gunakan MVC.
+- Quiz
+- Assignment
+- Certificate
+- Payment
+- Subscription
+- Instructor
+- Drip Content
+- Live Class
+- Discussion
+- Notifications
+- Reporting
+- Multi Instructor
 
-Gunakan Service Layer.
+without restructuring existing code.
 
-Gunakan Request Validation.
+***
 
-Gunakan Repository bila query mulai kompleks.
+# General Principles
 
-Selalu gunakan type declaration.
+- Prefer composition over inheritance.
+- Keep classes small.
+- Keep methods short.
+- Avoid duplicated code.
+- Write readable code.
+- Favor maintainability over cleverness.
+- Business logic belongs in Services.
+- Database logic belongs in Repositories.
+- Controllers remain thin.
+- Frontend communicates exclusively through REST API.
 
-Selalu gunakan namespace.
-
-Ikuti PSR-4.
-
-Jangan menggunakan Singleton kecuali benar-benar diperlukan.
-
----
-
-# Code Quality
-
-Kode yang dihasilkan harus:
-
-- Production Ready
-- Modular
-- Testable
-- Maintainable
-- SOLID
-- DRY
-- KISS
-- Secure
-- Readable
+Ecoursity should feel like a modern Laravel-style application running inside WordPress while remaining fully compatible with WordPress standards.
