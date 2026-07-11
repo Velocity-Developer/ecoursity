@@ -82,34 +82,62 @@ WordPress
 ```
 ecoursity/
 
+├── .gitignore
 ├── composer.json
+├── composer.lock
 ├── ecoursity.php
+├── LICENSE
+├── README.md
 ├── vendor/
 │
 ├── app/
-│
-│   ├── Core/
-│   ├── Providers/
+│   ├── Init.php
+│   ├── Template.php
 │   ├── Controllers/
-│   ├── Services/
-│   ├── Repositories/
+│   │   ├── CourseController.php
+│   │   ├── TemplateController.php
+│   │   └── Admin/
+│   │       ├── DashboardController.php
+│   │       └── StudentController.php
+│   ├── Helpers/
+│   │   └── Str.php
 │   ├── Models/
-│   ├── PostTypes/
-│   ├── Database/
-│   ├── Api/
-│   ├── Support/
-│   └── Helpers/
+│   │   ├── Course.php
+│   │   ├── Instructor.php
+│   │   ├── Lesson.php
+│   │   └── Student.php
+│   ├── Providers/
+│   │   ├── EnqueueProvider.php
+│   │   ├── MetaboxPostProvider.php
+│   │   ├── PostTypeProvider.php
+│   │   ├── TaxonomyProvider.php
+│   │   └── UserServiceProvider.php
+│   └── Routes/
+│       ├── AdminRoutes.php
+│       └── ApiRoutes.php
 │
-├── resources/
-│   ├── js/
-│   ├── css/
-│   └── images/
-│
-├── build/
+├── assets/
+│   └── css/
+│       ├── ecoursity-admin.css
+│       ├── ecoursity-main.css
+│       └── ecoursity-public.css
 │
 ├── templates/
+│   ├── components/
+│   │   ├── CoursePreview.php
+│   │   ├── CourseTableLists.php
+│   │   └── UiModal.php
+│   └── pages/
+│       └── admin/
+│           ├── courses.php
+│           ├── dashboard.php
+│           └── student.php
 │
-└── languages/
+└── tests/
+    ├── seed.php
+    └── Seeders/
+        ├── InstructorSeeder.php
+        └── StudentSeeder.php
 ```
 
 ***
