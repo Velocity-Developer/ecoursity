@@ -7,27 +7,26 @@ description: "Shopifi-inspired design system for Ecoursity UI — light/cream ca
 
 Shopifi-inspired design language — a clean, editorial commerce UI on a light canvas with cream/warm surfaces, pill-shaped buttons, aloe green accents, and thin-weight display type.
 
-All values use Tailwind classes (`tw:` prefix).
+**All CSS must be written to `../assets\css\ecoursity-main.css`.**
+**CSS variables (`--ecoursity-*`) are already defined there — add new component/utility CSS below the `:root` block.**
 
 ## Colors
 
-| Token | Tailwind | Hex | Usage |
-|-------|----------|-----|-------|
-| `primary` | `tw:bg-black` / `tw:text-black` | `#000000` | Pill fill, ink |
-| `on-primary` | `tw:text-white` | `#ffffff` | Text on dark fills |
-| `canvas-light` | `tw:bg-white` | `#ffffff` | Default surface |
-| `canvas-cream` | `tw:bg-[#fbfbf5]` | `#fbfbf5` | Page background, sections |
-| `aloe-10` | `tw:bg-[#c1fbd4]` / `tw:text-[#c1fbd4]` | `#c1fbd4` | Featured tier, mint accent |
-| `pistachio-10` | `tw:bg-[#d4f9e0]` | `#d4f9e0` | Section band fill |
-| `shade-30` | `tw:bg-zinc-200` | `#d4d4d8` | Tag/chip BG |
-| `shade-40` | `tw:text-zinc-400` | `#a1a1aa` | Tertiary text |
-| `shade-50` | `tw:text-zinc-500` | `#71717a` | Secondary text |
-| `shade-60` | `tw:text-zinc-600` | `#52525b` | Tertiary text |
-| `shade-70` | `tw:bg-zinc-700` | `#3f3f46` | Pressed pill state |
-| `hairline-light` | `tw:border-zinc-200` | `#e4e4e7` | Card borders, dividers |
-| `ink` | `tw:text-black` | `#000000` | Primary text |
-
-Opacity: `tw:bg-black/10` `tw:text-black/60` `tw:border-zinc-200/50`
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--ecoursity-primary` | `#000000` | Pill fill, ink |
+| `--ecoursity-on-primary` | `#ffffff` | Text on dark fills |
+| `--ecoursity-canvas-light` | `#ffffff` | Default surface |
+| `--ecoursity-canvas-cream` | `#fbfbf5` | Page background, sections |
+| `--ecoursity-aloe-10` | `#c1fbd4` | Featured tier, mint accent |
+| `--ecoursity-pistachio-10` | `#d4f9e0` | Section band fill |
+| `--ecoursity-shade-30` | `#d4d4d8` | Tag/chip BG |
+| `--ecoursity-shade-40` | `#a1a1aa` | Tertiary text |
+| `--ecoursity-shade-50` | `#71717a` | Secondary text |
+| `--ecoursity-shade-60` | `#52525b` | Tertiary text |
+| `--ecoursity-shade-70` | `#3f3f46` | Pressed pill state |
+| `--ecoursity-hairline-light` | `#e4e4e7` | Card borders, dividers |
+| `--ecoursity-ink` | `#000000` | Primary text |
 
 ## Typography
 
@@ -36,107 +35,107 @@ Font stack:
 - **Body/UI**: `"Inter Variable", "Inter", "Helvetica", "Arial", sans-serif` (weight 420–550)
 - **Code**: `"ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", monospace`
 
-Global: enable `font-feature-settings: "ss03"` — the brand's character-level signature.
+Global: `font-feature-settings: "ss03"` — the brand's character-level signature.
 
-| Token | Tailwind | Size | Wt | Use |
-|-------|----------|------|----|-----|
-| `display-lg` | `tw:text-[55px] tw:font-[330] tw:leading-[1.16]` | 55px | 330 | Page title |
-| `display-md` | `tw:text-[48px] tw:font-[330] tw:leading-[1.14]` | 48px | 330 | Section headline |
-| `heading-xl` | `tw:text-[28px] tw:font-medium tw:leading-[1.28] tw:tracking-[0.42px]` | 28px | 500 | Card / tier name |
-| `heading-lg` | `tw:text-[24px] tw:font-normal tw:leading-[1.14] tw:tracking-[0.36px]` | 24px | 400 | Compact card title |
-| `heading-md` | `tw:text-[20px] tw:font-medium tw:leading-[1.4] tw:tracking-[0.3px]` | 20px | 500 | Sub-heading |
-| `heading-sm` | `tw:text-[18px] tw:font-medium tw:leading-[1.25] tw:tracking-[0.72px]` | 18px | 500 | Eyebrow label |
-| `body-lg` | `tw:text-lg tw:font-semibold tw:leading-[1.56]` | 18px | 550 | Marketing lead |
-| `body-md` | `tw:text-base` | 16px | 420 | Default body, buttons |
-| `body-strong` | `tw:text-base tw:font-semibold` | 16px | 550 | Emphasized body |
-| `caption` | `tw:text-sm tw:font-medium tw:leading-[1.49] tw:tracking-[0.28px]` | 14px | 500 | Helpers, footnotes |
-| `micro` | `tw:text-[13px] tw:font-medium tw:leading-[1.5] tw:tracking-[-0.13px]` | 13px | 500 | Pricing fine print |
-| `eyebrow-cap` | `tw:text-xs tw:font-normal tw:leading-[1.2] tw:tracking-[0.72px] tw:uppercase` | 12px | 400 | All-caps eyebrow |
-| `code` | `tw:text-base tw:font-mono` | 16px | 400 | Code blocks |
+| Token | Size | Weight | Line H | Letter Sp | Use |
+|-------|------|--------|--------|-----------|-----|
+| `display-lg` | 55px | 330 | 1.16 | 0 | Page title |
+| `display-md` | 48px | 330 | 1.14 | 0 | Section headline |
+| `heading-xl` | 28px | 500 | 1.28 | 0.42px | Card / tier name |
+| `heading-lg` | 24px | 400 | 1.14 | 0.36px | Compact card title |
+| `heading-md` | 20px | 500 | 1.4 | 0.3px | Sub-heading |
+| `heading-sm` | 18px | 500 | 1.25 | 0.72px | Eyebrow label |
+| `body-lg` | 18px | 550 | 1.56 | 0 | Marketing lead |
+| `body-md` | 16px | 420 | 1.5 | 0 | Default body, buttons |
+| `body-strong` | 16px | 550 | 1.5 | 0 | Emphasized body |
+| `caption` | 14px | 500 | 1.49 | 0.28px | Helpers, footnotes |
+| `micro` | 13px | 500 | 1.5 | -0.13px | Pricing fine print |
+| `eyebrow-cap` | 12px | 400 | 1.2 | 0.72px | All-caps eyebrow, uppercase |
+| `code` | 16px | 400 | 1.5 | 0 | Code blocks, monospace |
 
 ## Border Radius
 
-| Token | Tailwind | Value | Use |
-|-------|----------|-------|-----|
-| `xs` | `tw:rounded-[4px]` | 4px | Inputs, hairline tags |
-| `sm` | `tw:rounded-[5px]` | 5px | Small image containers |
-| `md` | `tw:rounded-[8px]` | 8px | Form inputs, video frames |
-| `lg` | `tw:rounded-[12px]` | 12px | Pricing cards, feature cards |
-| `xl` | `tw:rounded-[20px]` | 20px | Hero photo frames |
-| `pill` | `tw:rounded-full` | 9999px | **All** buttons, tags, chips |
+| Token | Value | Use |
+|-------|-------|-----|
+| `--ecoursity-radius-xs` | 4px | Inputs, hairline tags |
+| `--ecoursity-radius-sm` | 5px | Small image containers |
+| `--ecoursity-radius-md` | 8px | Form inputs, video frames |
+| `--ecoursity-radius-lg` | 12px | Pricing cards, feature cards |
+| `--ecoursity-radius-xl` | 20px | Hero photo frames |
+| `--ecoursity-radius-pill` | 9999px | **All** buttons, tags, chips |
 
-**Rule**: Buttons are **always** `tw:rounded-full`. Never use rounded-rectangle for buttons.
+**Rule**: Buttons are **always** `border-radius: 9999px`. Never use rounded-rectangle for buttons.
 
 ## Spacing
 
 Base unit: 8px
 
-| Token | Tailwind | Value |
-|-------|----------|-------|
-| `xxs` | `tw:p-[2px]` | 2px |
-| `xs` | `tw:p-1` | 4px |
-| `sm` | `tw:p-2` | 8px |
-| `md` | `tw:p-3` | 12px |
-| `lg` | `tw:p-4` | 16px |
-| `xl` | `tw:p-6` | 24px |
-| `xxl` | `tw:p-8` | 32px |
-| `huge` | `tw:p-16` | 64px |
+| Token | Value |
+|-------|-------|
+| `--ecoursity-space-xxs` | 2px |
+| `--ecoursity-space-xs` | 4px |
+| `--ecoursity-space-sm` | 8px |
+| `--ecoursity-space-md` | 12px |
+| `--ecoursity-space-lg` | 16px |
+| `--ecoursity-space-xl` | 24px |
+| `--ecoursity-space-xxl` | 32px |
+| `--ecoursity-space-huge` | 64px |
 
 Section padding: ~48px on transactional pages (density for scannability).
 
 ## Elevation
 
-| Level | Tailwind | Use |
-|-------|----------|-----|
+| Level | Shadow | Use |
+|-------|--------|-----|
 | 0 | None | Default surface |
-| 1 | `tw:shadow-[0_8px_8px_rgba(0,0,0,0.1),0_4px_4px_rgba(0,0,0,0.1),0_2px_2px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.1)]` | Pricing cards — stacked soft shadows |
-| 2 | `tw:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]` | Modal / floating panel |
+| 1 | `0 8px 8px rgba(0,0,0,0.1), 0 4px 4px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.1)` | Pricing cards — stacked soft shadows |
+| 2 | `0 25px 50px -12px rgba(0,0,0,0.25)` | Modal / floating panel |
 
 ## Components
 
-### Buttons — **always** `tw:rounded-full`
+### Buttons — always `border-radius: 9999px`
 
-| Component | Classes | Notes |
-|-----------|---------|-------|
-| `button-primary-pill` | `tw:rounded-full tw:bg-black tw:text-white tw:px-6 tw:py-3 tw:text-base` | Dominant CTA |
-| `button-primary-pill-pressed` | `tw:rounded-full tw:bg-zinc-700 tw:text-white tw:px-6 tw:py-3 tw:text-base` | Pressed state |
-| `button-outline` | `tw:rounded-full tw:bg-white tw:text-black tw:px-6 tw:py-3 tw:text-base tw:border tw:border-black` | Outline CTA |
-| `button-aloe-pill` | `tw:rounded-full tw:bg-[#c1fbd4] tw:text-black tw:px-6 tw:py-3 tw:text-base` | Featured / mint CTA |
+| Component | BG | Text | Border | Padding | Size |
+|-----------|----|------|--------|---------|------|
+| `button-primary-pill` | `#000000` | `#ffffff` | none | 12px 24px | 16px / 420 |
+| `button-primary-pill-pressed` | `#3f3f46` | `#ffffff` | none | 12px 24px | 16px / 420 |
+| `button-outline` | `#ffffff` | `#000000` | 1px solid `#000000` | 12px 24px | 16px / 420 |
+| `button-aloe-pill` | `#c1fbd4` | `#000000` | none | 12px 24px | 16px / 420 |
 
 ### Cards & Containers
 
-| Component | Classes | Notes |
-|-----------|---------|-------|
-| `card-pricing` | `tw:rounded-[12px] tw:bg-white tw:p-8 tw:border tw:border-zinc-200` | Standard pricing |
-| `card-pricing-featured` | `tw:rounded-[12px] tw:bg-[#c1fbd4] tw:p-8` | Featured tier (aloe) |
-| `card-default` | `tw:rounded-[12px] tw:bg-white tw:p-8 tw:border tw:border-zinc-200` | Default content card |
-| `card-pistachio-band` | `tw:rounded-[12px] tw:bg-[#d4f9e0] tw:p-8` | Section band |
+| Component | BG | Radius | Padding | Border |
+|-----------|----|--------|---------|--------|
+| `card-pricing` | `#ffffff` | 12px | 32px | 1px solid `#e4e4e7` |
+| `card-pricing-featured` | `#c1fbd4` | 12px | 32px | none |
+| `card-default` | `#ffffff` | 12px | 32px | 1px solid `#e4e4e7` |
+| `card-pistachio-band` | `#d4f9e0` | 12px | 32px | none |
 
 ### Navigation
 
-| Component | Classes |
-|-----------|---------|
-| `nav-bar` | `tw:bg-white tw:text-black tw:px-6 tw:py-4 tw:text-base tw:border-b tw:border-zinc-200` |
-| `footer` | `tw:bg-white tw:text-black tw:px-6 tw:p-16 tw:text-sm tw:border-t tw:border-zinc-200` |
+| Component | BG | Text | Padding |
+|-----------|----|------|---------|
+| `nav-bar` | `#ffffff` | `#000000` | 16px 24px, border-bottom 1px `#e4e4e7` |
+| `footer` | `#ffffff` | `#000000` | 64px 24px, border-top 1px `#e4e4e7` |
 
 ### Inputs
 
-| Component | Classes |
-|-----------|---------|
-| `text-input` | `tw:rounded-[8px] tw:bg-white tw:text-black tw:px-3 tw:py-[10px] tw:text-base tw:border tw:border-zinc-200` |
+| Component | BG | Text | Radius | Padding | Border |
+|-----------|----|------|--------|---------|--------|
+| `text-input` | `#ffffff` | `#000000` | 8px | 10px 12px | 1px solid `#e4e4e7` |
 
-### Pills & Tags — **always** `tw:rounded-full`
+### Pills & Tags — always `border-radius: 9999px`
 
-| Component | Classes |
-|-----------|---------|
-| `pill-tag-mint` | `tw:rounded-full tw:bg-[#c1fbd4] tw:text-black tw:px-3 tw:py-1 tw:text-xs tw:uppercase tw:tracking-[0.72px]` |
-| `pill-tag-shade` | `tw:rounded-full tw:bg-zinc-200 tw:text-black tw:px-3 tw:py-1 tw:text-xs tw:uppercase tw:tracking-[0.72px]` |
+| Component | BG | Text | Padding | Type |
+|-----------|----|------|---------|------|
+| `pill-tag-mint` | `#c1fbd4` | `#000000` | 4px 12px | 12px / 400 uppercase, tracking 0.72px |
+| `pill-tag-shade` | `#d4d4d8` | `#000000` | 4px 12px | 12px / 400 uppercase, tracking 0.72px |
 
 ## Do's
 
-- Use **white** / **cream** canvas (`tw:bg-white` / `tw:bg-[#fbfbf5]`) as the primary background
-- **Pill shape only** for all buttons — `tw:rounded-full`, never rounded-rect
-- Display type at thin weight 330 — `tw:font-[330]`
+- Use **white** / **cream** canvas (`#ffffff` / `#fbfbf5`) as the primary background
+- **Pill shape only** for all buttons — `border-radius: 9999px`, never rounded-rect
+- Display type at thin weight 330
 - Aloe (`#c1fbd4`) for featured tiers and mint accent tags
 - Pistachio (`#d4f9e0`) for wide section band fills
 - Stacked tiny shadows for pricing card depth
@@ -165,30 +164,54 @@ Section padding: ~48px on transactional pages (density for scannability).
 No gradient system — depth comes from **stacked tiny shadows** (Level 1 elevation) and **aloe/pistachio band fills**.
 
 Pricing card elevation:
-```html
-<div class="tw:rounded-[12px] tw:bg-white tw:p-8 tw:border tw:border-zinc-200
-  tw:shadow-[0_8px_8px_rgba(0,0,0,0.1),0_4px_4px_rgba(0,0,0,0.1),0_2px_2px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.1)]">
+```
+box-shadow: 0 8px 8px rgba(0,0,0,0.1),
+            0 4px 4px rgba(0,0,0,0.1),
+            0 2px 2px rgba(0,0,0,0.1),
+            0 0 0 1px rgba(0,0,0,0.1);
 ```
 
-## Tailwind `@theme` Setup (main.css)
+## CSS Setup
 
 ```css
-@import "tailwindcss";
+:root {
+  --ecoursity-primary: #000000;
+  --ecoursity-on-primary: #ffffff;
+  --ecoursity-canvas-light: #ffffff;
+  --ecoursity-canvas-cream: #fbfbf5;
+  --ecoursity-aloe-10: #c1fbd4;
+  --ecoursity-pistachio-10: #d4f9e0;
+  --ecoursity-shade-30: #d4d4d8;
+  --ecoursity-shade-40: #a1a1aa;
+  --ecoursity-shade-50: #71717a;
+  --ecoursity-shade-60: #52525b;
+  --ecoursity-shade-70: #3f3f46;
+  --ecoursity-hairline-light: #e4e4e7;
+  --ecoursity-ink: #000000;
 
-@theme {
-  --color-canvas-cream: #fbfbf5;
-  --color-aloe-10: #c1fbd4;
-  --color-pistachio-10: #d4f9e0;
+  --ecoursity-radius-xs: 4px;
+  --ecoursity-radius-sm: 5px;
+  --ecoursity-radius-md: 8px;
+  --ecoursity-radius-lg: 12px;
+  --ecoursity-radius-xl: 20px;
+  --ecoursity-radius-pill: 9999px;
 
-  --radius-xs: 4px;
-  --radius-sm: 5px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 20px;
+  --ecoursity-space-xxs: 2px;
+  --ecoursity-space-xs: 4px;
+  --ecoursity-space-sm: 8px;
+  --ecoursity-space-md: 12px;
+  --ecoursity-space-lg: 16px;
+  --ecoursity-space-xl: 24px;
+  --ecoursity-space-xxl: 32px;
+  --ecoursity-space-huge: 64px;
+
+  --ecoursity-shadow-stacked: 0 8px 8px rgba(0,0,0,0.1),
+                    0 4px 4px rgba(0,0,0,0.1),
+                    0 2px 2px rgba(0,0,0,0.1),
+                    0 0 0 1px rgba(0,0,0,0.1);
+  --ecoursity-shadow-modal: 0 25px 50px -12px rgba(0,0,0,0.25);
 }
 ```
-
-Then use: `tw:bg-aloe-10` / `tw:bg-canvas-cream` / `tw:rounded-xl`
 
 ## References
 

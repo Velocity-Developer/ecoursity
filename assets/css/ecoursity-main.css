@@ -1,0 +1,52 @@
+/* ── Ecoursity Design Tokens ── */
+/* Shopifi-inspired: light/cream canvas, aloe accents, pill buttons, thin-weight display */
+
+:root {
+  /* Colors */
+  --ecoursity-primary: #000000;
+  --ecoursity-on-primary: #ffffff;
+  --ecoursity-canvas-light: #ffffff;
+  --ecoursity-canvas-cream: #fbfbf5;
+  --ecoursity-aloe-10: #c1fbd4;
+  --ecoursity-pistachio-10: #d4f9e0;
+  --ecoursity-shade-30: #d4d4d8;
+  --ecoursity-shade-40: #a1a1aa;
+  --ecoursity-shade-50: #71717a;
+  --ecoursity-shade-60: #52525b;
+  --ecoursity-shade-70: #3f3f46;
+  --ecoursity-hairline-light: #e4e4e7;
+  --ecoursity-ink: #000000;
+
+  /* Border Radius */
+  --ecoursity-radius-xs: 4px;
+  --ecoursity-radius-sm: 5px;
+  --ecoursity-radius-md: 8px;
+  --ecoursity-radius-lg: 12px;
+  --ecoursity-radius-xl: 20px;
+  --ecoursity-radius-pill: 9999px;
+
+  /* Spacing */
+  --ecoursity-space-xxs: 2px;
+  --ecoursity-space-xs: 4px;
+  --ecoursity-space-sm: 8px;
+  --ecoursity-space-md: 12px;
+  --ecoursity-space-lg: 16px;
+  --ecoursity-space-xl: 24px;
+  --ecoursity-space-xxl: 32px;
+  --ecoursity-space-huge: 64px;
+
+  /* Elevation */
+  --ecoursity-shadow-stacked: 0 8px 8px rgba(0,0,0,0.1),
+                    0 4px 4px rgba(0,0,0,0.1),
+                    0 2px 2px rgba(0,0,0,0.1),
+                    0 0 0 1px rgba(0,0,0,0.1);
+  --ecoursity-shadow-modal: 0 25px 50px -12px rgba(0,0,0,0.25);
+}
+
+/* ── Typography ── */
+/* Display: Neue Haas Grotesk Display, thin weight 330 */
+/* Body: Inter Variable, 420-550 */
+/* Global: font-feature-settings: "ss03" */
+
+/* ── Buttons ── */
+/* Always border-radius: var(--ecoursity-radius-pill) — never rounded-rectangle */

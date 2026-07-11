@@ -16,7 +16,7 @@ class EnqueueProvider
     public function register(): void
     {
         add_action('admin_enqueue_scripts', function (): void {
-            wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/main.css');
+            wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/ecoursity-main.css');
             wp_enqueue_style('ecoursity-admin-style', $this->resourceUri . 'css/ecoursity-admin.css');
             wp_enqueue_script(
                 'alpinejs',
@@ -28,7 +28,7 @@ class EnqueueProvider
         });
 
         add_action('wp_enqueue_scripts', function (): void {
-            wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/main.css');
+            wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/ecoursity-main.css');
             wp_enqueue_style('ecoursity-public-style', $this->resourceUri . 'css/ecoursity-public.css');
             wp_enqueue_script(
                 'alpinejs',
