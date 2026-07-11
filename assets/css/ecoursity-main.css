@@ -50,3 +50,73 @@
 
 /* ── Buttons ── */
 /* Always border-radius: var(--ecoursity-radius-pill) — never rounded-rectangle */
+
+/* ── UiModal ── */
+.ecoursity-ui-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ecoursity-space-lg);
+}
+
+.ecoursity-ui-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ecoursity-ui-modal-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 64rem;
+  max-height: 90vh;
+  overflow: hidden;
+  border-radius: var(--ecoursity-radius-xl);
+  background: var(--ecoursity-canvas-light);
+  box-shadow: var(--ecoursity-shadow-modal);
+  opacity: 0;
+  transform: scale(0.74);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.ecoursity-ui-modal-content--open {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ecoursity-ui-modal-header {
+  border-bottom: 1px solid var(--ecoursity-hairline-light);
+  padding: var(--ecoursity-space-lg) var(--ecoursity-space-xl);
+}
+
+.ecoursity-ui-modal-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ecoursity-ink);
+}
+
+.ecoursity-ui-modal-body {
+  padding: var(--ecoursity-space-lg) var(--ecoursity-space-xl);
+}
+
+.ecoursity-ui-modal-body-content {
+  overflow-y: auto;
+}
+
+.ecoursity-ui-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ecoursity-space-md);
+  border-top: 1px solid var(--ecoursity-hairline-light);
+  padding: var(--ecoursity-space-lg) var(--ecoursity-space-xl);
+}
+
+.ecoursity-modal-error {
+  font-size: 14px;
+  color: #dc2626;
+}
