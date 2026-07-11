@@ -7,8 +7,12 @@ description: "Shopifi-inspired design system for Ecoursity UI — light/cream ca
 
 Shopifi-inspired design language — a clean, editorial commerce UI on a light canvas with cream/warm surfaces, pill-shaped buttons, aloe green accents, and thin-weight display type.
 
-**All CSS must be written to `../assets\css\ecoursity-main.css`.**
-**CSS variables (`--ecoursity-*`) are already defined there — add new component/utility CSS below the `:root` block.**
+**CSS file rules:**
+- **Class umum / design tokens** → `../assets/css/ecoursity-main.css`
+- **Khusus dashboard wp-admin** → `../assets/css/ecoursity-admin.css`
+- **Khusus halaman public** → `../assets/css/ecoursity-public.css`
+- **CSS variables (`--ecoursity-*`)** sudah didefinisikan di `ecoursity-main.css` — tambah component/utility CSS baru di bawah block `:root`.
+
 **Gunakan Bahasa Indonesia untuk seluruh teks antarmuka — label, tombol, heading, pesan, dll. Hanya kode dan token desain yang tetap dalam bahasa Inggris.**
 
 ## Colors
