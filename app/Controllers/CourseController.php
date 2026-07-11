@@ -24,6 +24,9 @@ class CourseController
             ], 404);
         }
 
+        $course->thumbnail     = $course->thumbnail();
+        $course->thumbnail_id  = get_post_thumbnail_id($course->id);
+
         return new WP_REST_Response([
             'success' => true,
             'data'    => $course,
@@ -125,6 +128,10 @@ class CourseController
             if ($request->has_param($key)) {
                 $course->updateMeta("_ecoursity_{$key}", $request->get_param($key));
             }
+        }
+
+        if ($request->has_param('thumbnail_id')) {
+            $course->updateMeta('_thumbnail_id', (int) $request->get_param('thumbnail_id'));
         }
     }
 }

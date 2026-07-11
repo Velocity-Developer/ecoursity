@@ -173,11 +173,15 @@ class Course
             'excerpt' => $post->post_excerpt,
             'status'  => $post->post_status,
             'author'  => (int) $post->post_author,
-            'duration' => $post->meta_value['_ecoursity_duration'] ?? '',
-            'price' => $post->meta_value['_ecoursity_price'] ?? 0,
-            'price_sale' => $post->meta_value['_ecoursity_price_sale'] ?? '',
-            'price_sale_start' => $post->meta_value['_ecoursity_price_sale_start'] ?? '',
-            'price_sale_end' => $post->meta_value['_ecoursity_price_sale_end'] ?? '',
+            'duration'           => get_post_meta($post->ID, '_ecoursity_duration', true),
+            'level'              => get_post_meta($post->ID, '_ecoursity_level', true),
+            'max_students'       => get_post_meta($post->ID, '_ecoursity_max_students', true),
+            'price'              => get_post_meta($post->ID, '_ecoursity_price', true) ?: '0',
+            'price_sale'         => get_post_meta($post->ID, '_ecoursity_price_sale', true),
+            'price_sale_start'   => get_post_meta($post->ID, '_ecoursity_price_sale_start', true),
+            'price_sale_end'     => get_post_meta($post->ID, '_ecoursity_price_sale_end', true),
+            'course_evaluation'  => get_post_meta($post->ID, '_ecoursity_course_evaluation', true),
+            'passing_grade'      => get_post_meta($post->ID, '_ecoursity_passing_grade', true),
         ]);
     }
 }

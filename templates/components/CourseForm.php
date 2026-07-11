@@ -1,6 +1,7 @@
 <?php
 $course_id = $props['course_id'] ?? 0;
 $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
+wp_enqueue_media();
 ?>
 
 <div x-data="courseForm(<?php echo (int) $course_id; ?>, '<?php echo esc_js($rest_url); ?>')" x-cloak>
@@ -22,6 +23,26 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
             <div class="ecoursity-form-slug">
                 <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="course.slug || '(kosong)'"></span>
                 <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="course.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
+            </div>
+        </div>
+
+        <div class="ecoursity-form-group">
+            <label class="ecoursity-form-label">Gambar Unggulan</label>
+            <div class="ecoursity-form-featured-image">
+                <template x-if="course.thumbnail">
+                    <div class="ecoursity-form-featured-image__preview">
+                        <img :src="course.thumbnail" alt="Featured image">
+                    </div>
+                </template>
+                <template x-if="!course.thumbnail">
+                    <div class="ecoursity-form-featured-image__placeholder">
+                        <span>Belum ada gambar</span>
+                    </div>
+                </template>
+                <div class="ecoursity-form-featured-image__actions">
+                    <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--sm" @click="openMediaUploader()">Pilih Gambar</button>
+                    <button type="button" class="ecoursity-button ecoursity-button--ghost ecoursity-button--sm" x-show="course.thumbnail" @click="removeFeaturedImage()">Hapus</button>
+                </div>
             </div>
         </div>
 
@@ -128,6 +149,7 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
             loading: true,
             saving: false,
             slugEditable: false,
+            mediaUploader: null,
             message: '',
             message_type: 'success',
             course: {
@@ -148,6 +170,30 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
             },
             async init() {
                 await this.loadCourse();
+            },
+            openMediaUploader() {
+                if (typeof wp === 'undefined' || typeof wp.media === 'undefined') return;
+                if (this.mediaUploader) {
+                    this.mediaUploader.open();
+                    return;
+                }
+                this.mediaUploader = wp.media({
+                    title: 'Pilih Gambar Unggulan',
+                    button: {
+                        text: 'Gunakan sebagai Gambar Unggulan'
+                    },
+                    multiple: false,
+                });
+                this.mediaUploader.on('select', () => {
+                    const attachment = this.mediaUploader.state().get('selection').first().toJSON();
+                    this.course.thumbnail_id = attachment.id;
+                    this.course.thumbnail = attachment.url;
+                });
+                this.mediaUploader.open();
+            },
+            removeFeaturedImage() {
+                this.course.thumbnail_id = 0;
+                this.course.thumbnail = '';
             },
             async loadCourse() {
                 this.loading = true;
