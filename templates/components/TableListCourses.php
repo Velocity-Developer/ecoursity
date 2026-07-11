@@ -28,17 +28,6 @@ $list_courses = Course::all();
             <?php
             foreach ($list_courses as $course) {
                 $instructor = Instructor::find($course->author);
-                $modal_body = sprintf(
-                    '<div class="tw:space-y-4"><div><div class="tw:text-sm tw:text-slate-500">Instruktur</div><div class="tw:font-medium tw:text-slate-900">%s</div></div><div><div class="tw:text-sm tw:text-slate-500">Harga</div><div class="tw:font-medium tw:text-slate-900">%s</div></div><div><div class="tw:text-sm tw:text-slate-500">Durasi</div><div class="tw:font-medium tw:text-slate-900">%s</div></div><div><div class="tw:text-sm tw:text-slate-500">Deskripsi</div><div class="tw:prose tw:max-w-none tw:text-slate-700">%s</div></div></div>',
-                    esc_html($instructor->display_name ?? '-'),
-                    esc_html($course->price ?: '-'),
-                    esc_html($course->duration ?: '-'),
-                    wp_kses_post($course->excerpt ?: $course->content ?: '-')
-                );
-                $modal_footer = sprintf(
-                    '<button x-on:click="%s" type="button" class="tw:inline-flex tw:items-center tw:rounded-md tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white">Edit kursus</button>',
-                    '$store.EcoursityUiModal.open({ body: <?php echo wp_json_encode($modal_body); ?>})'
-                );
             ?>
                 <tr>
                     <td class="tw:text-left tw:px-4 tw:py-2">
@@ -54,13 +43,13 @@ $list_courses = Course::all();
                         <button
                             type="button"
                             class="tw:inline-flex tw:items-center tw:rounded-md tw:border tw:border-slate-300 tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:bg-white tw:hover:bg-slate-50"
-                            x-on:click='$store.EcoursityUiModal.open({ title: <?php echo wp_json_encode($course->title); ?>, body: <?php echo wp_json_encode($modal_body); ?>, footer: <?php echo wp_json_encode($modal_footer); ?> })'>
+                            x-on:click='$store.EcoursityUiModal.open({ title: <?php echo wp_json_encode($course->title); ?>, url:"<?php echo get_rest_url(null, 'ecoursity/v1/template_component/CoursePreview'); ?>?id=<?php echo $course->id; ?>"})'>
                             Detail
                         </button>
                         <button
                             type="button"
                             class="tw:inline-flex tw:items-center tw:rounded-md tw:border tw:border-slate-300 tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:bg-white tw:hover:bg-slate-50"
-                            x-on:click='$store.EcoursityUiModal.open({ title: "Edit kursus", url:"<?php echo get_rest_url(null, 'ecoursity/v1/template_component/CoursePreview'); ?>"})'>
+                            x-on:click='$store.EcoursityUiModal.open({ title: "Edit kursus", url:"<?php echo get_rest_url(null, 'ecoursity/v1/template_component/CoursePreview'); ?>?id=<?php echo $course->id; ?>"})'>
                             Edit
                         </button>
                     </td>

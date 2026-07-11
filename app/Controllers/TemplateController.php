@@ -11,7 +11,8 @@ class TemplateController
     public function view(WP_REST_Request $request): array|WP_Error
     {
         ob_start();
-        $html = Template::view($request->get_param('template'));
+        $props = $request->get_params();
+        $html = Template::view($request->get_param('template'), compact('props'));
         $html = ob_get_clean();
 
         if ($html === false) {
@@ -28,7 +29,8 @@ class TemplateController
     public function component(WP_REST_Request $request): array|WP_Error
     {
         ob_start();
-        $html = Template::component($request->get_param('component_name'));
+        $props = $request->get_params();
+        $html = Template::component($request->get_param('component_name'), compact('props'));
         $html = ob_get_clean();
 
         if ($html === false) {
@@ -37,6 +39,7 @@ class TemplateController
 
         return [
             'is_template'   => true,
+            'request' => $request->get_params(),
             'component' => $request->get_param('component_name'),
             'html' => $html,
         ];
