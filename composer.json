@@ -1,5 +1,7 @@
 {
     "name": "ecoursity/ecoursity",
+    "type": "wordpress-plugin",
+    "version": "0.1.0",
     "description": "WordPress LMS Plugin",
     "license": "GPL-2.0-or-later",
     "autoload": {
@@ -17,6 +19,24 @@
         "fakerphp/faker": "^1.24"
     },
     "scripts": {
-        "seed": "php tests/seed.php"
+        "seed": "php tests/seed.php",
+        "build:zip": "php build.php",
+        "build": [
+            "@composer install --no-dev --no-interaction",
+            "@build:zip",
+            "@composer install --no-interaction"
+        ]
+    },
+    "archive": {
+        "exclude": [
+            ".gitignore",
+            ".trae",
+            "AGENTS.md",
+            "build.php",
+            "composer.lock",
+            "node_modules",
+            "README.md",
+            "tests"
+        ]
     }
 }
