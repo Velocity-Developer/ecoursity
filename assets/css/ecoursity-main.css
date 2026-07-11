@@ -592,3 +592,86 @@ button.course-preview__btn.ecoursity-table-courses__btn {
   padding: 6px 16px;
   font-size: 12px;
 }
+
+/* ── Admin Page (student) ── */
+.ecoursity-admin-page {
+  padding: var(--ecoursity-space-xl);
+}
+
+.ecoursity-admin-page__header {
+  margin-bottom: var(--ecoursity-space-xl);
+}
+
+.ecoursity-admin-page__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ecoursity-ink);
+}
+
+.ecoursity-admin-page__desc {
+  margin: var(--ecoursity-space-xs) 0 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.ecoursity-admin-page__card {
+  overflow: hidden;
+  border-radius: var(--ecoursity-radius-lg);
+  border: 1px solid var(--ecoursity-hairline-light);
+  background: var(--ecoursity-canvas-light);
+}
+
+.ecoursity-admin-page__table-wrap {
+  overflow-x: auto;
+}
+
+.ecoursity-admin-page__table {
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ecoursity-admin-page__table thead {
+  background: var(--ecoursity-canvas-cream);
+}
+
+.ecoursity-admin-page__th {
+  padding: 12px var(--ecoursity-space-lg);
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid var(--ecoursity-hairline-light);
+}
+
+.ecoursity-admin-page__row {
+  border-bottom: 1px solid var(--ecoursity-hairline-light);
+}
+
+.ecoursity-admin-page__row:last-child {
+  border-bottom: none;
+}
+
+.ecoursity-admin-page__row:hover {
+  background: #fafafa;
+}
+
+.ecoursity-admin-page__td {
+  padding: 12px var(--ecoursity-space-lg);
+  color: var(--ecoursity-ink);
+  vertical-align: middle;
+}
+
+.ecoursity-admin-page__td--name {
+  font-weight: 500;
+}
+
+.ecoursity-admin-page__empty {
+  padding: var(--ecoursity-space-xl);
+  text-align: center;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+}
