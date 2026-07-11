@@ -19,7 +19,10 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
 
         <div class="ecoursity-form-group">
             <label class="ecoursity-form-label">Slug</label>
-            <input type="text" class="ecoursity-form-input" x-model="course.slug" placeholder="Otomatis jika kosong">
+            <div class="ecoursity-form-slug">
+                <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="course.slug || '(kosong)'"></span>
+                <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="course.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
+            </div>
         </div>
 
         <div class="ecoursity-form-row">
@@ -50,7 +53,15 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
 
         <div class="ecoursity-form-group">
             <label class="ecoursity-form-label">Konten</label>
-            <textarea class="ecoursity-form-textarea" x-model="course.content" rows="6" placeholder="Deskripsi kursus..."></textarea>
+            <?php
+            wp_editor('', 'ecoursity_course_content', [
+                'textarea_name' => 'course_content',
+                'textarea_rows' => 25,
+                'media_buttons' => true,
+                'teeny'         => false,
+                'quicktags'     => true,
+            ]);
+            ?>
         </div>
 
         <div class="ecoursity-form-group">
@@ -116,6 +127,7 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
         Alpine.data('courseForm', (courseId, restUrl) => ({
             loading: true,
             saving: false,
+            slugEditable: false,
             message: '',
             message_type: 'success',
             course: {
@@ -157,9 +169,29 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
                     this.message_type = 'error';
                 } finally {
                     this.loading = false;
+                    this.$nextTick(() => this.syncEditorContent());
+                }
+            },
+            syncEditorContent() {
+                const id = 'ecoursity_course_content';
+                if (typeof tinymce !== 'undefined' && tinymce.get(id)) {
+                    tinymce.get(id).setContent(this.course.content || '');
+                } else {
+                    const ta = document.getElementById(id);
+                    if (ta) ta.value = this.course.content || '';
+                }
+            },
+            syncEditorToModel() {
+                const id = 'ecoursity_course_content';
+                if (typeof tinymce !== 'undefined' && tinymce.get(id)) {
+                    this.course.content = tinymce.get(id).getContent();
+                } else {
+                    const ta = document.getElementById(id);
+                    if (ta) this.course.content = ta.value;
                 }
             },
             async submit() {
+                this.syncEditorToModel();
                 this.saving = true;
                 this.message = '';
                 try {

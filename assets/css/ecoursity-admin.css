@@ -248,6 +248,28 @@
     min-height: 80px;
 }
 
+.ecoursity-form-slug {
+    position: relative;
+}
+
+.ecoursity-form-slug__text {
+    display: block;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ecoursity-shade-60);
+    background: var(--ecoursity-canvas-cream);
+    border: 1px dashed var(--ecoursity-hairline-light);
+    border-radius: var(--ecoursity-radius-md);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.ecoursity-form-slug__text:hover {
+    border-color: var(--ecoursity-ink);
+    color: var(--ecoursity-ink);
+}
+
 .ecoursity-form-row {
     display: flex;
     gap: var(--ecoursity-space-xl);
