@@ -22,11 +22,14 @@ $props = isset($props) ? $props : [
         class="ecoursity-ui-modal-content tw:scale-x-74 tw:duration-10 tw:ease-in-out tw:relative tw:z-10 tw:w-full tw:max-w-5xl tw:overflow-hidden tw:rounded-xl tw:bg-white tw:shadow-2xl"
         x-bind:class="{'tw:scale-x-100': $store.EcoursityUiModal.show}">
         <div x-show="$store.EcoursityUiModal.title" class="ecoursity-ui-modal-header tw:border-b tw:border-slate-200 tw:px-6 tw:py-4">
-            <h2 class="ecoursity-ui-modal-title tw:m-0! tw:text-xl tw:font-semibold tw:text-slate-900" x-text="$store.EcoursityUiModal.title">
+            <h2 class="ecoursity-ui-modal-title tw:m-0! tw:text-xl tw:font-semibold" x-text="$store.EcoursityUiModal.title">
 
             </h2>
         </div>
-        <div x-show="$store.EcoursityUiModal.body" class="ecoursity-ui-modal-body tw:px-6 tw:py-4 tw:text-slate-700" x-html="$store.EcoursityUiModal.body">
+        <div x-show="$store.EcoursityUiModal.body" class="ecoursity-ui-modal-body tw:px-6 tw:py-4">
+
+            <div x-show="!$store.EcoursityUiModal.loading" class="ecoursity-ui-modal-body-content" x-html="$store.EcoursityUiModal.body">
+            </div>
 
         </div>
         <div x-show="$store.EcoursityUiModal.footer" class="ecoursity-ui-modal-footer tw:flex tw:justify-end tw:gap-3 tw:border-t tw:border-slate-200 tw:px-6 tw:py-4" x-html="$store.EcoursityUiModal.footer">
@@ -56,18 +59,19 @@ $props = isset($props) ? $props : [
                     await this.loadFromUrl();
                 }
             },
-            close() {
-                this.show = false;
-            },
             setContent(payload = {}) {
                 this.title = payload.title ?? this.title;
                 this.body = payload.body ?? this.body;
                 this.footer = payload.footer ?? this.footer;
                 this.url = payload.url ?? this.url;
             },
+            close() {
+                this.show = false;
+                //clear content
+                this.setContent({});
+            },
             async loadFromUrl() {
                 this.loading = true;
-                this.body = '<div class="tw:text-sm tw:text-slate-500">Loading...</div>';
 
                 try {
                     const response = await fetch(this.url, {
