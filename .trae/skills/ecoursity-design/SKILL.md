@@ -9,6 +9,7 @@ Shopifi-inspired design language — a clean, editorial commerce UI on a light c
 
 **All CSS must be written to `../assets\css\ecoursity-main.css`.**
 **CSS variables (`--ecoursity-*`) are already defined there — add new component/utility CSS below the `:root` block.**
+**Gunakan Bahasa Indonesia untuk seluruh teks antarmuka — label, tombol, heading, pesan, dll. Hanya kode dan token desain yang tetap dalam bahasa Inggris.**
 
 ## Colors
 
