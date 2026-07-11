@@ -6,7 +6,7 @@ use Ecoursity\App\Models\Instructor;
 $list_courses = Course::all();
 ?>
 
-<div class="ecoursity-table-list-courses tw:overflow-auto tw:bg-white tw:p-4 tw:rounded-md">
+<div x-data class="ecoursity-table-list-courses tw:overflow-auto tw:bg-white tw:p-4 tw:rounded-md">
     <table class="tw:table tw:table-fixed tw:table-stripped tw:table-zebra tw:w-full">
         <thead>
             <tr class="tw:bg-gray-100">
@@ -36,11 +36,11 @@ $list_courses = Course::all();
                     wp_kses_post($course->excerpt ?: $course->content ?: '-')
                 );
                 $modal_footer = sprintf(
-                    '<a href="%s" class="tw:inline-flex tw:items-center tw:rounded-md tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white">Edit kursus</a>',
-                    esc_url(get_edit_post_link($course->id))
+                    '<button x-on:click="%s" type="button" class="tw:inline-flex tw:items-center tw:rounded-md tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white">Edit kursus</button>',
+                    '$store.EcoursityUiModal.open({ body: <?php echo wp_json_encode($modal_body); ?>})'
                 );
             ?>
-                <tr x-data>
+                <tr>
                     <td class="tw:text-left tw:px-4 tw:py-2">
                         <?php echo esc_html($course->title); ?>
                     </td>
@@ -50,16 +50,19 @@ $list_courses = Course::all();
                     <td class=" tw:text-right tw:px-4 tw:py-2">
                         <?php echo esc_html($course->price); ?>
                     </td>
-                    <td class="tw:text-right tw:px-4 tw:py-2 tw:space-x-2">
+                    <td class="tw:text-right tw:px-4 tw:py-2 tw:space-x-1">
                         <button
                             type="button"
-                            class="tw:inline-flex tw:items-center tw:rounded-md tw:border tw:border-slate-300 tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700"
+                            class="tw:inline-flex tw:items-center tw:rounded-md tw:border tw:border-slate-300 tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:bg-white tw:hover:bg-slate-50"
                             x-on:click='$store.EcoursityUiModal.open({ title: <?php echo wp_json_encode($course->title); ?>, body: <?php echo wp_json_encode($modal_body); ?>, footer: <?php echo wp_json_encode($modal_footer); ?> })'>
                             Detail
                         </button>
-                        <a href="<?php echo esc_url(get_edit_post_link($course->id)); ?>">
+                        <button
+                            type="button"
+                            class="tw:inline-flex tw:items-center tw:rounded-md tw:border tw:border-slate-300 tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:bg-white tw:hover:bg-slate-50"
+                            x-on:click='$store.EcoursityUiModal.open({ title: "Edit kursus", body:"test"})'>
                             Edit
-                        </a>
+                        </button>
                     </td>
                 </tr>
             <?php
