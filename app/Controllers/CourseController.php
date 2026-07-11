@@ -13,6 +13,23 @@ class CourseController
         return Course::all();
     }
 
+    public function show(WP_REST_Request $request): WP_REST_Response
+    {
+        $course = Course::find($request->get_param('id'));
+
+        if (! $course) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => 'Course not found.',
+            ], 404);
+        }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data'    => $course,
+        ]);
+    }
+
     public function store(WP_REST_Request $request): WP_REST_Response
     {
         $course = new Course([

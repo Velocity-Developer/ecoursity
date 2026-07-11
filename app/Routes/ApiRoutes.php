@@ -58,6 +58,12 @@ class ApiRoutes
                 'permission_callback' => '__return_true',
             ],
             [
+                'route' => '/courses/(?P<id>\d+)',
+                'callback' => [CourseController::class, 'show'],
+                'methods' => 'GET',
+                'permission_callback' => '__return_true',
+            ],
+            [
                 'route' => '/courses/',
                 'callback' => [CourseController::class, 'store'],
                 'methods' => 'POST',

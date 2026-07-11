@@ -1,5 +1,191 @@
-<div x-data="form">
+<?php
+$course_id = $props['course_id'] ?? 0;
+$rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
+?>
 
-    <form method="post">
+<div x-data="courseForm(<?php echo (int) $course_id; ?>, '<?php echo esc_js($rest_url); ?>')" x-cloak>
+    <template x-if="loading">
+        <p class="ecoursity-form-loading">Memuat data kursus...</p>
+    </template>
+
+    <form x-show="!loading" @submit.prevent="submit" class="ecoursity-course-form">
+
+        <div x-show="message" class="ecoursity-form-message" :class="'ecoursity-form-message--' + message_type" x-text="message"></div>
+
+        <div class="ecoursity-form-group">
+            <label class="ecoursity-form-label">Judul Kursus <span class="ecoursity-required">*</span></label>
+            <input type="text" class="ecoursity-form-input" x-model="course.title" required placeholder="e.g. Belajar Laravel dari Nol">
+        </div>
+
+        <div class="ecoursity-form-group">
+            <label class="ecoursity-form-label">Slug</label>
+            <input type="text" class="ecoursity-form-input" x-model="course.slug" placeholder="Otomatis jika kosong">
+        </div>
+
+        <div class="ecoursity-form-row">
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Status</label>
+                <select class="ecoursity-form-select" x-model="course.status">
+                    <option value="draft">Draft</option>
+                    <option value="publish">Publik</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
+
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Level</label>
+                <select class="ecoursity-form-select" x-model="course.level">
+                    <option value="">Pilih Level</option>
+                    <option value="beginner">Pemula</option>
+                    <option value="intermediate">Menengah</option>
+                    <option value="advanced">Lanjutan</option>
+                </select>
+            </div>
+
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Durasi</label>
+                <input type="text" class="ecoursity-form-input" x-model="course.duration" placeholder="e.g. 10 jam">
+            </div>
+        </div>
+
+        <div class="ecoursity-form-group">
+            <label class="ecoursity-form-label">Konten</label>
+            <textarea class="ecoursity-form-textarea" x-model="course.content" rows="6" placeholder="Deskripsi kursus..."></textarea>
+        </div>
+
+        <div class="ecoursity-form-group">
+            <label class="ecoursity-form-label">Ringkasan</label>
+            <textarea class="ecoursity-form-textarea" x-model="course.excerpt" rows="3" placeholder="Ringkasan singkat..."></textarea>
+        </div>
+
+        <div class="ecoursity-form-row">
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Harga</label>
+                <input type="text" class="ecoursity-form-input" x-model="course.price" placeholder="0">
+            </div>
+
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Harga Diskon</label>
+                <input type="text" class="ecoursity-form-input" x-model="course.price_sale" placeholder="Kosongkan jika tidak ada">
+            </div>
+        </div>
+
+        <div class="ecoursity-form-row">
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Diskon Mulai</label>
+                <input type="datetime-local" class="ecoursity-form-input" x-model="course.price_sale_start">
+            </div>
+
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Diskon Berakhir</label>
+                <input type="datetime-local" class="ecoursity-form-input" x-model="course.price_sale_end">
+            </div>
+        </div>
+
+        <div class="ecoursity-form-row">
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Max Siswa</label>
+                <input type="number" class="ecoursity-form-input" x-model="course.max_students" min="0" placeholder="0 = tidak terbatas">
+            </div>
+
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Evaluasi</label>
+                <select class="ecoursity-form-select" x-model="course.course_evaluation">
+                    <option value="">Pilih Evaluasi</option>
+                    <option value="none">Tidak Ada</option>
+                    <option value="quiz">Kuis</option>
+                    <option value="assignment">Tugas</option>
+                </select>
+            </div>
+
+            <div class="ecoursity-form-group">
+                <label class="ecoursity-form-label">Nilai Lulus</label>
+                <input type="number" class="ecoursity-form-input" x-model="course.passing_grade" min="0" max="100" placeholder="e.g. 70">
+            </div>
+        </div>
+
+        <div class="ecoursity-form-actions">
+            <button type="submit" class="ecoursity-button ecoursity-button--primary" :disabled="saving" x-text="saving ? 'Menyimpan...' : 'Simpan'"></button>
+            <a href="<?php echo esc_url(get_admin_url(null, 'admin.php?page=ecoursity-courses')); ?>" class="ecoursity-button ecoursity-button--outline">Batal</a>
+        </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('courseForm', (courseId, restUrl) => ({
+            loading: true,
+            saving: false,
+            message: '',
+            message_type: 'success',
+            course: {
+                title: '',
+                slug: '',
+                status: 'draft',
+                content: '',
+                excerpt: '',
+                duration: '',
+                level: '',
+                max_students: '',
+                price: '0',
+                price_sale: '',
+                price_sale_start: '',
+                price_sale_end: '',
+                course_evaluation: '',
+                passing_grade: '',
+            },
+            async init() {
+                await this.loadCourse();
+            },
+            async loadCourse() {
+                this.loading = true;
+                try {
+                    const res = await fetch(`${restUrl}${courseId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                    });
+                    const json = await res.json();
+                    if (json.success && json.data) {
+                        Object.assign(this.course, json.data);
+                    } else {
+                        this.message = json.message || 'Gagal memuat data kursus.';
+                        this.message_type = 'error';
+                    }
+                } catch (e) {
+                    this.message = 'Gagal memuat data kursus.';
+                    this.message_type = 'error';
+                } finally {
+                    this.loading = false;
+                }
+            },
+            async submit() {
+                this.saving = true;
+                this.message = '';
+                try {
+                    const res = await fetch(`${restUrl}${courseId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify(this.course),
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                        this.message = json.message || 'Kursus berhasil disimpan.';
+                        this.message_type = 'success';
+                    } else {
+                        this.message = json.message || 'Gagal menyimpan kursus.';
+                        this.message_type = 'error';
+                    }
+                } catch (e) {
+                    this.message = 'Gagal menyimpan kursus.';
+                    this.message_type = 'error';
+                } finally {
+                    this.saving = false;
+                }
+            },
+        }));
+    });
+</script>
