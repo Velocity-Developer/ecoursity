@@ -19,7 +19,7 @@ $props = isset($props) ? $props : [
     <div class="ecoursity-ui-modal-overlay tw:absolute tw:inset-0 tw:bg-black/50" @click="$store.EcoursityUiModal.close()"></div>
 
     <div
-        class="ecoursity-ui-modal-content tw:scale-x-74 tw:duration-10 tw:ease-in-out tw:relative tw:z-10 tw:w-full tw:max-w-5xl tw:overflow-hidden tw:rounded-xl tw:bg-white tw:shadow-2xl"
+        class="ecoursity-ui-modal-content tw:max-h-[90vh] tw:overflow-hidden tw:scroll-snap-type-y mandatory tw:scale-x-74 tw:duration-10 tw:ease-in-out tw:relative tw:z-10 tw:w-full tw:max-w-5xl tw:rounded-xl tw:bg-white tw:shadow-2xl"
         x-bind:class="{'tw:scale-x-100': $store.EcoursityUiModal.show}">
         <div x-show="$store.EcoursityUiModal.title" class="ecoursity-ui-modal-header tw:border-b tw:border-slate-200 tw:px-6 tw:py-4">
             <h2 class="ecoursity-ui-modal-title tw:m-0! tw:text-xl tw:font-semibold" x-text="$store.EcoursityUiModal.title">
@@ -28,7 +28,7 @@ $props = isset($props) ? $props : [
         </div>
         <div x-show="$store.EcoursityUiModal.body" class="ecoursity-ui-modal-body tw:px-6 tw:py-4">
 
-            <div x-show="!$store.EcoursityUiModal.loading" class="ecoursity-ui-modal-body-content" x-html="$store.EcoursityUiModal.body">
+            <div x-show="!$store.EcoursityUiModal.loading" class="ecoursity-ui-modal-body-content tw:overflow-y-auto" x-html="$store.EcoursityUiModal.body">
             </div>
 
         </div>
