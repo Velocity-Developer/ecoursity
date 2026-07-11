@@ -4,7 +4,7 @@
     </h1>
 
     <?php
-    Ecoursity\App\Template::component('TableListCourses');
+    Ecoursity\App\Template::component('CourseTableLists');
     ?>
 
 </div>
