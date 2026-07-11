@@ -51,6 +51,106 @@
 /* ── Buttons ── */
 /* Always border-radius: var(--ecoursity-radius-pill) — never rounded-rectangle */
 
+/* ── Base Components ── */
+
+/* ecoursity-button */
+.ecoursity-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ecoursity-radius-pill);
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+  gap: var(--ecoursity-space-xs);
+}
+
+.ecoursity-button:hover {
+  opacity: 0.85;
+}
+
+.ecoursity-button--primary {
+  background: var(--ecoursity-primary);
+  color: var(--ecoursity-on-primary);
+}
+
+.ecoursity-button--primary:hover {
+  background: var(--ecoursity-shade-70);
+  opacity: 1;
+}
+
+.ecoursity-button--outline {
+  background: var(--ecoursity-canvas-light);
+  color: var(--ecoursity-ink);
+  border: 1px solid var(--ecoursity-primary);
+}
+
+.ecoursity-button--outline:hover {
+  background: #fafafa;
+  opacity: 1;
+}
+
+.ecoursity-button--ghost {
+  background: transparent;
+  color: var(--ecoursity-ink);
+}
+
+.ecoursity-button--ghost:hover {
+  background: #f4f4f5;
+  opacity: 1;
+}
+
+.ecoursity-button--sm {
+  padding: 6px 16px;
+  font-size: 12px;
+}
+
+.ecoursity-button--lg {
+  padding: 12px 28px;
+  font-size: 15px;
+}
+
+/* ecoursity-badge */
+.ecoursity-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--ecoursity-radius-pill);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--ecoursity-ink);
+  background: var(--ecoursity-shade-30);
+}
+
+.ecoursity-badge--pistachio {
+  background: var(--ecoursity-pistachio-10);
+}
+
+.ecoursity-badge--aloe {
+  background: var(--ecoursity-aloe-10);
+}
+
+.ecoursity-badge--cream {
+  background: var(--ecoursity-canvas-cream);
+  border: 1px solid var(--ecoursity-hairline-light);
+}
+
+/* ecoursity-card */
+.ecoursity-card {
+  overflow: hidden;
+  border-radius: var(--ecoursity-radius-lg);
+  border: 1px solid var(--ecoursity-hairline-light);
+  background: var(--ecoursity-canvas-light);
+  box-shadow: var(--ecoursity-shadow-stacked);
+}
+
 /* ── UiModal ── */
 .ecoursity-ui-modal {
   position: fixed;
