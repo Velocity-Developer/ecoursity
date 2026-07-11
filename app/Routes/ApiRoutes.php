@@ -57,6 +57,24 @@ class ApiRoutes
                 'methods' => 'GET',
                 'permission_callback' => '__return_true',
             ],
+            [
+                'route' => '/courses/',
+                'callback' => [CourseController::class, 'store'],
+                'methods' => 'POST',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/courses/(?P<id>\d+)',
+                'callback' => [CourseController::class, 'update'],
+                'methods' => 'PUT',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/courses/(?P<id>\d+)',
+                'callback' => [CourseController::class, 'delete'],
+                'methods' => 'DELETE',
+                'permission_callback' => '__return_true',
+            ],
         ];
     }
 }
