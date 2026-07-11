@@ -41,12 +41,11 @@ $list_courses = Course::all();
                             x-on:click='$store.EcoursityUiModal.open({ title: "Detail kursus", url:"<?php echo get_rest_url(null, 'ecoursity/v1/template_component/CoursePreview'); ?>?id=<?php echo $course->id; ?>"})'>
                             Detail
                         </button>
-                        <button
-                            type="button"
-                            class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn"
-                            x-on:click='$store.EcoursityUiModal.open({ title: "Edit kursus", url:"<?php echo get_rest_url(null, 'ecoursity/v1/template_component/CoursePreview'); ?>?id=<?php echo $course->id; ?>"})'>
+                        <a
+                            href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses&action=edit&ecoursity_course_id=' . $course->id); ?>"
+                            class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn">
                             Edit
-                        </button>
+                        </a>
                     </td>
                 </tr>
             <?php
