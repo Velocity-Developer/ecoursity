@@ -26,7 +26,7 @@ class Course
         $course_evaluation = '',
         $passing_grade = '';
 
-    public string $duration = '';
+    public mixed $duration = '';
 
     public string $price = '',
         $price_sale = '';
@@ -165,6 +165,8 @@ class Course
      */
     protected static function fromPost(\WP_Post $post): self
     {
+        $meta = fn($key) => get_post_meta($post->ID, $key, true);
+
         return new self([
             'id'      => $post->ID,
             'title'   => $post->post_title,
@@ -173,15 +175,24 @@ class Course
             'excerpt' => $post->post_excerpt,
             'status'  => $post->post_status,
             'author'  => (int) $post->post_author,
-            'duration'           => get_post_meta($post->ID, '_ecoursity_duration', true),
-            'level'              => get_post_meta($post->ID, '_ecoursity_level', true),
-            'max_students'       => get_post_meta($post->ID, '_ecoursity_max_students', true),
-            'price'              => get_post_meta($post->ID, '_ecoursity_price', true) ?: '0',
-            'price_sale'         => get_post_meta($post->ID, '_ecoursity_price_sale', true),
-            'price_sale_start'   => get_post_meta($post->ID, '_ecoursity_price_sale_start', true),
-            'price_sale_end'     => get_post_meta($post->ID, '_ecoursity_price_sale_end', true),
-            'course_evaluation'  => get_post_meta($post->ID, '_ecoursity_course_evaluation', true),
-            'passing_grade'      => get_post_meta($post->ID, '_ecoursity_passing_grade', true),
+            'duration'           => $meta('_ecoursity_duration') ?: '',
+            'level'              => self::metaString($meta('_ecoursity_level')),
+            'max_students'       => self::metaString($meta('_ecoursity_max_students')),
+            'price'              => self::metaString($meta('_ecoursity_price'), '0'),
+            'price_sale'         => self::metaString($meta('_ecoursity_price_sale')),
+            'price_sale_start'   => self::metaString($meta('_ecoursity_price_sale_start')),
+            'price_sale_end'     => self::metaString($meta('_ecoursity_price_sale_end')),
+            'course_evaluation'  => self::metaString($meta('_ecoursity_course_evaluation')),
+            'passing_grade'      => self::metaString($meta('_ecoursity_passing_grade')),
         ]);
+    }
+
+    private static function metaString(mixed $value, string $default = ''): string
+    {
+        if (is_array($value)) {
+            return implode(' ', $value);
+        }
+
+        return (string) ($value ?: $default);
     }
 }

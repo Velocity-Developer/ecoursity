@@ -68,7 +68,15 @@ wp_enqueue_media();
 
             <div class="ecoursity-form-group">
                 <label class="ecoursity-form-label">Durasi</label>
-                <input type="text" class="ecoursity-form-input" x-model="course.duration" placeholder="e.g. 10 jam">
+                <div class="ecoursity-form-duration">
+                    <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="course.duration_value" min="1" placeholder="1">
+                    <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="course.duration_unit">
+                        <option value="day">Hari</option>
+                        <option value="week">Minggu</option>
+                        <option value="month">Bulan</option>
+                        <option value="year">Tahun</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -158,7 +166,8 @@ wp_enqueue_media();
                 status: 'draft',
                 content: '',
                 excerpt: '',
-                duration: '',
+                duration_value: 1,
+                duration_unit: 'week',
                 level: '',
                 max_students: '',
                 price: '0',
@@ -195,6 +204,18 @@ wp_enqueue_media();
                 this.course.thumbnail_id = 0;
                 this.course.thumbnail = '';
             },
+            parseDuration() {
+                const d = this.course.duration;
+                if (Array.isArray(d)) {
+                    this.course.duration_value = d[0] || 1;
+                    this.course.duration_unit = d[1] || 'week';
+                } else if (typeof d === 'string' && d.includes(' ')) {
+                    const parts = d.split(' ');
+                    this.course.duration_value = parseInt(parts[0]) || 1;
+                    this.course.duration_unit = parts[1] || 'week';
+                }
+                delete this.course.duration;
+            },
             async loadCourse() {
                 this.loading = true;
                 try {
@@ -206,6 +227,7 @@ wp_enqueue_media();
                     const json = await res.json();
                     if (json.success && json.data) {
                         Object.assign(this.course, json.data);
+                        this.parseDuration();
                     } else {
                         this.message = json.message || 'Gagal memuat data kursus.';
                         this.message_type = 'error';
@@ -237,6 +259,7 @@ wp_enqueue_media();
                 }
             },
             async submit() {
+                this.course.duration = [this.course.duration_value, this.course.duration_unit];
                 this.syncEditorToModel();
                 this.saving = true;
                 this.message = '';

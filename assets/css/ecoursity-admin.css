@@ -330,6 +330,23 @@
     border-color: #fecaca;
 }
 
+/* ── Duration Group ── */
+.ecoursity-form-duration {
+    display: flex;
+    gap: var(--ecoursity-space-sm);
+    align-items: center;
+}
+
+.ecoursity-form-duration__input {
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.ecoursity-form-duration__select {
+    flex: 1;
+    min-width: 0;
+}
+
 .ecoursity-form-row {
     display: flex;
     gap: var(--ecoursity-space-xl);
