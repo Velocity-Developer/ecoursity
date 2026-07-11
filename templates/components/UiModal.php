@@ -45,9 +45,6 @@ $props = isset($props) ? $props : [
             footer: <?php echo wp_json_encode($props['footer']); ?>,
             url: <?php echo wp_json_encode($props['url']); ?>,
             async open(payload = {}) {
-                //clean content
-                this.setContent = {};
-                //close modal if already open
                 this.close();
                 this.title = payload.title ?? null;
                 this.body = payload.body ?? null;
@@ -70,7 +67,7 @@ $props = isset($props) ? $props : [
             },
             async loadFromUrl() {
                 this.loading = true;
-                this.body = '<div class="tw:text-sm tw:text-slate-500">Memuat...</div>';
+                this.body = '<div class="tw:text-sm tw:text-slate-500">Loading...</div>';
 
                 try {
                     const response = await fetch(this.url, {
@@ -83,8 +80,18 @@ $props = isset($props) ? $props : [
                         throw new Error(`HTTP ${response.status}`);
                     }
 
-                    this.body = await response.text();
+                    //if json, parse it
+                    if (response.headers.get('Content-Type')?.includes('application/json')) {
+                        const data = await response.json();
+                        this.body = data.html ?? this.body;
+                        this.setContent({
+                            body: this.body,
+                        });
+                        return;
+                    }
+
                 } catch (error) {
+                    console.error(error);
                     this.body = '<div class="tw:text-sm tw:text-red-600">Gagal memuat konten modal.</div>';
                 } finally {
                     this.loading = false;

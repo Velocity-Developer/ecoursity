@@ -2,32 +2,61 @@
 
 namespace Ecoursity\App\Routes;
 
-use Ecoursity\App\Controllers\Admin\DashboardController;
+use Ecoursity\App\Controllers\TemplateController;
+use Ecoursity\App\Controllers\CourseController;
 
 class ApiRoutes
 {
+    public $namespace_v1 = 'ecoursity/v1';
+
+    public function boot(): void
+    {
+        add_action('rest_api_init', function () {
+            foreach ($this->routes() as $route) {
+
+                $callback = function ($request) use ($route) {
+                    if (! $route['callback']) {
+                        return;
+                    }
+
+                    [$class, $method] = $route['callback'];
+
+                    return call_user_func([
+                        new $class(),
+                        $method,
+                    ], $request);
+                };
+
+                register_rest_route($this->namespace_v1, $route['route'], [
+                    'methods' => $route['methods'] ?? 'GET',
+                    'callback' => $callback,
+                    'permission_callback' => $route['permission_callback'] ?? '__return_true',
+                ]);
+            }
+        });
+    }
+
     public function routes(): array
     {
         return [
             [
-                'route' => '/admin/dashboard',
-                'callback' => [DashboardController::class, 'index'],
+                'route' => '/template_view/(?P<template>\d+)',
+                'callback' => [TemplateController::class, 'view'],
                 'methods' => 'GET',
-                'permission_callback' => static fn(): bool => current_user_can('manage_options'),
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/template_component/(?P<component_name>\w+)',
+                'callback' => [TemplateController::class, 'component'],
+                'methods' => 'GET',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/courses/',
+                'callback' => [CourseController::class, 'index'],
+                'methods' => 'GET',
+                'permission_callback' => '__return_true',
             ],
         ];
-    }
-
-    public function register(): void
-    {
-        add_action('rest_api_init', function () {
-            foreach ($this->routes() as $route) {
-                register_rest_route($this->namespace(), $route['route'], [
-                    'methods' => $route['methods'],
-                    'callback' => $route['callback'],
-                    'permission_callback' => $route['permission_callback'],
-                ]);
-            }
-        });
     }
 }

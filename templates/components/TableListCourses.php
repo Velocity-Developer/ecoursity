@@ -60,7 +60,7 @@ $list_courses = Course::all();
                         <button
                             type="button"
                             class="tw:inline-flex tw:items-center tw:rounded-md tw:border tw:border-slate-300 tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:bg-white tw:hover:bg-slate-50"
-                            x-on:click='$store.EcoursityUiModal.open({ title: "Edit kursus", body:"test"})'>
+                            x-on:click='$store.EcoursityUiModal.open({ title: "Edit kursus", url:"<?php echo get_rest_url(null, 'ecoursity/v1/template_component/CoursePreview'); ?>"})'>
                             Edit
                         </button>
                     </td>
