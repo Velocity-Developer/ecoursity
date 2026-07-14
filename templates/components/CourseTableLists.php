@@ -4,6 +4,23 @@ use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Instructor;
 
 $list_courses = Course::all();
+
+$formatCurrency = static function ($value): string {
+    if ($value === '' || $value === null) {
+        return 'Gratis';
+    }
+
+    $numericValue = preg_replace('/[^\d.,]/', '', (string) $value);
+    $normalizedValue = str_contains($numericValue, ',') && str_contains($numericValue, '.')
+        ? str_replace('.', '', str_replace(',', '.', $numericValue))
+        : str_replace(',', '.', $numericValue);
+
+    if ($normalizedValue === '' || !is_numeric($normalizedValue)) {
+        return (string) $value;
+    }
+
+    return 'Rp' . number_format((float) $normalizedValue, 0, ',', '.');
+};
 ?>
 
 <div x-data class="ecoursity-table-courses">
@@ -27,7 +44,7 @@ $list_courses = Course::all();
                     <?php
                     $instructor = Instructor::find($course->author);
                     $thumb = $course->thumbnail();
-                    $price = $course->price !== '' && $course->price !== null ? $course->price : 'Gratis';
+                    $price = $formatCurrency($course->price);
                     ?>
                     <tr class="ecoursity-table-courses__row">
                         <td class="ecoursity-table-courses__td ecoursity-table-courses__td--thumb">

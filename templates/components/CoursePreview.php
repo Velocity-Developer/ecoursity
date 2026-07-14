@@ -11,6 +11,23 @@ if (!$course) {
     return;
 }
 
+$formatCurrency = static function ($value): string {
+    if ($value === '' || $value === null) {
+        return 'Gratis';
+    }
+
+    $numericValue = preg_replace('/[^\d.,]/', '', (string) $value);
+    $normalizedValue = str_contains($numericValue, ',') && str_contains($numericValue, '.')
+        ? str_replace('.', '', str_replace(',', '.', $numericValue))
+        : str_replace(',', '.', $numericValue);
+
+    if ($normalizedValue === '' || !is_numeric($normalizedValue)) {
+        return (string) $value;
+    }
+
+    return 'Rp' . number_format((float) $normalizedValue, 0, ',', '.');
+};
+
 $courseId       = $course->id;
 $thumbnail      = $course->thumbnail() ?: '';
 $title          = $course->title ?? '';
@@ -55,13 +72,14 @@ $statusLabels = [
 $statusLabel = $statusLabels[$status] ?? ucfirst($status);
 
 // Price display
+$formattedPrice = $formatCurrency($price);
+$formattedPriceSale = $formatCurrency($priceSale);
+
 if ($priceSale !== '') {
-    $displayPrice = '<span class="course-preview__price-sale">' . esc_html((string) $priceSale) . '</span>'
-        . ' <span class="course-preview__price-original">' . esc_html((string) $price) . '</span>';
-} elseif ($price !== '') {
-    $displayPrice = esc_html((string) $price);
+    $displayPrice = '<span class="course-preview__price-sale">' . esc_html($formattedPriceSale) . '</span>'
+        . ' <span class="course-preview__price-original">' . esc_html($formattedPrice) . '</span>';
 } else {
-    $displayPrice = 'Gratis';
+    $displayPrice = esc_html($formattedPrice);
 }
 
 $editUrl = $canManage ? get_edit_post_link($courseId) : '';
@@ -186,6 +204,8 @@ $metaLabels = [
                             <?php
                             if ($metaKey === '_ecoursity_duration') {
                                 echo esc_html((string) $metaValue[0] . ' ' . $metaValue[1]);
+                            } elseif (in_array($metaKey, ['_ecoursity_price', '_ecoursity_price_sale'], true)) {
+                                echo esc_html($formatCurrency($metaValue));
                             } else {
                                 echo esc_html((string) $metaValue);
                             }

@@ -155,7 +155,7 @@
 
 /* ── Course Form ── */
 .ecoursity-course-form {
-    max-width: 960px;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -219,7 +219,7 @@
 .ecoursity-form-textarea {
     display: block;
     width: 100%;
-    min-height: 44px;
+    min-height: 24px;
     padding: 12px 16px;
     font-size: 16px;
     font-weight: 400;
@@ -333,7 +333,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 44px;
+    min-height: 24px;
     padding: 12px 24px;
     border-radius: 4px;
     font-size: 14px;
