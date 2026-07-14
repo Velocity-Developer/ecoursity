@@ -10,11 +10,18 @@ $action = $_GET['action'] ?? '';
             <h1 class="ecoursity-admin-page__title">Edit Kursus</h1>
         </div>
 
-        <a
-            href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses'); ?>"
-            class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn">
-            Daftar Kursus
-        </a>
+        <div style="display: flex; justify-content: flex-end;gap: 6px;">
+            <a
+                href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses'); ?>"
+                class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn" style="margin-bottom: 24px;">
+                Daftar Kursus
+            </a>
+            <a
+                href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses&action=new'); ?>"
+                class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn" style="margin-bottom: 24px;">
+                Tambah Kursus
+            </a>
+        </div>
 
         <?php
         $props = [
