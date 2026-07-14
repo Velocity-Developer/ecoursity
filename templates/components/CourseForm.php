@@ -1,10 +1,200 @@
 <?php
 $course_id = $props['course_id'] ?? 0;
 $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
+
 wp_enqueue_media();
+
+$course_form_sections = apply_filters('ecoursity_course_form_sections', [
+    [
+        'type'   => 'field',
+        'name'   => 'title',
+        'label'  => 'Judul Kursus',
+        'input'  => 'text',
+        'class'  => 'ecoursity-form-input',
+        'required' => true,
+        'placeholder' => 'e.g. Belajar Laravel dari Nol',
+        'default' => '',
+    ],
+    [
+        'type' => 'special',
+        'name' => 'slug',
+    ],
+    [
+        'type' => 'special',
+        'name' => 'thumbnail',
+    ],
+    [
+        'type'   => 'row',
+        'fields' => [
+            [
+                'type'    => 'field',
+                'name'    => 'status',
+                'label'   => 'Status',
+                'input'   => 'select',
+                'class'   => 'ecoursity-form-select',
+                'default' => 'draft',
+                'options' => [
+                    ['value' => 'draft', 'label' => 'Draft'],
+                    ['value' => 'publish', 'label' => 'Publik'],
+                    ['value' => 'pending', 'label' => 'Pending'],
+                ],
+            ],
+            [
+                'type'    => 'field',
+                'name'    => 'level',
+                'label'   => 'Level',
+                'input'   => 'select',
+                'class'   => 'ecoursity-form-select',
+                'default' => '',
+                'options' => [
+                    ['value' => '', 'label' => 'Pilih Level'],
+                    ['value' => 'beginner', 'label' => 'Pemula'],
+                    ['value' => 'intermediate', 'label' => 'Menengah'],
+                    ['value' => 'advanced', 'label' => 'Lanjutan'],
+                ],
+            ],
+            [
+                'type' => 'special',
+                'name' => 'duration',
+            ],
+        ],
+    ],
+    [
+        'type' => 'special',
+        'name' => 'content',
+    ],
+    [
+        'type'   => 'field',
+        'name'   => 'excerpt',
+        'label'  => 'Ringkasan',
+        'input'  => 'textarea',
+        'class'  => 'ecoursity-form-textarea',
+        'rows'   => 3,
+        'placeholder' => 'Ringkasan singkat...',
+        'default' => '',
+    ],
+    [
+        'type'   => 'row',
+        'fields' => [
+            [
+                'type' => 'field',
+                'name' => 'price',
+                'label' => 'Harga',
+                'input' => 'text',
+                'class' => 'ecoursity-form-input',
+                'placeholder' => '0',
+                'default' => '0',
+            ],
+            [
+                'type' => 'field',
+                'name' => 'price_sale',
+                'label' => 'Harga Diskon',
+                'input' => 'text',
+                'class' => 'ecoursity-form-input',
+                'placeholder' => 'Kosongkan jika tidak ada',
+                'default' => '',
+            ],
+        ],
+    ],
+    [
+        'type'   => 'row',
+        'fields' => [
+            [
+                'type' => 'field',
+                'name' => 'price_sale_start',
+                'label' => 'Diskon Mulai',
+                'input' => 'datetime-local',
+                'class' => 'ecoursity-form-input',
+                'default' => '',
+            ],
+            [
+                'type' => 'field',
+                'name' => 'price_sale_end',
+                'label' => 'Diskon Berakhir',
+                'input' => 'datetime-local',
+                'class' => 'ecoursity-form-input',
+                'default' => '',
+            ],
+        ],
+    ],
+    [
+        'type'   => 'row',
+        'fields' => [
+            [
+                'type' => 'field',
+                'name' => 'max_students',
+                'label' => 'Max Siswa',
+                'input' => 'number',
+                'class' => 'ecoursity-form-input',
+                'min' => 0,
+                'placeholder' => '0 = tidak terbatas',
+                'default' => '',
+            ],
+            [
+                'type'    => 'field',
+                'name'    => 'course_evaluation',
+                'label'   => 'Evaluasi',
+                'input'   => 'select',
+                'class'   => 'ecoursity-form-select',
+                'default' => '',
+                'options' => [
+                    ['value' => '', 'label' => 'Pilih Evaluasi'],
+                    ['value' => 'none', 'label' => 'Tidak Ada'],
+                    ['value' => 'quiz', 'label' => 'Kuis'],
+                    ['value' => 'assignment', 'label' => 'Tugas'],
+                ],
+            ],
+            [
+                'type' => 'field',
+                'name' => 'passing_grade',
+                'label' => 'Nilai Lulus',
+                'input' => 'number',
+                'class' => 'ecoursity-form-input',
+                'min' => 0,
+                'max' => 100,
+                'placeholder' => 'e.g. 70',
+                'default' => '',
+            ],
+        ],
+    ],
+]);
+
+$collect_defaults = static function (array $items) use (&$collect_defaults): array {
+    $defaults = [];
+
+    foreach ($items as $item) {
+        if (($item['type'] ?? '') === 'row') {
+            $defaults = array_merge($defaults, $collect_defaults($item['fields'] ?? []));
+            continue;
+        }
+
+        if (($item['type'] ?? '') !== 'field' || empty($item['name'])) {
+            continue;
+        }
+
+        $defaults[$item['name']] = $item['default'] ?? '';
+    }
+
+    return $defaults;
+};
+
+$course_defaults = array_merge([
+    'slug' => '',
+    'content' => '',
+    'thumbnail' => '',
+    'thumbnail_id' => 0,
+    'duration_value' => 1,
+    'duration_unit' => 'week',
+], $collect_defaults($course_form_sections));
 ?>
 
-<div x-data="courseForm(<?php echo (int) $course_id; ?>, '<?php echo esc_js($rest_url); ?>')" x-cloak>
+<div
+    x-data="courseForm(
+        <?php echo (int) $course_id; ?>,
+        '<?php echo esc_js($rest_url); ?>',
+        <?php echo esc_attr(wp_json_encode($course_defaults)); ?>
+    )"
+    x-cloak>
     <template x-if="loading">
         <p class="ecoursity-form-loading">Memuat data kursus...</p>
     </template>
@@ -13,137 +203,177 @@ wp_enqueue_media();
 
         <div x-show="message" class="ecoursity-form-message" :class="'ecoursity-form-message--' + message_type" x-text="message"></div>
 
-        <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">Judul Kursus <span class="ecoursity-required">*</span></label>
-            <input type="text" class="ecoursity-form-input" x-model="course.title" required placeholder="e.g. Belajar Laravel dari Nol">
-        </div>
+        <?php
+        $render_field = static function (array $field): void {
+            $name        = $field['name'] ?? '';
+            $label       = $field['label'] ?? '';
+            $input       = $field['input'] ?? 'text';
+            $class       = $field['class'] ?? 'ecoursity-form-input';
+            $placeholder = $field['placeholder'] ?? '';
+            $required    = !empty($field['required']);
+            $rows        = (int) ($field['rows'] ?? 3);
+            $min         = $field['min'] ?? null;
+            $max         = $field['max'] ?? null;
+            $step        = $field['step'] ?? null;
+            $options     = $field['options'] ?? [];
 
-        <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">Slug</label>
-            <div class="ecoursity-form-slug">
-                <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="course.slug || '(kosong)'"></span>
-                <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="course.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
-            </div>
-        </div>
-
-        <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">Gambar Unggulan</label>
-            <div class="ecoursity-form-featured-image">
-                <template x-if="course.thumbnail">
-                    <div class="ecoursity-form-featured-image__preview">
-                        <img :src="course.thumbnail" alt="Featured image">
-                    </div>
-                </template>
-                <template x-if="!course.thumbnail">
-                    <div class="ecoursity-form-featured-image__placeholder">
-                        <span>Belum ada gambar</span>
-                    </div>
-                </template>
-                <div class="ecoursity-form-featured-image__actions">
-                    <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--sm" @click="openMediaUploader()">Pilih Gambar</button>
-                    <button type="button" class="ecoursity-button ecoursity-button--ghost ecoursity-button--sm" x-show="course.thumbnail" @click="removeFeaturedImage()">Hapus</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="ecoursity-form-row">
+            if ($name === '' || $label === '') {
+                return;
+            }
+        ?>
             <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Status</label>
-                <select class="ecoursity-form-select" x-model="course.status">
-                    <option value="draft">Draft</option>
-                    <option value="publish">Publik</option>
-                    <option value="pending">Pending</option>
-                </select>
-            </div>
+                <label class="ecoursity-form-label">
+                    <?php echo esc_html($label); ?>
+                    <?php if ($required) : ?>
+                        <span class="ecoursity-required">*</span>
+                    <?php endif; ?>
+                </label>
 
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Level</label>
-                <select class="ecoursity-form-select" x-model="course.level">
-                    <option value="">Pilih Level</option>
-                    <option value="beginner">Pemula</option>
-                    <option value="intermediate">Menengah</option>
-                    <option value="advanced">Lanjutan</option>
-                </select>
-            </div>
-
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Durasi</label>
-                <div class="ecoursity-form-duration">
-                    <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="course.duration_value" min="1" placeholder="1">
-                    <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="course.duration_unit">
-                        <option value="day">Hari</option>
-                        <option value="week">Minggu</option>
-                        <option value="month">Bulan</option>
-                        <option value="year">Tahun</option>
+                <?php if ($input === 'textarea') : ?>
+                    <textarea
+                        class="<?php echo esc_attr($class); ?>"
+                        x-model="course.<?php echo esc_attr($name); ?>"
+                        rows="<?php echo esc_attr((string) $rows); ?>"
+                        <?php if ($placeholder !== '') : ?>placeholder="<?php echo esc_attr($placeholder); ?>" <?php endif; ?>
+                        <?php if ($required) : ?>required<?php endif; ?>></textarea>
+                <?php elseif ($input === 'select') : ?>
+                    <select
+                        class="<?php echo esc_attr($class); ?>"
+                        x-model="course.<?php echo esc_attr($name); ?>"
+                        <?php if ($required) : ?>required<?php endif; ?>>
+                        <?php foreach ($options as $option) : ?>
+                            <option value="<?php echo esc_attr((string) ($option['value'] ?? '')); ?>"><?php echo esc_html((string) ($option['label'] ?? '')); ?></option>
+                        <?php endforeach; ?>
                     </select>
-                </div>
-            </div>
-        </div>
+                <?php else : ?>
+                    <input
+                        type="<?php echo esc_attr($input); ?>"
+                        class="<?php echo esc_attr($class); ?>"
+                        x-model="course.<?php echo esc_attr($name); ?>"
+                        <?php if ($placeholder !== '') : ?>placeholder="<?php echo esc_attr($placeholder); ?>" <?php endif; ?>
+                        <?php if ($min !== null) : ?>min="<?php echo esc_attr((string) $min); ?>" <?php endif; ?>
+                        <?php if ($max !== null) : ?>max="<?php echo esc_attr((string) $max); ?>" <?php endif; ?>
+                        <?php if ($step !== null) : ?>step="<?php echo esc_attr((string) $step); ?>" <?php endif; ?>
+                        <?php if ($required) : ?>required<?php endif; ?>>
+                <?php endif; ?>
 
-        <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">Konten</label>
+                <?php do_action('ecoursity_course_form_after_field', $field); ?>
+            </div>
             <?php
-            wp_editor('', 'ecoursity_course_content', [
-                'textarea_name' => 'course_content',
-                'textarea_rows' => 40,
-                'editor_height' => 600,
-                'media_buttons' => true,
-                'teeny'         => false,
-                'quicktags'     => true,
-            ]);
+        };
+
+        foreach ($course_form_sections as $section) :
+            $section_type = $section['type'] ?? '';
+
+            if ($section_type === 'field') {
+                $render_field($section);
+                continue;
+            }
+
+            if ($section_type === 'row') :
             ?>
-        </div>
+                <div class="ecoursity-form-row">
+                    <?php
+                    foreach (($section['fields'] ?? []) as $field) {
+                        $field_type = $field['type'] ?? 'field';
 
-        <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">Ringkasan</label>
-            <textarea class="ecoursity-form-textarea" x-model="course.excerpt" rows="3" placeholder="Ringkasan singkat..."></textarea>
-        </div>
+                        if ($field_type === 'field') {
+                            $render_field($field);
+                            continue;
+                        }
 
-        <div class="ecoursity-form-row">
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Harga</label>
-                <input type="text" class="ecoursity-form-input" x-model="course.price" placeholder="0">
-            </div>
+                        if ($field_type !== 'special') {
+                            continue;
+                        }
 
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Harga Diskon</label>
-                <input type="text" class="ecoursity-form-input" x-model="course.price_sale" placeholder="Kosongkan jika tidak ada">
-            </div>
-        </div>
+                        $special_name = $field['name'] ?? '';
 
-        <div class="ecoursity-form-row">
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Diskon Mulai</label>
-                <input type="datetime-local" class="ecoursity-form-input" x-model="course.price_sale_start">
-            </div>
+                        if ($special_name === 'duration') :
+                    ?>
+                            <div class="ecoursity-form-group">
+                                <label class="ecoursity-form-label">Durasi</label>
+                                <div class="ecoursity-form-duration">
+                                    <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="course.duration_value" min="1" placeholder="1">
+                                    <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="course.duration_unit">
+                                        <option value="day">Hari</option>
+                                        <option value="week">Minggu</option>
+                                        <option value="month">Bulan</option>
+                                        <option value="year">Tahun</option>
+                                    </select>
+                                </div>
+                            </div>
+                    <?php
+                        endif;
+                    }
+                    ?>
+                </div>
+            <?php
+                continue;
+            endif;
 
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Diskon Berakhir</label>
-                <input type="datetime-local" class="ecoursity-form-input" x-model="course.price_sale_end">
-            </div>
-        </div>
+            if ($section_type !== 'special') {
+                continue;
+            }
 
-        <div class="ecoursity-form-row">
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Max Siswa</label>
-                <input type="number" class="ecoursity-form-input" x-model="course.max_students" min="0" placeholder="0 = tidak terbatas">
-            </div>
+            $special_name = $section['name'] ?? '';
 
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Evaluasi</label>
-                <select class="ecoursity-form-select" x-model="course.course_evaluation">
-                    <option value="">Pilih Evaluasi</option>
-                    <option value="none">Tidak Ada</option>
-                    <option value="quiz">Kuis</option>
-                    <option value="assignment">Tugas</option>
-                </select>
-            </div>
+            if ($special_name === 'slug') :
+            ?>
+                <div class="ecoursity-form-group">
+                    <label class="ecoursity-form-label">Slug</label>
+                    <div class="ecoursity-form-slug">
+                        <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="course.slug || '(kosong)'"></span>
+                        <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="course.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
+                    </div>
+                </div>
+            <?php
+                continue;
+            endif;
 
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Nilai Lulus</label>
-                <input type="number" class="ecoursity-form-input" x-model="course.passing_grade" min="0" max="100" placeholder="e.g. 70">
-            </div>
-        </div>
+            if ($special_name === 'thumbnail') :
+            ?>
+                <div class="ecoursity-form-group">
+                    <label class="ecoursity-form-label">Gambar Unggulan</label>
+                    <div class="ecoursity-form-featured-image">
+                        <template x-if="course.thumbnail">
+                            <div class="ecoursity-form-featured-image__preview">
+                                <img :src="course.thumbnail" alt="Featured image">
+                            </div>
+                        </template>
+                        <template x-if="!course.thumbnail">
+                            <div class="ecoursity-form-featured-image__placeholder">
+                                <span>Belum ada gambar</span>
+                            </div>
+                        </template>
+                        <div class="ecoursity-form-featured-image__actions">
+                            <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--sm" @click="openMediaUploader()">Pilih Gambar</button>
+                            <button type="button" class="ecoursity-button ecoursity-button--ghost ecoursity-button--sm" x-show="course.thumbnail" @click="removeFeaturedImage()">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            <?php
+                continue;
+            endif;
+
+            if ($special_name === 'content') :
+            ?>
+                <div class="ecoursity-form-group">
+                    <label class="ecoursity-form-label">Konten</label>
+                    <?php
+                    wp_editor('', 'ecoursity_course_content', [
+                        'textarea_name' => 'course_content',
+                        'textarea_rows' => 40,
+                        'editor_height' => 600,
+                        'media_buttons' => true,
+                        'teeny'         => false,
+                        'quicktags'     => true,
+                    ]);
+                    ?>
+                </div>
+        <?php
+            endif;
+        endforeach;
+        ?>
 
         <div class="ecoursity-form-actions">
             <button type="submit" class="ecoursity-button ecoursity-button--primary" :disabled="saving" x-text="saving ? 'Menyimpan...' : 'Simpan'"></button>
@@ -154,7 +384,7 @@ wp_enqueue_media();
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('courseForm', (courseId, restUrl) => ({
+        Alpine.data('courseForm', (courseId, restUrl, defaults) => ({
             loading: true,
             saving: false,
             slugEditable: false,
@@ -162,21 +392,7 @@ wp_enqueue_media();
             message: '',
             message_type: 'success',
             course: {
-                title: '',
-                slug: '',
-                status: 'draft',
-                content: '',
-                excerpt: '',
-                duration_value: 1,
-                duration_unit: 'week',
-                level: '',
-                max_students: '',
-                price: '0',
-                price_sale: '',
-                price_sale_start: '',
-                price_sale_end: '',
-                course_evaluation: '',
-                passing_grade: '',
+                ...defaults,
             },
             async init() {
                 await this.loadCourse();
