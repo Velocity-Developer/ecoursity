@@ -85,7 +85,8 @@ wp_enqueue_media();
             <?php
             wp_editor('', 'ecoursity_course_content', [
                 'textarea_name' => 'course_content',
-                'textarea_rows' => 25,
+                'textarea_rows' => 40,
+                'editor_height' => 600,
                 'media_buttons' => true,
                 'teeny'         => false,
                 'quicktags'     => true,
