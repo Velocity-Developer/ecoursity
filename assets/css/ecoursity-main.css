@@ -1,55 +1,58 @@
 /* ── Ecoursity Design Tokens ── */
-/* Shopifi-inspired: light/cream canvas, aloe accents, pill buttons, thin-weight display */
+/* HP-inspired: white paper surfaces, electric blue CTA, dark ink typography */
 
 :root {
   /* Colors */
-  --ecoursity-primary: #000000;
+  --ecoursity-primary: #024ad8;
+  --ecoursity-primary-bright: #296ef9;
+  --ecoursity-primary-deep: #0e3191;
+  --ecoursity-primary-soft: #c9e0fc;
   --ecoursity-on-primary: #ffffff;
+  --ecoursity-ink: #1a1a1a;
+  --ecoursity-ink-deep: #000000;
+  --ecoursity-ink-soft: #292929;
+  --ecoursity-on-ink: #ffffff;
   --ecoursity-canvas-light: #ffffff;
-  --ecoursity-canvas-cream: #fbfbf5;
-  --ecoursity-aloe-10: #c1fbd4;
-  --ecoursity-pistachio-10: #d4f9e0;
-  --ecoursity-shade-30: #d4d4d8;
-  --ecoursity-shade-40: #a1a1aa;
-  --ecoursity-shade-50: #71717a;
-  --ecoursity-shade-60: #52525b;
-  --ecoursity-shade-70: #3f3f46;
-  --ecoursity-hairline-light: #e4e4e7;
-  --ecoursity-ink: #000000;
+  --ecoursity-canvas-cream: #f7f7f7;
+  --ecoursity-fog: #e8e8e8;
+  --ecoursity-steel: #c2c2c2;
+  --ecoursity-graphite: #636363;
+  --ecoursity-charcoal: #3d3d3d;
+  --ecoursity-hairline-light: #e8e8e8;
+  --ecoursity-hairline-strong: #c2c2c2;
+  --ecoursity-error: #b3262b;
+  --ecoursity-error-soft: #f9d4d2;
+  --ecoursity-error-deep: #5a1313;
 
   /* Border Radius */
-  --ecoursity-radius-xs: 4px;
-  --ecoursity-radius-sm: 5px;
-  --ecoursity-radius-md: 8px;
-  --ecoursity-radius-lg: 12px;
-  --ecoursity-radius-xl: 20px;
+  --ecoursity-radius-xs: 2px;
+  --ecoursity-radius-sm: 3px;
+  --ecoursity-radius-md: 4px;
+  --ecoursity-radius-lg: 8px;
+  --ecoursity-radius-xl: 16px;
   --ecoursity-radius-pill: 9999px;
 
   /* Spacing */
-  --ecoursity-space-xxs: 2px;
-  --ecoursity-space-xs: 4px;
-  --ecoursity-space-sm: 8px;
-  --ecoursity-space-md: 12px;
-  --ecoursity-space-lg: 16px;
+  --ecoursity-space-xxs: 4px;
+  --ecoursity-space-xs: 8px;
+  --ecoursity-space-sm: 12px;
+  --ecoursity-space-md: 16px;
+  --ecoursity-space-lg: 20px;
   --ecoursity-space-xl: 24px;
   --ecoursity-space-xxl: 32px;
-  --ecoursity-space-huge: 64px;
+  --ecoursity-space-huge: 80px;
 
   /* Elevation */
-  --ecoursity-shadow-stacked: 0 8px 8px rgba(0,0,0,0.1),
-                    0 4px 4px rgba(0,0,0,0.1),
-                    0 2px 2px rgba(0,0,0,0.1),
-                    0 0 0 1px rgba(0,0,0,0.1);
-  --ecoursity-shadow-modal: 0 25px 50px -12px rgba(0,0,0,0.25);
+  --ecoursity-shadow-stacked: 0 2px 8px rgba(26, 26, 26, 0.08);
+  --ecoursity-shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 /* ── Typography ── */
-/* Display: Neue Haas Grotesk Display, thin weight 330 */
-/* Body: Inter Variable, 420-550 */
-/* Global: font-feature-settings: "ss03" */
+/* Display + body: Forma DJR Micro, fallback Manrope/Inter/Roboto */
+/* Global: clean, white-paper enterprise-consumer rhythm */
 
 /* ── Buttons ── */
-/* Always border-radius: var(--ecoursity-radius-pill) — never rounded-rectangle */
+/* Buttons use 4px radius. Pills reserved for chips/tabs only. */
 
 /* ── Base Components ── */
 
@@ -58,42 +61,47 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--ecoursity-radius-pill);
-  padding: 8px 20px;
-  font-size: 13px;
-  font-weight: 500;
+  min-height: 44px;
+  padding: 12px 24px;
+  border-radius: var(--ecoursity-radius-md);
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.4;
-  border: none;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
   text-decoration: none;
   gap: var(--ecoursity-space-xs);
 }
 
 .ecoursity-button:hover {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .ecoursity-button--primary {
   background: var(--ecoursity-primary);
   color: var(--ecoursity-on-primary);
+  border-color: var(--ecoursity-primary);
 }
 
 .ecoursity-button--primary:hover {
-  background: var(--ecoursity-shade-70);
-  opacity: 1;
+  background: var(--ecoursity-primary-deep);
+  border-color: var(--ecoursity-primary-deep);
 }
 
 .ecoursity-button--outline {
   background: var(--ecoursity-canvas-light);
-  color: var(--ecoursity-ink);
-  border: 1px solid var(--ecoursity-primary);
+  color: var(--ecoursity-primary);
+  border-color: var(--ecoursity-primary);
 }
 
 .ecoursity-button--outline:hover {
-  background: #fafafa;
-  opacity: 1;
+  background: var(--ecoursity-canvas-light);
+  color: var(--ecoursity-primary-deep);
+  border-color: var(--ecoursity-primary-deep);
 }
 
 .ecoursity-button--ghost {
@@ -102,50 +110,54 @@
 }
 
 .ecoursity-button--ghost:hover {
-  background: #f4f4f5;
-  opacity: 1;
+  background: var(--ecoursity-canvas-cream);
 }
 
 .ecoursity-button--sm {
-  padding: 6px 16px;
-  font-size: 12px;
+  min-height: 40px;
+  padding: 12px 16px;
+  font-size: 12.6px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.126px;
 }
 
 .ecoursity-button--lg {
-  padding: 12px 28px;
-  font-size: 15px;
+  min-height: 44px;
+  padding: 12px 24px;
+  font-size: 14px;
 }
 
 /* ecoursity-badge */
 .ecoursity-badge {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--ecoursity-radius-pill);
-  padding: 2px 10px;
-  font-size: 11px;
+  min-height: 32px;
+  border-radius: var(--ecoursity-radius-lg);
+  padding: 6px 12px;
+  font-size: 16px;
   font-weight: 500;
-  letter-spacing: 0.3px;
+  line-height: 1.38;
+  letter-spacing: 0;
   color: var(--ecoursity-ink);
-  background: var(--ecoursity-shade-30);
+  background: var(--ecoursity-canvas-light);
+  border: 1px solid var(--ecoursity-steel);
 }
 
-.ecoursity-badge--pistachio {
-  background: var(--ecoursity-pistachio-10);
-}
-
+.ecoursity-badge--pistachio,
 .ecoursity-badge--aloe {
-  background: var(--ecoursity-aloe-10);
+  background: var(--ecoursity-canvas-light);
 }
 
 .ecoursity-badge--cream {
-  background: var(--ecoursity-canvas-cream);
+  background: var(--ecoursity-canvas-light);
   border: 1px solid var(--ecoursity-hairline-light);
 }
 
 /* ecoursity-card */
 .ecoursity-card {
   overflow: hidden;
-  border-radius: var(--ecoursity-radius-lg);
+  border-radius: var(--ecoursity-radius-xl);
   border: 1px solid var(--ecoursity-hairline-light);
   background: var(--ecoursity-canvas-light);
   box-shadow: var(--ecoursity-shadow-stacked);
@@ -178,6 +190,7 @@
   flex-direction: column;
   border-radius: var(--ecoursity-radius-xl);
   background: var(--ecoursity-canvas-light);
+  border: 1px solid var(--ecoursity-hairline-light);
   box-shadow: var(--ecoursity-shadow-modal);
   opacity: 0;
   transform: scale(0.74);
@@ -509,6 +522,7 @@
   gap: 12px;
 }
 
+.course-preview__btn,
 .course-preview__action {
   display: inline-flex;
   align-items: center;
@@ -525,35 +539,41 @@
   text-decoration: none;
 }
 
+.course-preview__btn--primary,
 .course-preview__action--primary {
   background: #024ad8;
   color: #ffffff;
   border-color: #024ad8;
 }
 
+.course-preview__btn--primary:hover,
 .course-preview__action--primary:hover {
   background: #0e3191;
   color: #ffffff;
 }
 
+.course-preview__btn--outline,
 .course-preview__action--outline {
   background: #ffffff;
   color: #024ad8;
   border-color: #024ad8;
 }
 
+.course-preview__btn--outline:hover,
 .course-preview__action--outline:hover {
   background: #ffffff;
+  color: #0e3191;
+  border-color: #0e3191;
 }
 
 .course-preview__error {
   padding: 24px;
   font-size: 14px;
   line-height: 1.5;
-  color: #5a1313;
-  background: #f9d4d2;
-  border-radius: 16px;
-  border: 1px solid #b3262b;
+  color: var(--ecoursity-error-deep);
+  background: var(--ecoursity-error-soft);
+  border-radius: var(--ecoursity-radius-xl);
+  border: 1px solid var(--ecoursity-error);
 }
 
 @media (max-width: 767px) {
@@ -596,13 +616,14 @@
 .ecoursity-table-courses {
   overflow-x: auto;
   background: var(--ecoursity-canvas-light);
-  border-radius: var(--ecoursity-radius-lg);
   border: 1px solid var(--ecoursity-hairline-light);
+  border-radius: var(--ecoursity-radius-xl);
 }
 
 .ecoursity-table-courses__table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 14px;
 }
 
@@ -611,53 +632,59 @@
 }
 
 .ecoursity-table-courses__th {
+  padding: 16px 24px;
   text-align: left;
-  padding: 12px var(--ecoursity-space-lg);
-  font-weight: 500;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(0, 0, 0, 0.45);
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0;
+  color: var(--ecoursity-graphite);
   border-bottom: 1px solid var(--ecoursity-hairline-light);
-}
-
-.ecoursity-table-courses__th--right {
-  text-align: right;
 }
 
 .ecoursity-table-courses__th--thumb {
-  width: 56px;
+  width: 72px;
   padding-right: 0;
 }
 
-.ecoursity-table-courses__row {
-  border-bottom: 1px solid var(--ecoursity-hairline-light);
-}
-
-.ecoursity-table-courses__row:last-child {
-  border-bottom: none;
+.ecoursity-table-courses__th--actions-head {
+  width: 1%;
 }
 
 .ecoursity-table-courses__row:hover {
-  background: #fafafa;
+  background: var(--ecoursity-canvas-cream);
+}
+
+.ecoursity-table-courses__row:last-child .ecoursity-table-courses__td {
+  border-bottom: none;
 }
 
 .ecoursity-table-courses__td {
-  padding: 12px var(--ecoursity-space-lg);
+  padding: 16px 24px;
   color: var(--ecoursity-ink);
   vertical-align: middle;
+  border-bottom: 1px solid var(--ecoursity-hairline-light);
 }
 
 .ecoursity-table-courses__td--thumb {
-  width: 56px;
+  width: 72px;
   padding-right: 0;
+}
+
+.ecoursity-table-courses__td--course {
+  min-width: 240px;
+}
+
+.ecoursity-table-courses__td--actions {
+  width: 1%;
+  white-space: nowrap;
 }
 
 .ecoursity-table-courses__thumb {
   display: block;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--ecoursity-radius-sm);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ecoursity-radius-xl);
   object-fit: cover;
 }
 
@@ -665,21 +692,51 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f4f4f5;
+  background: var(--ecoursity-canvas-cream);
+  font-size: 18px;
+}
+
+.ecoursity-table-courses__title {
+  margin: 0 0 4px;
   font-size: 16px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: var(--ecoursity-ink);
 }
 
-.ecoursity-table-courses__td--right {
-  text-align: right;
+.ecoursity-table-courses__meta,
+.ecoursity-table-courses__instructor {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ecoursity-graphite);
 }
 
-.ecoursity-table-courses__td--actions {
-  white-space: nowrap;
+.ecoursity-table-courses__price {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: var(--ecoursity-ink);
 }
 
-button.course-preview__btn.ecoursity-table-courses__btn {
-  padding: 6px 16px;
-  font-size: 12px;
+.ecoursity-table-courses__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.ecoursity-table-courses__empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ecoursity-graphite);
+}
+
+button.course-preview__btn.ecoursity-table-courses__btn,
+.course-preview__btn.ecoursity-table-courses__btn {
+  min-height: 44px;
+  padding: 12px 24px;
 }
 
 /* ── Admin Page (student) ── */
@@ -695,18 +752,20 @@ button.course-preview__btn.ecoursity-table-courses__btn {
   margin: 0;
   font-size: 24px;
   font-weight: 500;
+  line-height: 1.17;
   color: var(--ecoursity-ink);
 }
 
 .ecoursity-admin-page__desc {
   margin: var(--ecoursity-space-xs) 0 0;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.5);
+  line-height: 1.5;
+  color: var(--ecoursity-graphite);
 }
 
 .ecoursity-admin-page__card {
   overflow: hidden;
-  border-radius: var(--ecoursity-radius-lg);
+  border-radius: var(--ecoursity-radius-xl);
   border: 1px solid var(--ecoursity-hairline-light);
   background: var(--ecoursity-canvas-light);
 }
@@ -717,7 +776,8 @@ button.course-preview__btn.ecoursity-table-courses__btn {
 
 .ecoursity-admin-page__table {
   min-width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 14px;
 }
 
@@ -726,32 +786,29 @@ button.course-preview__btn.ecoursity-table-courses__btn {
 }
 
 .ecoursity-admin-page__th {
-  padding: 12px var(--ecoursity-space-lg);
+  padding: 16px 24px;
   text-align: left;
-  font-weight: 500;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(0, 0, 0, 0.45);
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0;
+  color: var(--ecoursity-graphite);
   border-bottom: 1px solid var(--ecoursity-hairline-light);
-}
-
-.ecoursity-admin-page__row {
-  border-bottom: 1px solid var(--ecoursity-hairline-light);
-}
-
-.ecoursity-admin-page__row:last-child {
-  border-bottom: none;
 }
 
 .ecoursity-admin-page__row:hover {
-  background: #fafafa;
+  background: var(--ecoursity-canvas-cream);
+}
+
+.ecoursity-admin-page__row:last-child .ecoursity-admin-page__td {
+  border-bottom: none;
 }
 
 .ecoursity-admin-page__td {
-  padding: 12px var(--ecoursity-space-lg);
+  padding: 16px 24px;
   color: var(--ecoursity-ink);
   vertical-align: middle;
+  border-bottom: 1px solid var(--ecoursity-hairline-light);
 }
 
 .ecoursity-admin-page__td--name {
@@ -759,8 +816,9 @@ button.course-preview__btn.ecoursity-table-courses__btn {
 }
 
 .ecoursity-admin-page__empty {
-  padding: var(--ecoursity-space-xl);
+  padding: 24px;
   text-align: center;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--ecoursity-graphite);
   font-size: 14px;
+  line-height: 1.5;
 }
