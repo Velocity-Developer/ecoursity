@@ -8,26 +8,26 @@ Pendekatan paling kecil dan sesuai kondisi codebase sekarang: ubah inisialisasi 
 ## Current State Analysis
 Hasil eksplorasi codebase:
 
-- Faker sudah terpasang sebagai dependency dev di [composer.json](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/composer.json#L16-L20).
-- Alur seeding berjalan lewat script Composer `seed`, yang mengeksekusi [seed.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/seed.php#L24-L31).
+- Faker sudah terpasang sebagai dependency dev di [composer.json](ecoursity/composer.json#L16-L20).
+- Alur seeding berjalan lewat script Composer `seed`, yang mengeksekusi [seed.php](ecoursity/tests/seed.php#L24-L31).
 - Tidak ada bootstrap PHPUnit global atau config test level plugin yang bisa dipakai sebagai tempat set locale Faker secara terpusat.
 - Pemakaian Faker saat ini hanya ada di dua file:
-  - [StudentSeeder.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/Seeders/StudentSeeder.php#L16-L24)
-  - [InstructorSeeder.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/Seeders/InstructorSeeder.php#L15-L23)
+  - [StudentSeeder.php](ecoursity/tests/Seeders/StudentSeeder.php#L16-L24)
+  - [InstructorSeeder.php](ecoursity/tests/Seeders/InstructorSeeder.php#L15-L23)
 - Kedua file masih memakai `Factory::create()` tanpa locale, jadi Faker jatuh ke locale default.
-- Username dan email dibentuk dari slug nama lewat helper [Str.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Helpers/Str.php). Ini tidak perlu diubah untuk kebutuhan locale Faker, tetapi tetap relevan karena nama hasil Faker akan dipakai untuk `user_login` dan `user_email`.
+- Username dan email dibentuk dari slug nama lewat helper [Str.php](ecoursity/app/Helpers/Str.php). Ini tidak perlu diubah untuk kebutuhan locale Faker, tetapi tetap relevan karena nama hasil Faker akan dipakai untuk `user_login` dan `user_email`.
 
 ## Assumptions & Decisions
 - Locale target: `id_ID`.
 - Scope hanya untuk data seeding/test, bukan runtime plugin.
 - Tidak perlu tambah helper/shared factory baru karena penggunaan Faker masih cuma dua titik. Diff paling pendek lebih tepat.
-- Tidak perlu ubah [seed.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/seed.php) karena file itu hanya orchestration, bukan tempat pembuatan instance Faker.
+- Tidak perlu ubah [seed.php](ecoursity/tests/seed.php) karena file itu hanya orchestration, bukan tempat pembuatan instance Faker.
 - Tidak perlu ubah `composer.json` karena package `fakerphp/faker` sudah tersedia.
 
 ## Proposed Changes
 
 ### 1) Ubah Faker locale di StudentSeeder
-File: [StudentSeeder.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/Seeders/StudentSeeder.php)
+File: [StudentSeeder.php](ecoursity/tests/Seeders/StudentSeeder.php)
 
 Apa:
 - Ganti `Factory::create()` menjadi `Factory::create('id_ID')`.
@@ -39,7 +39,7 @@ Bagaimana:
 - Edit satu baris inisialisasi Faker pada method `seed()`.
 
 ### 2) Ubah Faker locale di InstructorSeeder
-File: [InstructorSeeder.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/Seeders/InstructorSeeder.php)
+File: [InstructorSeeder.php](ecoursity/tests/Seeders/InstructorSeeder.php)
 
 Apa:
 - Ganti `Factory::create()` menjadi `Factory::create('id_ID')`.
@@ -52,8 +52,8 @@ Bagaimana:
 
 ### 3) Rapikan import yang tidak terpakai bila memang tersentuh
 File:
-- [StudentSeeder.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/Seeders/StudentSeeder.php)
-- [InstructorSeeder.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/tests/Seeders/InstructorSeeder.php)
+- [StudentSeeder.php](ecoursity/tests/Seeders/StudentSeeder.php)
+- [InstructorSeeder.php](ecoursity/tests/Seeders/InstructorSeeder.php)
 
 Apa:
 - Evaluasi `use Faker\Generator;`, `use WP_Error;`, dan model import yang tampak tidak dipakai.

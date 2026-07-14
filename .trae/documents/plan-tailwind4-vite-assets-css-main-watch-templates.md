@@ -6,24 +6,24 @@ Ubah pipeline frontend agar Tailwind 4 dibangun lewat Vite dari entry CSS yang s
 ## Current State Analysis
 
 ### File dan pola yang ditemukan
-- Konfigurasi Vite sekarang sangat minimal di [vite.config.ts](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/vite.config.ts#L1-L8). Hanya memuat plugin `@tailwindcss/vite` tanpa `build`, `input`, `outDir`, atau `watch`.
-- `package.json` di [package.json](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/package.json#L1-L32) sudah punya dependency `tailwindcss` dan `@tailwindcss/vite`, tetapi belum punya script `dev` dan `build`.
-- Entry CSS sudah ada di [main.css](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/src/css/main.css#L1-L1) dan saat ini hanya berisi `@import "tailwindcss";`.
-- Runtime WordPress masih enqueue file CSS lama dari folder assets lewat [EnqueueProvider.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Providers/EnqueueProvider.php#L16-L36):
+- Konfigurasi Vite sekarang sangat minimal di [vite.config.ts](ecoursity/vite.config.ts#L1-L8). Hanya memuat plugin `@tailwindcss/vite` tanpa `build`, `input`, `outDir`, atau `watch`.
+- `package.json` di [package.json](ecoursity/package.json#L1-L32) sudah punya dependency `tailwindcss` dan `@tailwindcss/vite`, tetapi belum punya script `dev` dan `build`.
+- Entry CSS sudah ada di [main.css](ecoursity/src/css/main.css#L1-L1) dan saat ini hanya berisi `@import "tailwindcss";`.
+- Runtime WordPress masih enqueue file CSS lama dari folder assets lewat [EnqueueProvider.php](ecoursity/app/Providers/EnqueueProvider.php#L16-L36):
   - admin: `assets/css/ecoursity-admin.css`
   - public: `assets/css/ecoursity-public.css`
-- Template PHP aktif dirender dari folder `templates` berdasarkan [TemplateService.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Services/TemplateService.php). Contoh file nyata: [dashboard.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/templates/admin/dashboard.php) dan [student.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/templates/admin/student.php).
+- Template PHP aktif dirender dari folder `templates` berdasarkan [TemplateService.php](ecoursity/app/Services/TemplateService.php). Contoh file nyata: [dashboard.php](ecoursity/templates/admin/dashboard.php) dan [student.php](ecoursity/templates/admin/student.php).
 
 ### Implikasi teknis
 - Agar CSS keluar ke path stabil `assets/css/main.css`, Vite perlu dikonfigurasi untuk build CSS-only dari `src/css/main.css` ke folder `assets` dengan nama file tetap, bukan hashed filename bawaan.
 - Karena `assets/` juga dipakai file plugin lain, `emptyOutDir` tidak boleh menghapus isi folder secara agresif.
 - Tailwind 4 perlu tahu lokasi file PHP yang mengandung class utility. Folder `templates/**/*.php` harus masuk source scanning.
-- Bila output baru ingin dipakai runtime WordPress, enqueue di [EnqueueProvider.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Providers/EnqueueProvider.php#L16-L36) harus diarahkan ke `assets/css/main.css`.
+- Bila output baru ingin dipakai runtime WordPress, enqueue di [EnqueueProvider.php](ecoursity/app/Providers/EnqueueProvider.php#L16-L36) harus diarahkan ke `assets/css/main.css`.
 
 ## Proposed Changes
 
 ### 1) Perbarui konfigurasi Vite
-**File:** [vite.config.ts](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/vite.config.ts)
+**File:** [vite.config.ts](ecoursity/vite.config.ts)
 
 **Perubahan:**
 - Tetapkan input build ke `src/css/main.css`.
@@ -45,7 +45,7 @@ Ubah pipeline frontend agar Tailwind 4 dibangun lewat Vite dari entry CSS yang s
 - Tambahkan `server.watch` untuk perubahan file PHP di folder `templates`.
 
 ### 2) Tambahkan source Tailwind ke template PHP
-**File:** [main.css](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/src/css/main.css)
+**File:** [main.css](ecoursity/src/css/main.css)
 
 **Perubahan:**
 - Pertahankan `@import "tailwindcss";`.
@@ -61,7 +61,7 @@ Ubah pipeline frontend agar Tailwind 4 dibangun lewat Vite dari entry CSS yang s
 - Jaga file tetap minimal, tanpa config file Tailwind tambahan selama belum dibutuhkan.
 
 ### 3) Tambahkan script npm untuk workflow build
-**File:** [package.json](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/package.json)
+**File:** [package.json](ecoursity/package.json)
 
 **Perubahan:**
 - Tambahkan script `dev` untuk menjalankan Vite.
@@ -77,7 +77,7 @@ Ubah pipeline frontend agar Tailwind 4 dibangun lewat Vite dari entry CSS yang s
 - Pertahankan perubahan seminimal mungkin; tidak perlu tambah `preview` jika tidak dipakai.
 
 ### 4) Sinkronkan enqueue WordPress ke output CSS baru
-**File:** [EnqueueProvider.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Providers/EnqueueProvider.php)
+**File:** [EnqueueProvider.php](ecoursity/app/Providers/EnqueueProvider.php)
 
 **Perubahan:**
 - Ganti referensi CSS admin dan public agar mengarah ke `assets/css/main.css`.
@@ -102,7 +102,7 @@ Ubah pipeline frontend agar Tailwind 4 dibangun lewat Vite dari entry CSS yang s
 1. Jalankan script build Vite.
 2. Pastikan file output terbentuk di `assets/css/main.css`.
 3. Pastikan file lama lain di folder `assets/` tidak ikut terhapus.
-4. Tambahkan sementara satu utility class Tailwind di salah satu file template, misalnya [dashboard.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/templates/admin/dashboard.php), lalu jalankan mode watch/dev.
+4. Tambahkan sementara satu utility class Tailwind di salah satu file template, misalnya [dashboard.php](ecoursity/templates/admin/dashboard.php), lalu jalankan mode watch/dev.
 5. Pastikan perubahan di folder `templates` memicu rebuild dan utility class baru muncul di `assets/css/main.css`.
 6. Buka halaman admin/public yang memakai enqueue plugin, lalu pastikan stylesheet yang dimuat sudah mengarah ke `assets/css/main.css`.
 

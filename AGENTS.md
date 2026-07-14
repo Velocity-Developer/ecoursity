@@ -466,6 +466,13 @@ without restructuring existing code.
 
 ***
 
+# Documentation
+
+- Create documentation in Markdown format (`.md`).
+- Store documentation files inside the `documents/` folder.
+
+***
+
 # General Principles
 
 - Prefer composition over inheritance.

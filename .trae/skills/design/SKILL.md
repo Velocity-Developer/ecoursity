@@ -5,7 +5,7 @@ description: "Applies HP-style design system from DESIGN.md. Invoke when designi
 
 # Design
 
-Gunakan skill ini saat membuat atau mengubah UI agar konsisten dengan design system di [DESIGN.md](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/DESIGN.md).
+Gunakan skill ini saat membuat atau mengubah UI agar konsisten dengan design system di [DESIGN.md](ecoursity/DESIGN.md).
 
 ## Kapan dipakai
 
@@ -23,7 +23,7 @@ Jangan pakai saat:
 
 ## Sumber kebenaran
 
-Selalu pakai [DESIGN.md](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/DESIGN.md) sebagai source of truth.
+Selalu pakai [DESIGN.md](ecoursity/DESIGN.md) sebagai source of truth.
 
 Prioritas:
 1. Token frontmatter: warna, typography, rounded, spacing, components
