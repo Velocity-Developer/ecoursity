@@ -4,6 +4,7 @@ namespace Ecoursity\App\Routes;
 
 use Ecoursity\App\Controllers\CourseController;
 use Ecoursity\App\Controllers\LessonController;
+use Ecoursity\App\Controllers\SectionController;
 use Ecoursity\App\Controllers\TemplateController;
 
 class ApiRoutes
@@ -79,6 +80,18 @@ class ApiRoutes
                 'route' => '/courses/(?P<id>\d+)',
                 'callback' => [CourseController::class, 'delete'],
                 'methods' => 'DELETE',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/sections/',
+                'callback' => [SectionController::class, 'store'],
+                'methods' => 'POST',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/sections/(?P<id>\d+)',
+                'callback' => [SectionController::class, 'update'],
+                'methods' => 'PUT',
                 'permission_callback' => '__return_true',
             ],
             [
