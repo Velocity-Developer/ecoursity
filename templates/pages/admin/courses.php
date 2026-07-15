@@ -29,7 +29,26 @@ $action = $_GET['action'] ?? '';
         ];
         Ecoursity\App\Template::component('CourseForm', compact('props'));
         ?>
+    <?php elseif ($action == 'new'): ?>
 
+        <div class="ecoursity-admin-page__header">
+            <h1 class="ecoursity-admin-page__title">Tambah Kursus</h1>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;gap: 6px;">
+            <a
+                href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses'); ?>"
+                class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn" style="margin-bottom: 24px;">
+                Daftar Kursus
+            </a>
+        </div>
+
+        <?php
+        $props = [
+            'course_id' => '',
+        ];
+        Ecoursity\App\Template::component('CourseForm', compact('props'));
+        ?>
     <?php else: ?>
 
         <div class="ecoursity-admin-page__header">

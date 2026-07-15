@@ -460,10 +460,19 @@ $course_defaults = array_merge([
             mediaUploader: null,
             message: '',
             message_type: 'success',
+            currentCourseId: parseInt(courseId, 10) || 0,
             course: {
                 ...defaults,
             },
             async init() {
+                if (!this.currentCourseId) {
+                    this.parseDuration();
+                    this.syncTaxonomies();
+                    this.loading = false;
+                    this.$nextTick(() => this.syncEditorContent());
+                    return;
+                }
+
                 await this.loadCourse();
             },
             openMediaUploader() {
@@ -512,7 +521,7 @@ $course_defaults = array_merge([
             async loadCourse() {
                 this.loading = true;
                 try {
-                    const res = await fetch(`${restUrl}${courseId}`, {
+                    const res = await fetch(`${restUrl}${this.currentCourseId}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
                         },
@@ -557,8 +566,7 @@ $course_defaults = array_merge([
                 this.course.course_category_ids = Array.isArray(this.course.course_category_ids) ?
                     this.course.course_category_ids
                     .map((id) => parseInt(id, 10))
-                    .filter((id) => Number.isInteger(id) && id > 0) :
-                    [];
+                    .filter((id) => Number.isInteger(id) && id > 0) : [];
                 this.course.course_tags = this.course.course_tags_input
                     .split(',')
                     .map((tag) => tag.trim())
@@ -567,8 +575,10 @@ $course_defaults = array_merge([
                 this.saving = true;
                 this.message = '';
                 try {
-                    const res = await fetch(`${restUrl}${courseId}`, {
-                        method: 'PUT',
+                    const endpoint = this.currentCourseId ? `${restUrl}${this.currentCourseId}` : restUrl;
+                    const method = this.currentCourseId ? 'PUT' : 'POST';
+                    const res = await fetch(endpoint, {
+                        method,
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
@@ -577,6 +587,13 @@ $course_defaults = array_merge([
                     });
                     const json = await res.json();
                     if (json.success) {
+                        if (json.data?.id) {
+                            this.currentCourseId = parseInt(json.data.id, 10) || this.currentCourseId;
+                            Object.assign(this.course, json.data);
+                            this.parseDuration();
+                            this.syncTaxonomies();
+                            this.$nextTick(() => this.syncEditorContent());
+                        }
                         this.message = json.message || 'Kursus berhasil disimpan.';
                         this.message_type = 'success';
                     } else {
