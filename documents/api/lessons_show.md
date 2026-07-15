@@ -4,8 +4,8 @@
 
 Ambil detail lesson berdasarkan id.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L90-L95)
-- Controller: [LessonController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/LessonController.php#L18-L35)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L90-L95)
+- Controller: [LessonController.php](ecoursity/app/Controllers/LessonController.php#L18-L35)
 - Permission: public
 
 ## Parameter

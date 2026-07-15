@@ -4,10 +4,10 @@
 
 Ambil daftar course.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L54-L59)
-- Controller: [CourseController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/CourseController.php#L11-L14)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L54-L59)
+- Controller: [CourseController.php](ecoursity/app/Controllers/CourseController.php#L11-L14)
 - Permission: public
 
 ## Response
 
-Mengembalikan array course dari model [Course.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Models/Course.php).
+Mengembalikan array course dari model [Course.php](ecoursity/app/Models/Course.php).

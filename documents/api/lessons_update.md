@@ -4,8 +4,8 @@
 
 Update lesson berdasarkan id.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L102-L107)
-- Controller: [LessonController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/LessonController.php#L66-L106)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L102-L107)
+- Controller: [LessonController.php](ecoursity/app/Controllers/LessonController.php#L66-L106)
 - Permission: perlu `edit_posts`
 
 ## Parameter

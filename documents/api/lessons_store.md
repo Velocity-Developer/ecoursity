@@ -4,8 +4,8 @@
 
 Buat lesson baru.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L96-L101)
-- Controller: [LessonController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/LessonController.php#L37-L64)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L96-L101)
+- Controller: [LessonController.php](ecoursity/app/Controllers/LessonController.php#L37-L64)
 - Permission: perlu `edit_posts`
 
 ## Body

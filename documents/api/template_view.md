@@ -4,8 +4,8 @@
 
 Ambil hasil render template berdasarkan id template.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L42-L47)
-- Controller: [TemplateController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/TemplateController.php)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L42-L47)
+- Controller: [TemplateController.php](ecoursity/app/Controllers/TemplateController.php)
 - Permission: public
 
 ## Parameter

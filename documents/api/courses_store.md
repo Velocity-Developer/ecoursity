@@ -4,8 +4,8 @@
 
 Buat course baru.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L66-L71)
-- Controller: [CourseController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/CourseController.php#L36-L64)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L66-L71)
+- Controller: [CourseController.php](ecoursity/app/Controllers/CourseController.php#L36-L64)
 - Permission: public
 
 ## Body

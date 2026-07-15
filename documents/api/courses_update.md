@@ -4,8 +4,8 @@
 
 Update course berdasarkan id.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L72-L77)
-- Controller: [CourseController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/CourseController.php#L66-L93)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L72-L77)
+- Controller: [CourseController.php](ecoursity/app/Controllers/CourseController.php#L66-L93)
 - Permission: public
 
 ## Parameter

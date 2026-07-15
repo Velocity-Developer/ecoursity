@@ -4,8 +4,8 @@
 
 Ambil hasil render component template berdasarkan nama component.
 
-- Lokasi: [ApiRoutes.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Routes/ApiRoutes.php#L48-L53)
-- Controller: [TemplateController.php](file:///c:/laragon/www/ecoursity/wp-content/plugins/ecoursity/app/Controllers/TemplateController.php)
+- Lokasi: [ApiRoutes.php](ecoursity/app/Routes/ApiRoutes.php#L48-L53)
+- Controller: [TemplateController.php](ecoursity/app/Controllers/TemplateController.php)
 - Permission: public
 
 ## Parameter
