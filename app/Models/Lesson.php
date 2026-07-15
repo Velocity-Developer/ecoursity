@@ -18,6 +18,15 @@ class Lesson
     public string $excerpt = '';
     public string $thumbnail = '';
     public int $author = 0;
+    public mixed $duration = '';
+    public bool $preview = false;
+    public int $assigned = 0;
+
+    public array $meta_keys = [
+        '_ecoursity_duration',
+        '_ecoursity_preview',
+        '_ecoursity_assigned',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -100,8 +109,22 @@ class Lesson
         return get_the_post_thumbnail_url($this->id, 'large') ?: '';
     }
 
+    public function meta(string $key, $default = null)
+    {
+        $value = get_post_meta($this->id, $key, true);
+
+        return $value === '' ? $default : $value;
+    }
+
+    public function updateMeta(string $key, $value): void
+    {
+        update_post_meta($this->id, $key, $value);
+    }
+
     protected static function fromPost(\WP_Post $post): self
     {
+        $meta = fn($key) => get_post_meta($post->ID, $key, true);
+
         return new self([
             'id' => $post->ID,
             'title' => $post->post_title,
@@ -110,6 +133,9 @@ class Lesson
             'excerpt' => $post->post_excerpt,
             'status' => $post->post_status,
             'author' => (int) $post->post_author,
+            'duration' => $meta('_ecoursity_duration') ?: '',
+            'preview' => (bool) $meta('_ecoursity_preview'),
+            'assigned' => (int) $meta('_ecoursity_assigned'),
         ]);
     }
 }

@@ -26,15 +26,75 @@ class PostTypeProvider
         ]);
 
         register_post_type(Lesson::POST_TYPE, [
-            'labels' => $this->makeLabels(__('Pelajaran')),
+            'labels' => $this->makeLabels(__('Materi Kursus')),
             'public' => true,
             'has_archive' => true,
-            'rewrite' => ['slug' => 'pelajaran'],
+            'rewrite' => ['slug' => 'lesson'],
             'show_in_menu' => false,
             'show_in_rest' => false,
-            'supports' => ['title', 'editor', 'thumbnail', 'comments'],
+            'supports' => ['title', 'editor'],
+        ]);
+
+        register_post_meta(Lesson::POST_TYPE, '_ecoursity_duration', [
+            'type' => 'array',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeLessonDurationMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Lesson::POST_TYPE, '_ecoursity_preview', [
+            'type' => 'boolean',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => 'rest_sanitize_boolean',
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Lesson::POST_TYPE, '_ecoursity_assigned', [
+            'type' => 'integer',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeLessonAssignedMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
         ]);
     }
+
+    public function sanitizeLessonDurationMeta(mixed $value): array
+    {
+        $amount = is_array($value) && isset($value[0]) ? absint($value[0]) : 1;
+        $unit = is_array($value) && isset($value[1]) ? sanitize_key((string) $value[1]) : 'minute';
+        $allowedUnits = ['minute', 'hour'];
+
+        if (!in_array($unit, $allowedUnits, true)) {
+            $unit = 'minute';
+        }
+
+        if ($amount < 1) {
+            $amount = 1;
+        }
+
+        return [$amount, $unit];
+    }
+
+    public function sanitizeLessonAssignedMeta(mixed $value): int
+    {
+        $courseId = absint($value);
+
+        if ($courseId < 1) {
+            return 0;
+        }
+
+        $course = get_post($courseId);
+
+        return $course && $course->post_type === Course::POST_TYPE ? $courseId : 0;
+    }
+
+    public function canEditPostMeta(): bool
+    {
+        return current_user_can('edit_posts');
+    }
+
     private function makeLabels(string $name): array
     {
         return [
