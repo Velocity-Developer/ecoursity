@@ -26,11 +26,9 @@ class LessonController
             ], 404);
         }
 
-        $lesson->thumbnail = $lesson->thumbnail();
-
         return new WP_REST_Response([
             'success' => true,
-            'data' => $lesson,
+            'data' => $this->transformLesson($lesson),
         ]);
     }
 
@@ -41,7 +39,7 @@ class LessonController
             'content' => (string) $request->get_param('content'),
             'excerpt' => (string) $request->get_param('excerpt'),
             'slug' => sanitize_title((string) $request->get_param('slug')),
-            'status' => sanitize_key((string) ($request->get_param('status') ?? 'draft')),
+            'status' => 'publish',
             'author' => get_current_user_id(),
         ]);
 
@@ -59,7 +57,7 @@ class LessonController
         return new WP_REST_Response([
             'success' => true,
             'message' => 'Lesson created.',
-            'data' => Lesson::find($id),
+            'data' => $this->transformLesson(Lesson::find($id)),
         ], 201);
     }
 
@@ -91,17 +89,14 @@ class LessonController
             $lesson->slug = sanitize_title((string) $request->get_param('slug'));
         }
 
-        if ($request->has_param('status')) {
-            $lesson->status = sanitize_key((string) $request->get_param('status'));
-        }
-
+        $lesson->status = 'publish';
         $lesson->save();
         $this->saveMeta($lesson, $request);
 
         return new WP_REST_Response([
             'success' => true,
             'message' => 'Lesson updated.',
-            'data' => Lesson::find($id),
+            'data' => $this->transformLesson(Lesson::find($id)),
         ]);
     }
 
@@ -141,5 +136,30 @@ class LessonController
         if ($request->has_param('assigned')) {
             $lesson->updateMeta('_ecoursity_assigned', absint($request->get_param('assigned')));
         }
+    }
+
+    private function transformLesson(?Lesson $lesson): array
+    {
+        if (! $lesson) {
+            return [];
+        }
+
+        $assignedId = (int) $lesson->assigned;
+
+        return [
+            'id' => (int) $lesson->id,
+            'title' => (string) $lesson->title,
+            'slug' => (string) $lesson->slug,
+            'content' => (string) $lesson->content,
+            'excerpt' => (string) $lesson->excerpt,
+            'status' => 'publish',
+            'author' => (int) $lesson->author,
+            'duration' => $lesson->duration,
+            'preview' => (bool) $lesson->preview,
+            'assigned' => $assignedId,
+            'assigned_title' => $assignedId > 0 ? (string) get_the_title($assignedId) : '',
+            'permalink' => $lesson->id ? (string) get_permalink($lesson->id) : '',
+            'thumbnail' => $lesson->thumbnail(),
+        ];
     }
 }

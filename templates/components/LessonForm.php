@@ -1,25 +1,22 @@
 <?php
 $lesson_id = $props['lesson_id'] ?? 0;
-$course_id = $props['course_id'] ?? 0;
+$course_id = (int) ($props['course_id'] ?? 0);
 $rest_url  = get_rest_url(null, 'ecoursity/v1/lessons/');
-
-$course_options = get_posts([
-    'post_type'      => 'ecoursity_course',
-    'posts_per_page' => -1,
-    'post_status'    => ['publish', 'draft', 'pending', 'private'],
-    'orderby'        => 'title',
-    'order'          => 'ASC',
-]);
+$course_title = $course_id > 0 ? get_the_title($course_id) : '';
+$course_permalink = $course_id > 0 ? get_permalink($course_id) : '';
+$lesson_permalink = $lesson_id > 0 ? get_permalink($lesson_id) : '';
 
 $lesson_defaults = [
     'title'          => '',
     'slug'           => '',
-    'assigned'       => (int) $course_id,
+    'assigned'       => $course_id,
+    'assigned_title' => $course_title ?: '',
     'content'        => '',
-    'status'         => 'draft',
+    'status'         => 'publish',
     'duration_value' => 35,
     'duration_unit'  => 'minute',
     'preview'        => false,
+    'permalink'      => $lesson_permalink ?: '',
 ];
 ?>
 
@@ -35,31 +32,29 @@ $lesson_defaults = [
 
         <div class="ecoursity-form-group">
             <label class="ecoursity-form-label">
-                Judul Lesson
+                Judul
                 <span class="ecoursity-required">*</span>
             </label>
             <input type="text" class="ecoursity-form-input" x-model="lesson.title" required placeholder="e.g. Pengenalan Laravel">
         </div>
 
         <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">Slug</label>
-            <div class="ecoursity-form-slug">
-                <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="lesson.slug || '(kosong)'"></span>
-                <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="lesson.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
-            </div>
+            <label class="ecoursity-form-label">Permalink</label>
+            <template x-if="lesson.permalink">
+                <a :href="lesson.permalink" target="_blank" rel="noopener noreferrer" class="ecoursity-form-slug__text" x-text="lesson.permalink"></a>
+            </template>
+            <template x-if="!lesson.permalink">
+                <span class="ecoursity-form-slug__text">Permalink tersedia setelah lesson disimpan.</span>
+            </template>
         </div>
 
         <div class="ecoursity-form-group">
-            <label class="ecoursity-form-label">
-                Course
-                <span class="ecoursity-required">*</span>
-            </label>
-            <select class="ecoursity-form-select" x-model="lesson.assigned" required>
-                <option value="0">Pilih Course</option>
-                <?php foreach ($course_options as $course_option) : ?>
-                    <option value="<?php echo esc_attr((string) $course_option->ID); ?>"><?php echo esc_html($course_option->post_title); ?></option>
-                <?php endforeach; ?>
-            </select>
+            <label class="ecoursity-form-label">Course</label>
+            <?php if ($course_permalink) : ?>
+                <a href="<?php echo esc_url($course_permalink); ?>" target="_blank" rel="noopener noreferrer" class="ecoursity-form-slug__text" x-text="lesson.assigned_title || '<?php echo esc_js($course_title); ?>'"></a>
+            <?php else : ?>
+                <span class="ecoursity-form-slug__text" x-text="lesson.assigned_title || 'Course tidak ditemukan'"></span>
+            <?php endif; ?>
         </div>
 
         <div class="ecoursity-form-group">
@@ -76,25 +71,14 @@ $lesson_defaults = [
             ?>
         </div>
 
-        <div class="ecoursity-form-row">
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Status</label>
-                <select class="ecoursity-form-select" x-model="lesson.status">
-                    <option value="draft">Draft</option>
-                    <option value="publish">Publik</option>
-                    <option value="pending">Pending</option>
+        <div class="ecoursity-form-group">
+            <label class="ecoursity-form-label">Durasi</label>
+            <div class="ecoursity-form-duration">
+                <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="lesson.duration_value" min="1" placeholder="35">
+                <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="lesson.duration_unit">
+                    <option value="minute">Menit</option>
+                    <option value="hour">Jam</option>
                 </select>
-            </div>
-
-            <div class="ecoursity-form-group">
-                <label class="ecoursity-form-label">Durasi</label>
-                <div class="ecoursity-form-duration">
-                    <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="lesson.duration_value" min="1" placeholder="35">
-                    <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="lesson.duration_unit">
-                        <option value="minute">Menit</option>
-                        <option value="hour">Jam</option>
-                    </select>
-                </div>
             </div>
         </div>
 

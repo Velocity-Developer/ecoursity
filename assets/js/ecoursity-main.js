@@ -13,7 +13,6 @@
         window.Alpine.data('lessonForm', (lessonId, restUrl, defaults) => ({
             loading: true,
             saving: false,
-            slugEditable: false,
             message: '',
             message_type: 'success',
             currentLessonId: parseInt(lessonId, 10) || 0,
@@ -22,6 +21,7 @@
             },
             async init() {
                 if (!this.currentLessonId) {
+                    this.lesson.status = 'publish';
                     this.loading = false;
                     this.$nextTick(() => this.syncEditorContent());
                     return;
@@ -40,7 +40,7 @@
                 delete this.lesson.duration;
             },
             normalizeAssigned() {
-                this.lesson.assigned = String(parseInt(this.lesson.assigned, 10) || 0);
+                this.lesson.assigned = parseInt(this.lesson.assigned, 10) || 0;
             },
             async loadLesson() {
                 this.loading = true;
@@ -55,6 +55,7 @@
 
                     if (json.success && json.data) {
                         Object.assign(this.lesson, json.data);
+                        this.lesson.status = 'publish';
                         this.parseDuration();
                         this.normalizeAssigned();
                     } else {
@@ -105,6 +106,7 @@
                     assigned: parseInt(this.lesson.assigned, 10) || 0,
                     duration: [parseInt(this.lesson.duration_value, 10) || 35, this.lesson.duration_unit || 'minute'],
                     preview: !!this.lesson.preview,
+                    status: 'publish',
                 };
 
                 try {
@@ -124,6 +126,7 @@
                         if (json.data?.id) {
                             this.currentLessonId = parseInt(json.data.id, 10) || this.currentLessonId;
                             Object.assign(this.lesson, json.data);
+                            this.lesson.status = 'publish';
                             this.parseDuration();
                             this.normalizeAssigned();
                             this.$nextTick(() => this.syncEditorContent());
