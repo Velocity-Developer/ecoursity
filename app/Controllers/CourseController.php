@@ -54,6 +54,7 @@ class CourseController
         }
 
         $this->saveMeta($course, $request);
+        $this->saveTaxonomies($course, $request);
 
         return new WP_REST_Response([
             'success' => true,
@@ -82,6 +83,7 @@ class CourseController
 
         $course->save();
         $this->saveMeta($course, $request);
+        $this->saveTaxonomies($course, $request);
 
         return new WP_REST_Response([
             'success' => true,
@@ -132,6 +134,19 @@ class CourseController
 
         if ($request->has_param('thumbnail_id')) {
             $course->updateMeta('_thumbnail_id', (int) $request->get_param('thumbnail_id'));
+        }
+    }
+
+    private function saveTaxonomies(Course $course, WP_REST_Request $request): void
+    {
+        if ($request->has_param('course_category_ids')) {
+            $category_ids = array_map('intval', (array) $request->get_param('course_category_ids'));
+            wp_set_post_terms($course->id, $category_ids, 'ecoursity_course_category');
+        }
+
+        if ($request->has_param('course_tags')) {
+            $tags = array_values(array_filter(array_map('sanitize_text_field', (array) $request->get_param('course_tags'))));
+            wp_set_post_terms($course->id, $tags, 'ecoursity_course_tag');
         }
     }
 }

@@ -4,6 +4,11 @@ $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
 
 wp_enqueue_media();
 
+$course_category_options = get_terms([
+    'taxonomy'   => 'ecoursity_course_category',
+    'hide_empty' => false,
+]);
+
 $course_form_sections = apply_filters('ecoursity_course_form_sections', [
     [
         'type'   => 'field',
@@ -22,6 +27,14 @@ $course_form_sections = apply_filters('ecoursity_course_form_sections', [
     [
         'type' => 'special',
         'name' => 'thumbnail',
+    ],
+    [
+        'type' => 'special',
+        'name' => 'course_category',
+    ],
+    [
+        'type' => 'special',
+        'name' => 'course_tag',
     ],
     [
         'type'    => 'field',
@@ -185,6 +198,9 @@ $course_defaults = array_merge([
     'thumbnail_id' => 0,
     'duration_value' => 1,
     'duration_unit' => 'week',
+    'course_category_ids' => [],
+    'course_tags' => [],
+    'course_tags_input' => '',
 ], $collect_defaults($course_form_sections));
 ?>
 
@@ -270,7 +286,7 @@ $course_defaults = array_merge([
                     $section_type = $section['type'] ?? '';
                     $section_name = $section['name'] ?? '';
 
-                    if (in_array($section_name, ['slug', 'thumbnail', 'status', 'excerpt'], true)) {
+                    if (in_array($section_name, ['slug', 'thumbnail', 'course_category', 'course_tag', 'status', 'excerpt'], true)) {
                         continue;
                     }
 
@@ -394,6 +410,33 @@ $course_defaults = array_merge([
                                 </div>
                             </div>
                         </div>
+                    <?php
+                        continue;
+                    endif;
+
+                    if ($section_name === 'course_category') :
+                    ?>
+                        <div class="ecoursity-form-group ecoursity-form-group--aside">
+                            <label class="ecoursity-form-label">Kategori Kursus</label>
+                            <div class="ecoursity-form-select--multiple">
+                                <?php foreach ($course_category_options as $category) : ?>
+                                    <label class="ecoursity-checkbox-option">
+                                        <input type="checkbox" value="<?php echo esc_attr((string) $category->term_id); ?>" x-model="course.course_category_ids">
+                                        <span><?php echo esc_html($category->name); ?></span>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php
+                        continue;
+                    endif;
+
+                    if ($section_name === 'course_tag') :
+                    ?>
+                        <div class="ecoursity-form-group ecoursity-form-group--aside">
+                            <label class="ecoursity-form-label">Tag Kursus</label>
+                            <input type="text" class="ecoursity-form-input" x-model="course.course_tags_input" placeholder="Pisahkan dengan koma">
+                        </div>
                 <?php
                     endif;
                 endforeach;
@@ -459,6 +502,13 @@ $course_defaults = array_merge([
                 }
                 delete this.course.duration;
             },
+            syncTaxonomies() {
+                this.course.course_category_ids = Array.isArray(this.course.course_category_ids) ?
+                    this.course.course_category_ids.map((id) => String(id)) : [];
+                this.course.course_tags = Array.isArray(this.course.course_tags) ?
+                    this.course.course_tags : [];
+                this.course.course_tags_input = this.course.course_tags.join(', ');
+            },
             async loadCourse() {
                 this.loading = true;
                 try {
@@ -471,6 +521,7 @@ $course_defaults = array_merge([
                     if (json.success && json.data) {
                         Object.assign(this.course, json.data);
                         this.parseDuration();
+                        this.syncTaxonomies();
                     } else {
                         this.message = json.message || 'Gagal memuat data kursus.';
                         this.message_type = 'error';
@@ -503,6 +554,10 @@ $course_defaults = array_merge([
             },
             async submit() {
                 this.course.duration = [this.course.duration_value, this.course.duration_unit];
+                this.course.course_tags = this.course.course_tags_input
+                    .split(',')
+                    .map((tag) => tag.trim())
+                    .filter(Boolean);
                 this.syncEditorToModel();
                 this.saving = true;
                 this.message = '';

@@ -168,13 +168,15 @@ class Course
         $meta = fn($key) => get_post_meta($post->ID, $key, true);
 
         return new self([
-            'id'      => $post->ID,
-            'title'   => $post->post_title,
-            'slug'    => $post->post_name,
-            'content' => $post->post_content,
-            'excerpt' => $post->post_excerpt,
-            'status'  => $post->post_status,
-            'author'  => (int) $post->post_author,
+            'id'                  => $post->ID,
+            'title'               => $post->post_title,
+            'slug'                => $post->post_name,
+            'content'             => $post->post_content,
+            'excerpt'             => $post->post_excerpt,
+            'status'              => $post->post_status,
+            'author'              => (int) $post->post_author,
+            'course_category_ids' => wp_get_post_terms($post->ID, 'ecoursity_course_category', ['fields' => 'ids']),
+            'course_tags'         => wp_get_post_terms($post->ID, 'ecoursity_course_tag', ['fields' => 'names']),
             'duration'           => $meta('_ecoursity_duration') ?: '',
             'level'              => self::metaString($meta('_ecoursity_level')),
             'max_students'       => self::metaString($meta('_ecoursity_max_students')),
