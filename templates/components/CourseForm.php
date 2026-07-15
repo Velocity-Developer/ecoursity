@@ -1,6 +1,7 @@
 <?php
 $course_id = $props['course_id'] ?? 0;
 $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
+$course_view_base_url = trailingslashit(home_url('kursus'));
 
 wp_enqueue_media();
 
@@ -208,7 +209,8 @@ $course_defaults = array_merge([
     x-data="courseForm(
         <?php echo (int) $course_id; ?>,
         '<?php echo esc_js($rest_url); ?>',
-        <?php echo esc_attr(wp_json_encode($course_defaults)); ?>
+        <?php echo esc_attr(wp_json_encode($course_defaults)); ?>,
+        '<?php echo esc_js($course_view_base_url); ?>'
     )"
     x-cloak>
     <template x-if="loading">
@@ -446,6 +448,14 @@ $course_defaults = array_merge([
 
         <div class="ecoursity-form-actions">
             <button type="submit" class="ecoursity-button ecoursity-button--primary" :disabled="saving" x-text="saving ? 'Menyimpan...' : 'Simpan'"></button>
+            <a
+                x-show="viewUrl"
+                :href="viewUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="ecoursity-button ecoursity-button--outline">
+                Lihat Kursus
+            </a>
             <a href="<?php echo esc_url(get_admin_url(null, 'admin.php?page=ecoursity-courses')); ?>" class="ecoursity-button ecoursity-button--outline">Batal</a>
         </div>
     </form>
@@ -453,7 +463,7 @@ $course_defaults = array_merge([
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('courseForm', (courseId, restUrl, defaults) => ({
+        Alpine.data('courseForm', (courseId, restUrl, defaults, courseViewBaseUrl) => ({
             loading: true,
             saving: false,
             slugEditable: false,
@@ -461,6 +471,14 @@ $course_defaults = array_merge([
             message: '',
             message_type: 'success',
             currentCourseId: parseInt(courseId, 10) || 0,
+            courseViewBaseUrl,
+            get viewUrl() {
+                if (!this.currentCourseId || !this.course.slug) {
+                    return '';
+                }
+
+                return `${this.courseViewBaseUrl}${this.course.slug}/`;
+            },
             course: {
                 ...defaults,
             },

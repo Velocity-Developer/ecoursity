@@ -13,12 +13,12 @@ $action = $_GET['action'] ?? '';
         <div style="display: flex; justify-content: flex-end;gap: 6px;">
             <a
                 href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses'); ?>"
-                class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn" style="margin-bottom: 24px;">
+                class="button button-secondary" style="margin-bottom: 24px;">
                 Daftar Kursus
             </a>
             <a
                 href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses&action=new'); ?>"
-                class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn" style="margin-bottom: 24px;">
+                class="button button-secondary" style="margin-bottom: 24px;">
                 Tambah Kursus
             </a>
         </div>
@@ -38,7 +38,7 @@ $action = $_GET['action'] ?? '';
         <div style="display: flex; justify-content: flex-end;gap: 6px;">
             <a
                 href="<?php echo get_admin_url(null, 'admin.php?page=ecoursity-courses'); ?>"
-                class="course-preview__btn course-preview__btn--primary ecoursity-table-courses__btn" style="margin-bottom: 24px;">
+                class="button button-secondary" style="margin-bottom: 24px;">
                 Daftar Kursus
             </a>
         </div>
