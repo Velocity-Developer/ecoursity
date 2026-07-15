@@ -18,6 +18,8 @@ class Course
     public string $excerpt = '';
     public string $thumbnail = '';
     public int $author = 0;
+    public array $course_category_ids = [];
+    public array $course_tags = [];
 
     public string $level = '',
         $max_students = '',

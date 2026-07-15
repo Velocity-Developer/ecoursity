@@ -22,6 +22,7 @@ class PostTypeProvider
             'show_in_menu' => false,
             'show_in_rest' => false,
             'supports' => ['title', 'editor', 'thumbnail', 'comments'],
+            'taxonomies' => ['ecoursity_course_category', 'ecoursity_course_tag'],
         ]);
 
         register_post_type(Lesson::POST_TYPE, [

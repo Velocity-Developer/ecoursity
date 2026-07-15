@@ -23,6 +23,9 @@ class TaxonomyProvider
             'hierarchical' => false,
             'rewrite' => ['slug' => 'tag-kursus'],
         ]);
+
+        register_taxonomy_for_object_type('ecoursity_course_category', 'ecoursity_course');
+        register_taxonomy_for_object_type('ecoursity_course_tag', 'ecoursity_course');
     }
     private function makeLabels(string $name): array
     {

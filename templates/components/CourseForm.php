@@ -554,6 +554,11 @@ $course_defaults = array_merge([
             },
             async submit() {
                 this.course.duration = [this.course.duration_value, this.course.duration_unit];
+                this.course.course_category_ids = Array.isArray(this.course.course_category_ids) ?
+                    this.course.course_category_ids
+                    .map((id) => parseInt(id, 10))
+                    .filter((id) => Number.isInteger(id) && id > 0) :
+                    [];
                 this.course.course_tags = this.course.course_tags_input
                     .split(',')
                     .map((tag) => tag.trim())

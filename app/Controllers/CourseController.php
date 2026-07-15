@@ -139,14 +139,18 @@ class CourseController
 
     private function saveTaxonomies(Course $course, WP_REST_Request $request): void
     {
-        if ($request->has_param('course_category_ids')) {
-            $category_ids = array_map('intval', (array) $request->get_param('course_category_ids'));
-            wp_set_post_terms($course->id, $category_ids, 'ecoursity_course_category');
+        $category_ids = array_map('intval', (array) ($request->get_param('course_category_ids') ?? []));
+        $category_ids = array_values(array_filter($category_ids));
+        wp_set_object_terms($course->id, $category_ids, 'ecoursity_course_category');
+
+        $tags = $request->get_param('course_tags');
+
+        if ($tags === null) {
+            $tags = $request->get_param('course_tags_input');
+            $tags = is_string($tags) ? array_map('trim', explode(',', $tags)) : [];
         }
 
-        if ($request->has_param('course_tags')) {
-            $tags = array_values(array_filter(array_map('sanitize_text_field', (array) $request->get_param('course_tags'))));
-            wp_set_post_terms($course->id, $tags, 'ecoursity_course_tag');
-        }
+        $tags = array_values(array_filter(array_map('sanitize_text_field', (array) $tags)));
+        wp_set_object_terms($course->id, $tags, 'ecoursity_course_tag');
     }
 }
