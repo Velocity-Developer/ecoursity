@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Ecoursity\App\Models\Section;
+
 /**
  * Plugin Name: Ecoursity
  * Plugin URI: https://ecourse.velocitydeveloper.com
@@ -51,6 +53,7 @@ final class EcoursityPlugin
 
     public static function activate(): void
     {
+        Section::createTables();
         flush_rewrite_rules();
     }
 
