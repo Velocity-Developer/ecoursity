@@ -63,7 +63,7 @@ class Lesson
     {
         $query = new WP_Query(array_merge([
             'post_type' => self::POST_TYPE,
-            'post_status' => 'publish',
+            'post_status' => ['publish', 'draft', 'pending', 'private'],
             'posts_per_page' => 25,
         ], $args));
 

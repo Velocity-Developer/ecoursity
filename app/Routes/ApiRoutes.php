@@ -2,8 +2,9 @@
 
 namespace Ecoursity\App\Routes;
 
-use Ecoursity\App\Controllers\TemplateController;
 use Ecoursity\App\Controllers\CourseController;
+use Ecoursity\App\Controllers\LessonController;
+use Ecoursity\App\Controllers\TemplateController;
 
 class ApiRoutes
 {
@@ -13,7 +14,6 @@ class ApiRoutes
     {
         add_action('rest_api_init', function () {
             foreach ($this->routes() as $route) {
-
                 $callback = function ($request) use ($route) {
                     if (! $route['callback']) {
                         return;
@@ -80,6 +80,36 @@ class ApiRoutes
                 'callback' => [CourseController::class, 'delete'],
                 'methods' => 'DELETE',
                 'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/lessons/',
+                'callback' => [LessonController::class, 'index'],
+                'methods' => 'GET',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/lessons/(?P<id>\d+)',
+                'callback' => [LessonController::class, 'show'],
+                'methods' => 'GET',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/lessons/',
+                'callback' => [LessonController::class, 'store'],
+                'methods' => 'POST',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
+                'route' => '/lessons/(?P<id>\d+)',
+                'callback' => [LessonController::class, 'update'],
+                'methods' => 'PUT',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
+                'route' => '/lessons/(?P<id>\d+)',
+                'callback' => [LessonController::class, 'delete'],
+                'methods' => 'DELETE',
+                'permission_callback' => fn() => current_user_can('delete_posts'),
             ],
         ];
     }
