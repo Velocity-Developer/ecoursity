@@ -24,21 +24,21 @@ $course_form_sections = apply_filters('ecoursity_course_form_sections', [
         'name' => 'thumbnail',
     ],
     [
+        'type'    => 'field',
+        'name'    => 'status',
+        'label'   => 'Status',
+        'input'   => 'select',
+        'class'   => 'ecoursity-form-select',
+        'default' => 'draft',
+        'options' => [
+            ['value' => 'draft', 'label' => 'Draft'],
+            ['value' => 'publish', 'label' => 'Publik'],
+            ['value' => 'pending', 'label' => 'Pending'],
+        ],
+    ],
+    [
         'type'   => 'row',
         'fields' => [
-            [
-                'type'    => 'field',
-                'name'    => 'status',
-                'label'   => 'Status',
-                'input'   => 'select',
-                'class'   => 'ecoursity-form-select',
-                'default' => 'draft',
-                'options' => [
-                    ['value' => 'draft', 'label' => 'Draft'],
-                    ['value' => 'publish', 'label' => 'Publik'],
-                    ['value' => 'pending', 'label' => 'Pending'],
-                ],
-            ],
             [
                 'type'    => 'field',
                 'name'    => 'level',
@@ -259,121 +259,147 @@ $course_defaults = array_merge([
 
                 <?php do_action('ecoursity_course_form_after_field', $field); ?>
             </div>
-            <?php
+        <?php
         };
 
-        foreach ($course_form_sections as $section) :
-            $section_type = $section['type'] ?? '';
+        ?>
+        <div class="ecoursity-course-form__layout">
+            <div class="ecoursity-course-form__main">
+                <?php
+                foreach ($course_form_sections as $section) :
+                    $section_type = $section['type'] ?? '';
+                    $section_name = $section['name'] ?? '';
 
-            if ($section_type === 'field') {
-                $render_field($section);
-                continue;
-            }
+                    if (in_array($section_name, ['slug', 'thumbnail', 'status', 'excerpt'], true)) {
+                        continue;
+                    }
 
-            if ($section_type === 'row') :
-            ?>
-                <div class="ecoursity-form-row">
+                    if ($section_type === 'field') {
+                        $render_field($section);
+                        continue;
+                    }
+
+                    if ($section_type === 'row') :
+                ?>
+                        <div class="ecoursity-form-row">
+                            <?php
+                            foreach (($section['fields'] ?? []) as $field) {
+                                $field_type = $field['type'] ?? 'field';
+
+                                if ($field_type === 'field') {
+                                    $render_field($field);
+                                    continue;
+                                }
+
+                                if ($field_type !== 'special') {
+                                    continue;
+                                }
+
+                                $special_name = $field['name'] ?? '';
+
+                                if ($special_name === 'duration') :
+                            ?>
+                                    <div class="ecoursity-form-group">
+                                        <label class="ecoursity-form-label">Durasi</label>
+                                        <div class="ecoursity-form-duration">
+                                            <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="course.duration_value" min="1" placeholder="1">
+                                            <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="course.duration_unit">
+                                                <option value="day">Hari</option>
+                                                <option value="week">Minggu</option>
+                                                <option value="month">Bulan</option>
+                                                <option value="year">Tahun</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                            <?php
+                                endif;
+                            }
+                            ?>
+                        </div>
                     <?php
-                    foreach (($section['fields'] ?? []) as $field) {
-                        $field_type = $field['type'] ?? 'field';
+                        continue;
+                    endif;
 
-                        if ($field_type === 'field') {
-                            $render_field($field);
-                            continue;
-                        }
+                    if ($section_type !== 'special') {
+                        continue;
+                    }
 
-                        if ($field_type !== 'special') {
-                            continue;
-                        }
-
-                        $special_name = $field['name'] ?? '';
-
-                        if ($special_name === 'duration') :
+                    if ($section_name === 'content') :
                     ?>
-                            <div class="ecoursity-form-group">
-                                <label class="ecoursity-form-label">Durasi</label>
-                                <div class="ecoursity-form-duration">
-                                    <input type="number" class="ecoursity-form-input ecoursity-form-duration__input" x-model="course.duration_value" min="1" placeholder="1">
-                                    <select class="ecoursity-form-select ecoursity-form-duration__select" x-model="course.duration_unit">
-                                        <option value="day">Hari</option>
-                                        <option value="week">Minggu</option>
-                                        <option value="month">Bulan</option>
-                                        <option value="year">Tahun</option>
-                                    </select>
+                        <div class="ecoursity-form-group">
+                            <label class="ecoursity-form-label">Konten</label>
+                            <?php
+                            wp_editor('', 'ecoursity_course_content', [
+                                'textarea_name' => 'course_content',
+                                'textarea_rows' => 40,
+                                'editor_height' => 600,
+                                'media_buttons' => true,
+                                'teeny'         => false,
+                                'quicktags'     => true,
+                            ]);
+                            ?>
+                        </div>
+                <?php
+                    endif;
+                endforeach;
+                ?>
+            </div>
+
+            <aside class="ecoursity-course-form__aside">
+                <?php foreach ($course_form_sections as $section) : ?>
+                    <?php
+                    $section_type = $section['type'] ?? '';
+                    $section_name = $section['name'] ?? '';
+
+                    if ($section_type === 'field' && in_array($section_name, ['status', 'excerpt'], true)) {
+                        $render_field($section);
+                        continue;
+                    }
+
+                    if ($section_type !== 'special') {
+                        continue;
+                    }
+
+                    if ($section_name === 'slug') :
+                    ?>
+                        <div class="ecoursity-form-group ecoursity-form-group--aside">
+                            <label class="ecoursity-form-label">Slug</label>
+                            <div class="ecoursity-form-slug">
+                                <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="course.slug || '(kosong)'"></span>
+                                <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="course.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
+                            </div>
+                        </div>
+                    <?php
+                        continue;
+                    endif;
+
+                    if ($section_name === 'thumbnail') :
+                    ?>
+                        <div class="ecoursity-form-group ecoursity-form-group--aside">
+                            <label class="ecoursity-form-label">Gambar Unggulan</label>
+                            <div class="ecoursity-form-featured-image">
+                                <template x-if="course.thumbnail">
+                                    <div class="ecoursity-form-featured-image__preview">
+                                        <img :src="course.thumbnail" alt="Featured image">
+                                    </div>
+                                </template>
+                                <template x-if="!course.thumbnail">
+                                    <div class="ecoursity-form-featured-image__placeholder">
+                                        <span>Belum ada gambar</span>
+                                    </div>
+                                </template>
+                                <div class="ecoursity-form-featured-image__actions">
+                                    <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--sm" @click="openMediaUploader()">Pilih Gambar</button>
+                                    <button type="button" class="ecoursity-button ecoursity-button--ghost ecoursity-button--sm" x-show="course.thumbnail" @click="removeFeaturedImage()">Hapus</button>
                                 </div>
                             </div>
-                    <?php
-                        endif;
-                    }
-                    ?>
-                </div>
-            <?php
-                continue;
-            endif;
-
-            if ($section_type !== 'special') {
-                continue;
-            }
-
-            $special_name = $section['name'] ?? '';
-
-            if ($special_name === 'slug') :
-            ?>
-                <div class="ecoursity-form-group">
-                    <label class="ecoursity-form-label">Slug</label>
-                    <div class="ecoursity-form-slug">
-                        <span x-show="!slugEditable" @click="slugEditable = true" class="ecoursity-form-slug__text" x-text="course.slug || '(kosong)'"></span>
-                        <input x-show="slugEditable" type="text" class="ecoursity-form-input" x-model="course.slug" @click.outside="slugEditable = false" @keydown.enter="slugEditable = false" @keydown.escape="slugEditable = false" placeholder="Otomatis jika kosong">
-                    </div>
-                </div>
-            <?php
-                continue;
-            endif;
-
-            if ($special_name === 'thumbnail') :
-            ?>
-                <div class="ecoursity-form-group">
-                    <label class="ecoursity-form-label">Gambar Unggulan</label>
-                    <div class="ecoursity-form-featured-image">
-                        <template x-if="course.thumbnail">
-                            <div class="ecoursity-form-featured-image__preview">
-                                <img :src="course.thumbnail" alt="Featured image">
-                            </div>
-                        </template>
-                        <template x-if="!course.thumbnail">
-                            <div class="ecoursity-form-featured-image__placeholder">
-                                <span>Belum ada gambar</span>
-                            </div>
-                        </template>
-                        <div class="ecoursity-form-featured-image__actions">
-                            <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--sm" @click="openMediaUploader()">Pilih Gambar</button>
-                            <button type="button" class="ecoursity-button ecoursity-button--ghost ecoursity-button--sm" x-show="course.thumbnail" @click="removeFeaturedImage()">Hapus</button>
                         </div>
-                    </div>
-                </div>
-            <?php
-                continue;
-            endif;
-
-            if ($special_name === 'content') :
-            ?>
-                <div class="ecoursity-form-group">
-                    <label class="ecoursity-form-label">Konten</label>
-                    <?php
-                    wp_editor('', 'ecoursity_course_content', [
-                        'textarea_name' => 'course_content',
-                        'textarea_rows' => 40,
-                        'editor_height' => 600,
-                        'media_buttons' => true,
-                        'teeny'         => false,
-                        'quicktags'     => true,
-                    ]);
-                    ?>
-                </div>
-        <?php
-            endif;
-        endforeach;
-        ?>
+                <?php
+                    endif;
+                endforeach;
+                ?>
+            </aside>
+        </div>
 
         <div class="ecoursity-form-actions">
             <button type="submit" class="ecoursity-button ecoursity-button--primary" :disabled="saving" x-text="saving ? 'Menyimpan...' : 'Simpan'"></button>
