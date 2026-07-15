@@ -90,7 +90,7 @@
                         selector: '#' + id,
                         height: 360,
                         menubar: false,
-                        plugins: 'link image media table lists advlist',
+                        plugins: 'link image media lists table',
                         toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | link image media | table',
                         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.6; }',
                         setup: (editor) => {
