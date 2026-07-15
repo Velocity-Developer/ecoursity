@@ -29,6 +29,7 @@ $formatCurrency = static function ($value): string {
             <tr class="ecoursity-table-courses__header">
                 <th class="ecoursity-table-courses__th ecoursity-table-courses__th--thumb"></th>
                 <th class="ecoursity-table-courses__th">Kursus</th>
+                <th class="ecoursity-table-courses__th">Kategori</th>
                 <th class="ecoursity-table-courses__th">Instruktur</th>
                 <th class="ecoursity-table-courses__th">Harga</th>
                 <th class="ecoursity-table-courses__th ecoursity-table-courses__th--actions-head">Aksi</th>
@@ -44,7 +45,11 @@ $formatCurrency = static function ($value): string {
                     <?php
                     $instructor = Instructor::find($course->author);
                     $thumb = $course->thumbnail();
+                    $categories = wp_get_post_terms($course->id, 'ecoursity_course_category', ['fields' => 'names']);
+                    $categoryLabel = !is_wp_error($categories) && !empty($categories) ? implode(', ', $categories) : '-';
                     $price = $formatCurrency($course->price);
+                    $salePrice = $formatCurrency($course->price_sale);
+                    $hasSalePrice = $course->price_sale !== '' && $course->price_sale !== null;
                     ?>
                     <tr class="ecoursity-table-courses__row">
                         <td class="ecoursity-table-courses__td ecoursity-table-courses__td--thumb">
@@ -55,14 +60,27 @@ $formatCurrency = static function ($value): string {
                             <?php endif; ?>
                         </td>
                         <td class="ecoursity-table-courses__td ecoursity-table-courses__td--course">
-                            <div class="ecoursity-table-courses__title"><?php echo esc_html($course->title); ?></div>
-                            <div class="ecoursity-table-courses__meta">ID #<?php echo esc_html((string) $course->id); ?></div>
+                            <div class="ecoursity-table-courses__title">
+                                <a href="<?php echo esc_url(get_post_permalink($course->id)); ?>" target="_blank">
+                                    <?php echo esc_html($course->title); ?>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="ecoursity-table-courses__td">
+                            <div class="ecoursity-table-courses__category"><?php echo esc_html($categoryLabel); ?></div>
                         </td>
                         <td class="ecoursity-table-courses__td">
                             <div class="ecoursity-table-courses__instructor"><?php echo esc_html($instructor->display_name ?? '-'); ?></div>
                         </td>
                         <td class="ecoursity-table-courses__td">
-                            <div class="ecoursity-table-courses__price"><?php echo esc_html((string) $price); ?></div>
+                            <div class="ecoursity-table-courses__price">
+                                <?php if ($hasSalePrice): ?>
+                                    <del><small style="color: #f00000;"><?php echo esc_html((string) $price); ?></small></del>
+                                    <div><?php echo esc_html((string) $salePrice); ?></div>
+                                <?php else: ?>
+                                    <?php echo esc_html((string) $price); ?>
+                                <?php endif; ?>
+                            </div>
                         </td>
                         <td class="ecoursity-table-courses__td ecoursity-table-courses__td--actions">
                             <div class="ecoursity-table-courses__actions">
