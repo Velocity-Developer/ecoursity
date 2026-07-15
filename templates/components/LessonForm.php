@@ -59,16 +59,7 @@ $lesson_defaults = [
 
         <div class="ecoursity-form-group">
             <label class="ecoursity-form-label">Konten</label>
-            <?php
-            wp_editor('', 'ecoursity_lesson_content', [
-                'textarea_name' => 'lesson_content',
-                'textarea_rows' => 20,
-                'editor_height' => 360,
-                'media_buttons' => true,
-                'teeny'         => false,
-                'quicktags'     => true,
-            ]);
-            ?>
+            <textarea id="ecoursity_lesson_content" class="ecoursity-form-textarea" rows="20" x-model="lesson.content" placeholder="Tulis konten lesson..."></textarea>
         </div>
 
         <div class="ecoursity-form-group">
