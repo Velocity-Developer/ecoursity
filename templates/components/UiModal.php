@@ -26,7 +26,7 @@ $props = isset($props) ? $props : [
         </div>
         <div x-show="$store.EcoursityUiModal.body" class="ecoursity-ui-modal-body">
 
-            <div x-show="!$store.EcoursityUiModal.loading" class="ecoursity-ui-modal-body-content" x-html="$store.EcoursityUiModal.body">
+            <div x-ref="modalBody" x-show="!$store.EcoursityUiModal.loading" class="ecoursity-ui-modal-body-content" x-html="$store.EcoursityUiModal.body">
             </div>
 
         </div>
@@ -55,7 +55,10 @@ $props = isset($props) ? $props : [
 
                 if (this.url) {
                     await this.loadFromUrl();
+                    return;
                 }
+
+                this.refreshBody();
             },
             setContent(payload = {}) {
                 this.title = payload.title ?? this.title;
@@ -65,7 +68,38 @@ $props = isset($props) ? $props : [
             },
             close() {
                 this.show = false;
-                this.setContent({});
+                this.setContent({
+                    title: null,
+                    body: null,
+                    footer: null,
+                    url: null,
+                });
+            },
+            refreshBody() {
+                queueMicrotask(() => {
+                    const modalBody = document.querySelector('.ecoursity-ui-modal-body-content');
+
+                    if (!modalBody) {
+                        return;
+                    }
+
+                    const scripts = Array.from(modalBody.querySelectorAll('script'));
+
+                    scripts.forEach((script) => {
+                        const executableScript = document.createElement('script');
+
+                        Array.from(script.attributes).forEach((attribute) => {
+                            executableScript.setAttribute(attribute.name, attribute.value);
+                        });
+
+                        executableScript.textContent = script.textContent;
+                        script.replaceWith(executableScript);
+                    });
+
+                    if (window.Alpine?.initTree) {
+                        window.Alpine.initTree(modalBody);
+                    }
+                });
             },
             async loadFromUrl() {
                 this.loading = true;
@@ -87,6 +121,7 @@ $props = isset($props) ? $props : [
                         this.setContent({
                             body: this.body,
                         });
+                        this.refreshBody();
                         return;
                     }
 

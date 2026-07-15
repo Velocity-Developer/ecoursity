@@ -2,6 +2,7 @@
 $course_id = $props['course_id'] ?? 0;
 $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
 $sections_rest_url = get_rest_url(null, 'ecoursity/v1/sections/');
+$lesson_form_component_url = get_rest_url(null, 'ecoursity/v1/template_component/LessonForm');
 $course_view_base_url = trailingslashit(home_url('kursus'));
 
 wp_enqueue_media();
@@ -253,6 +254,7 @@ $course_defaults = array_merge([
         <?php echo (int) $course_id; ?>,
         '<?php echo esc_js($rest_url); ?>',
         '<?php echo esc_js($sections_rest_url); ?>',
+        '<?php echo esc_js($lesson_form_component_url); ?>',
         <?php echo esc_attr(wp_json_encode($course_defaults)); ?>,
         <?php echo esc_attr(wp_json_encode($curriculum_section_payload)); ?>,
         '<?php echo esc_js($course_view_base_url); ?>'
@@ -263,7 +265,6 @@ $course_defaults = array_merge([
     </template>
 
     <form x-show="!loading" @submit.prevent="submit" class="ecoursity-course-form">
-
         <div x-show="message" class="ecoursity-form-message" :class="'ecoursity-form-message--' + message_type" x-text="message"></div>
 
         <?php
@@ -324,8 +325,8 @@ $course_defaults = array_merge([
             </div>
         <?php
         };
-
         ?>
+
         <div class="ecoursity-course-form__tabs" role="tablist" aria-label="Tab form kursus">
             <button type="button" class="ecoursity-course-form__tab" :class="{ 'is-active': currentTab === 'summary' }" @click="currentTab = 'summary'">Ringkasan</button>
             <button type="button" class="ecoursity-course-form__tab" :class="{ 'is-active': currentTab === 'curriculum' }" @click="currentTab = 'curriculum'">Kurikulum</button>
@@ -525,7 +526,7 @@ $course_defaults = array_merge([
                         </template>
 
                         <div class="ecoursity-curriculum__accordion" x-show="curriculumSections.length">
-                            <template x-for="(section, index) in curriculumSections" :key="section.section_id">
+                            <template x-for="section in curriculumSections" :key="section.section_id">
                                 <div class="ecoursity-curriculum__section">
                                     <button type="button" class="ecoursity-curriculum__section-toggle" @click="toggleSection(section.section_id)" :aria-expanded="isSectionOpen(section.section_id).toString()">
                                         <span>
@@ -539,7 +540,7 @@ $course_defaults = array_merge([
                                         </span>
                                     </button>
 
-                                    <div x-show="isSectionOpen(section.section_id)" x-collapse>
+                                    <div x-show="isSectionOpen(section.section_id)">
                                         <div class="ecoursity-curriculum__section-form">
                                             <div class="ecoursity-form-group">
                                                 <label class="ecoursity-form-label">Deskripsi Section</label>
@@ -547,6 +548,7 @@ $course_defaults = array_merge([
                                             </div>
 
                                             <div class="ecoursity-curriculum__section-actions">
+                                                <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--fit" @click="openLessonFormModal(section)">Tambah Materi</button>
                                                 <button type="button" class="ecoursity-button ecoursity-button--primary ecoursity-button--fit" :disabled="sectionUpdatingId === section.section_id" @click="updateSection(section)" x-text="sectionUpdatingId === section.section_id ? 'Menyimpan...' : 'Update'"></button>
                                             </div>
                                         </div>
@@ -669,7 +671,9 @@ $course_defaults = array_merge([
     }
 
     .ecoursity-curriculum__chevron {
-        font-size: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         line-height: 1;
         transition: transform .2s ease;
     }
@@ -685,6 +689,7 @@ $course_defaults = array_merge([
     .ecoursity-curriculum__section-actions {
         display: flex;
         justify-content: flex-end;
+        gap: 12px;
         margin-top: 12px;
     }
 
@@ -734,7 +739,9 @@ $course_defaults = array_merge([
     }
 
     @media (max-width: 640px) {
-        .ecoursity-curriculum__create-fields {
+
+        .ecoursity-curriculum__create-fields,
+        .ecoursity-curriculum__section-actions {
             flex-direction: column;
             align-items: stretch;
         }
@@ -747,7 +754,7 @@ $course_defaults = array_merge([
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, defaults, initialSections, courseViewBaseUrl) => ({
+        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl) => ({
             loading: true,
             saving: false,
             sectionCreating: false,
@@ -759,6 +766,7 @@ $course_defaults = array_merge([
             currentTab: 'summary',
             currentCourseId: parseInt(courseId, 10) || 0,
             courseViewBaseUrl,
+            lessonFormComponentUrl,
             newSectionTitle: '',
             openSectionIds: [],
             curriculumSections: Array.isArray(initialSections) ?
@@ -809,6 +817,21 @@ $course_defaults = array_merge([
                 }
 
                 return status.charAt(0).toUpperCase() + status.slice(1);
+            },
+            openLessonFormModal(section) {
+                if (!window.Alpine?.store('EcoursityUiModal')) {
+                    return;
+                }
+
+                const params = new URLSearchParams({
+                    course_id: String(this.currentCourseId),
+                    section_id: String(section.section_id || 0),
+                });
+
+                window.Alpine.store('EcoursityUiModal').open({
+                    title: `Tambah Materi - ${section.section_name || 'Section'}`,
+                    url: `${this.lessonFormComponentUrl}?${params.toString()}`,
+                });
             },
             async createSection() {
                 const title = this.newSectionTitle.trim();

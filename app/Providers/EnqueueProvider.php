@@ -25,6 +25,13 @@ class EnqueueProvider
                 '3.14.9',
                 true
             );
+            wp_enqueue_script(
+                'ecoursity-main-script',
+                $this->resourceUri . 'js/ecoursity-main.js',
+                ['alpinejs'],
+                null,
+                true
+            );
         });
 
         add_action('wp_enqueue_scripts', function (): void {
@@ -35,6 +42,13 @@ class EnqueueProvider
                 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
                 [],
                 '3.14.9',
+                true
+            );
+            wp_enqueue_script(
+                'ecoursity-main-script',
+                $this->resourceUri . 'js/ecoursity-main.js',
+                ['alpinejs'],
+                null,
                 true
             );
         });
