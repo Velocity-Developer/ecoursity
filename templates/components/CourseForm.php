@@ -592,26 +592,36 @@ $course_defaults = array_merge([
 
 <style>
     .ecoursity-course-form__tabs {
-        display: flex;
-        gap: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #e8e8e8;
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        margin-bottom: 16px;
+        border: 1px solid #e8e8e8;
+        border-radius: 9999px;
+        background: #f7f7f7;
     }
 
     .ecoursity-course-form__tab {
-        padding: 10px 16px;
-        border: 1px solid #c2c2c2;
-        border-radius: 999px;
-        background: #ffffff;
-        color: #1a1a1a;
+        padding: 10px 18px;
+        border: 0;
+        border-radius: 9999px;
+        background: transparent;
+        color: #636363;
         cursor: pointer;
         font: inherit;
+        font-weight: 600;
+        line-height: 1.2;
+        transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .ecoursity-course-form__tab:hover {
+        color: #1a1a1a;
     }
 
     .ecoursity-course-form__tab.is-active {
-        background: #024ad8;
-        border-color: #024ad8;
-        color: #ffffff;
+        background: #ffffff;
+        color: #024ad8;
+        box-shadow: 0 1px 2px rgba(26, 26, 26, 0.08);
     }
 
     .ecoursity-course-form__tab-panel {
