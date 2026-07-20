@@ -21,15 +21,11 @@
             },
             tinyMceInitialized: false,
             async init() {
-                if (!this.currentLessonId) {
-                    this.lesson.status = 'publish';
-                    this.lesson.section_id = parseInt(this.lesson.section_id, 10) || 0;
-                    this.loading = false;
-                    this.$nextTick(() => this.initTinyMce());
-                    return;
-                }
-
-                await this.loadLesson();
+                this.lesson.status = 'publish';
+                this.parseDuration();
+                this.normalizeAssigned();
+                this.loading = false;
+                this.$nextTick(() => this.initTinyMce());
             },
             parseDuration() {
                 const duration = this.lesson.duration;
@@ -60,79 +56,32 @@
 
                 return headers;
             },
-            async loadLesson() {
-                this.loading = true;
-
-                try {
-                    const res = await fetch(`${restUrl}${this.currentLessonId}`, {
-                        headers: this.getAuthHeaders(),
-                    });
-                    const json = await res.json();
-
-                    if (json.success && json.data) {
-                        Object.assign(this.lesson, json.data);
-                        this.lesson.status = 'publish';
-                        this.parseDuration();
-                        this.normalizeAssigned();
-                    } else {
-                        this.message = json.message || 'Gagal memuat data lesson.';
-                        this.message_type = 'error';
-                    }
-                } catch (e) {
-                    this.message = 'Gagal memuat data lesson.';
-                    this.message_type = 'error';
-                } finally {
-                    this.loading = false;
-                    this.$nextTick(() => this.initTinyMce());
-                }
-            },
             initTinyMce() {
-                if (this.tinyMceInitialized) {
+                const id = 'ecoursity_lesson_content';
+                const textarea = document.getElementById(id);
+
+                if (typeof tinymce !== 'undefined' && tinymce.get(id)) {
+                    this.tinyMceInitialized = true;
                     this.syncEditorContent();
                     return;
                 }
 
-                const id = 'ecoursity_lesson_content';
-
-                if (typeof tinymce !== 'undefined') {
-                    if (tinymce.get(id)) {
-                        tinymce.get(id).setContent(this.lesson.content || '');
-                        this.tinyMceInitialized = true;
-                        return;
-                    }
-
-                    tinymce.init({
-                        selector: '#' + id,
-                        height: 360,
-                        menubar: false,
-                        plugins: 'link image media lists table',
-                        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | link image media | table',
-                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.6; }',
-                        setup: (editor) => {
-                            editor.on('change', () => {
-                                this.lesson.content = editor.getContent();
-                            });
-                        },
-                    });
-
-                    tinymce.on('init', () => {
-                        if (!this.tinyMceInitialized && tinymce.get(id)) {
-                            this.tinyMceInitialized = true;
-                            this.syncEditorContent();
-                        }
-                    });
-                } else {
-                    const textarea = document.getElementById(id);
-                    if (textarea) {
-                        textarea.value = this.lesson.content || '';
-                    }
+                if (textarea) {
+                    textarea.value = this.lesson.content || '';
+                    this.tinyMceInitialized = true;
                 }
             },
             syncEditorContent() {
                 const id = 'ecoursity_lesson_content';
 
                 if (typeof tinymce !== 'undefined' && tinymce.get(id)) {
-                    tinymce.get(id).setContent(this.lesson.content || '');
+                    const editor = tinymce.get(id);
+                    const content = this.lesson.content || '';
+
+                    if (editor.getContent() !== content) {
+                        editor.setContent(content);
+                    }
+
                     return;
                 }
 

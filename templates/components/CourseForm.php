@@ -1,4 +1,5 @@
 <?php
+wp_enqueue_editor();
 $course_id = $props['course_id'] ?? 0;
 $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
 $sections_rest_url = get_rest_url(null, 'ecoursity/v1/sections/');

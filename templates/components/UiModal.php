@@ -75,6 +75,44 @@ $props = isset($props) ? $props : [
                     url: null,
                 });
             },
+            initWpEditors(modalBody) {
+                if (!modalBody || !window.wp?.editor) {
+                    return;
+                }
+
+                const textareas = Array.from(modalBody.querySelectorAll('textarea.wp-editor-area'));
+
+                textareas.forEach((textarea) => {
+                    const editorId = textarea.id;
+
+                    if (!editorId) {
+                        return;
+                    }
+
+                    if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                        tinymce.get(editorId).remove();
+                    }
+
+                    if (typeof quicktags !== 'undefined' && window.QTags?.instances?.[editorId]) {
+                        const quicktagsWrapper = document.getElementById(`qt_${editorId}_toolbar`);
+
+                        if (quicktagsWrapper) {
+                            quicktagsWrapper.remove();
+                        }
+
+                        delete window.QTags.instances[editorId];
+                    }
+
+                    const settings = window.wp.editor.getDefaultSettings();
+                    const initialContent = textarea.value;
+
+                    window.wp.editor.initialize(editorId, settings);
+
+                    if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                        tinymce.get(editorId).setContent(initialContent || '');
+                    }
+                });
+            },
             refreshBody() {
                 queueMicrotask(() => {
                     const modalBody = document.querySelector('.ecoursity-ui-modal-body-content');
@@ -99,6 +137,8 @@ $props = isset($props) ? $props : [
                     if (window.Alpine?.initTree) {
                         window.Alpine.initTree(modalBody);
                     }
+
+                    this.initWpEditors(modalBody);
                 });
             },
             async loadFromUrl() {

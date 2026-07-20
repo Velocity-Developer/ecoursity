@@ -1,34 +1,54 @@
 <?php
-$lesson_id = $props['lesson_id'] ?? 0;
+
+use Ecoursity\App\Models\Lesson;
+use Ecoursity\App\Models\Section;
+
+$lesson_id = (int) ($props['lesson_id'] ?? 0);
 $course_id = (int) ($props['course_id'] ?? 0);
 $section_id = (int) ($props['section_id'] ?? 0);
-$rest_url  = get_rest_url(null, 'ecoursity/v1/lessons/');
+$rest_url = get_rest_url(null, 'ecoursity/v1/lessons/');
+$lesson = $lesson_id > 0 ? Lesson::find($lesson_id) : null;
+
+if ($lesson instanceof Lesson) {
+    $course_id = (int) $lesson->assigned;
+
+    if ($section_id < 1 && $course_id > 0) {
+        foreach (Section::allByCourse($course_id) as $section) {
+            foreach ($section->items as $item) {
+                if ((int) ($item['item_id'] ?? 0) === $lesson_id && (string) ($item['item_type'] ?? '') === 'lesson') {
+                    $section_id = (int) ($section->section_id ?? 0);
+                    break 2;
+                }
+            }
+        }
+    }
+}
+
 $course_title = $course_id > 0 ? get_the_title($course_id) : '';
 $course_permalink = $course_id > 0 ? get_permalink($course_id) : '';
 $lesson_permalink = $lesson_id > 0 ? get_permalink($lesson_id) : '';
+$duration = $lesson instanceof Lesson && is_array($lesson->duration) ? $lesson->duration : [35, 'minute'];
+$duration_value = isset($duration[0]) ? (int) $duration[0] : 35;
+$duration_unit = isset($duration[1]) ? (string) $duration[1] : 'minute';
 
 $lesson_defaults = [
-    'title'          => '',
-    'slug'           => '',
-    'assigned'       => $course_id,
+    'title' => $lesson?->title ?? '',
+    'slug' => $lesson?->slug ?? '',
+    'assigned' => $course_id,
     'assigned_title' => $course_title ?: '',
-    'section_id'     => $section_id,
-    'content'        => '',
-    'status'         => 'publish',
-    'duration_value' => 35,
-    'duration_unit'  => 'minute',
-    'preview'        => false,
-    'permalink'      => $lesson_permalink ?: '',
+    'section_id' => $section_id,
+    'content' => $lesson?->content ?? '',
+    'status' => 'publish',
+    'duration_value' => $duration_value > 0 ? $duration_value : 35,
+    'duration_unit' => $duration_unit ?: 'minute',
+    'preview' => (bool) ($lesson?->preview ?? false),
+    'permalink' => $lesson_permalink ?: '',
 ];
 ?>
 
 <div
     x-data="lessonForm(<?php echo (int) $lesson_id; ?>, '<?php echo esc_js($rest_url); ?>', <?php echo esc_attr(wp_json_encode($lesson_defaults)); ?>)"
     x-cloak>
-    <template x-if="loading">
-        <p class="ecoursity-form-loading">Memuat data lesson...</p>
-    </template>
-
     <form x-show="!loading" @submit.prevent="submit" class="ecoursity-course-form">
         <div x-show="message" class="ecoursity-form-message" :class="'ecoursity-form-message--' + message_type" x-text="message"></div>
 
@@ -61,7 +81,16 @@ $lesson_defaults = [
 
         <div class="ecoursity-form-group">
             <label class="ecoursity-form-label">Konten</label>
-            <textarea id="ecoursity_lesson_content" class="ecoursity-form-textarea" rows="20" x-model="lesson.content" placeholder="Tulis konten lesson..."></textarea>
+            <?php
+            wp_editor($lesson_defaults['content'], 'ecoursity_lesson_content', [
+                'textarea_name' => 'lesson_content',
+                'textarea_rows' => 30,
+                'editor_height' => 420,
+                'media_buttons' => true,
+                'teeny' => false,
+                'quicktags' => true,
+            ]);
+            ?>
         </div>
 
         <div class="ecoursity-form-group">
