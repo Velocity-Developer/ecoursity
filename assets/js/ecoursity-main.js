@@ -197,10 +197,12 @@
                         this.message_type = 'success';
 
                         if (window.Alpine?.store('EcoursityUiModal')) {
-                            queueMicrotask(() => {
-                                window.Alpine.store('EcoursityUiModal').close();
-                            });
+                            window.Alpine.store('EcoursityUiModal').close();
                         }
+
+                        window.setTimeout(() => {
+                            window.location.reload();
+                        }, 150);
                     } else {
                         this.message = json.message || 'Gagal menyimpan lesson.';
                         this.message_type = 'error';
