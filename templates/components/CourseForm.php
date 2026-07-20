@@ -790,8 +790,8 @@ $course_defaults = array_merge([
                     this.openSectionIds = [this.curriculumSections[0].section_id];
                 }
 
-                window.addEventListener('ecoursity:lesson-saved', (event) => {
-                    this.syncLessonToSection(event.detail?.lesson || null);
+                window.addEventListener('ecoursity:lesson-saved', async () => {
+                    await this.reloadCurriculum();
                 });
 
                 if (!this.currentCourseId) {
@@ -836,6 +836,36 @@ $course_defaults = array_merge([
                     title: `Tambah Materi - ${section.section_name || 'Section'}`,
                     url: `${this.lessonFormComponentUrl}?${params.toString()}`,
                 });
+            },
+            async reloadCurriculum() {
+                if (!this.currentCourseId) {
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`${restUrl}${this.currentCourseId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+                    const json = await res.json();
+
+                    if (!json.success || !json.data) {
+                        return;
+                    }
+
+                    const sections = Array.isArray(json.data.curriculum_sections) ? json.data.curriculum_sections : [];
+                    this.curriculumSections = sections.map((section) => ({
+                        ...section,
+                        section_id: parseInt(section.section_id, 10) || 0,
+                        items: Array.isArray(section.items) ? section.items : [],
+                    }));
+                    this.openSectionIds = this.curriculumSections.map((section) => section.section_id);
+                    this.currentTab = 'curriculum';
+                } catch (e) {
+                    this.message = 'Gagal memuat kurikulum.';
+                    this.message_type = 'error';
+                }
             },
             async createSection() {
                 const title = this.newSectionTitle.trim();

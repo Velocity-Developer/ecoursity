@@ -199,10 +199,6 @@
                         if (window.Alpine?.store('EcoursityUiModal')) {
                             window.Alpine.store('EcoursityUiModal').close();
                         }
-
-                        window.setTimeout(() => {
-                            window.location.reload();
-                        }, 150);
                     } else {
                         this.message = json.message || 'Gagal menyimpan lesson.';
                         this.message_type = 'error';
