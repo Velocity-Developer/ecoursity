@@ -43,14 +43,27 @@
             normalizeAssigned() {
                 this.lesson.assigned = parseInt(this.lesson.assigned, 10) || 0;
             },
+            getAuthHeaders(includeJson = false) {
+                const headers = {
+                    'X-Requested-With': 'XMLHttpRequest',
+                };
+
+                if (includeJson) {
+                    headers['Content-Type'] = 'application/json';
+                }
+
+                if (window.ecoursity?.restNonce) {
+                    headers['X-WP-Nonce'] = window.ecoursity.restNonce;
+                }
+
+                return headers;
+            },
             async loadLesson() {
                 this.loading = true;
 
                 try {
                     const res = await fetch(`${restUrl}${this.currentLessonId}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
+                        headers: this.getAuthHeaders(),
                     });
                     const json = await res.json();
 
@@ -157,10 +170,7 @@
                     const method = this.currentLessonId ? 'PUT' : 'POST';
                     const res = await fetch(endpoint, {
                         method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
+                        headers: this.getAuthHeaders(true),
                         body: JSON.stringify(payload),
                     });
                     const json = await res.json();

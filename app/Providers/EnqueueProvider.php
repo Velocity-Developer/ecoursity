@@ -32,6 +32,9 @@ class EnqueueProvider
                 null,
                 true
             );
+            wp_localize_script('ecoursity-main-script', 'ecoursity', [
+                'restNonce' => wp_create_nonce('wp_rest'),
+            ]);
         });
 
         add_action('wp_enqueue_scripts', function (): void {
@@ -51,6 +54,9 @@ class EnqueueProvider
                 null,
                 true
             );
+            wp_localize_script('ecoursity-main-script', 'ecoursity', [
+                'restNonce' => wp_create_nonce('wp_rest'),
+            ]);
         });
 
         add_action('admin_footer', function (): void {
