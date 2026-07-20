@@ -1,6 +1,7 @@
 <?php
 $lesson_id = $props['lesson_id'] ?? 0;
 $course_id = (int) ($props['course_id'] ?? 0);
+$section_id = (int) ($props['section_id'] ?? 0);
 $rest_url  = get_rest_url(null, 'ecoursity/v1/lessons/');
 $course_title = $course_id > 0 ? get_the_title($course_id) : '';
 $course_permalink = $course_id > 0 ? get_permalink($course_id) : '';
@@ -11,6 +12,7 @@ $lesson_defaults = [
     'slug'           => '',
     'assigned'       => $course_id,
     'assigned_title' => $course_title ?: '',
+    'section_id'     => $section_id,
     'content'        => '',
     'status'         => 'publish',
     'duration_value' => 35,

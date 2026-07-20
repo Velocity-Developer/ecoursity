@@ -790,6 +790,10 @@ $course_defaults = array_merge([
                     this.openSectionIds = [this.curriculumSections[0].section_id];
                 }
 
+                window.addEventListener('ecoursity:lesson-saved', (event) => {
+                    this.syncLessonToSection(event.detail?.lesson || null);
+                });
+
                 if (!this.currentCourseId) {
                     this.parseDuration();
                     this.syncTaxonomies();

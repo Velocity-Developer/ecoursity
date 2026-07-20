@@ -23,6 +23,7 @@
             async init() {
                 if (!this.currentLessonId) {
                     this.lesson.status = 'publish';
+                    this.lesson.section_id = parseInt(this.lesson.section_id, 10) || 0;
                     this.loading = false;
                     this.$nextTick(() => this.initTinyMce());
                     return;
@@ -42,6 +43,7 @@
             },
             normalizeAssigned() {
                 this.lesson.assigned = parseInt(this.lesson.assigned, 10) || 0;
+                this.lesson.section_id = parseInt(this.lesson.section_id, 10) || 0;
             },
             getAuthHeaders(includeJson = false) {
                 const headers = {
@@ -160,6 +162,7 @@
                 const payload = {
                     ...this.lesson,
                     assigned: parseInt(this.lesson.assigned, 10) || 0,
+                    section_id: parseInt(this.lesson.section_id, 10) || 0,
                     duration: [parseInt(this.lesson.duration_value, 10) || 35, this.lesson.duration_unit || 'minute'],
                     preview: !!this.lesson.preview,
                     status: 'publish',
@@ -183,10 +186,21 @@
                             this.parseDuration();
                             this.normalizeAssigned();
                             this.$nextTick(() => this.syncEditorContent());
+                            window.dispatchEvent(new CustomEvent('ecoursity:lesson-saved', {
+                                detail: {
+                                    lesson: { ...json.data },
+                                },
+                            }));
                         }
 
                         this.message = json.message || 'Lesson berhasil disimpan.';
                         this.message_type = 'success';
+
+                        if (window.Alpine?.store('EcoursityUiModal')) {
+                            queueMicrotask(() => {
+                                window.Alpine.store('EcoursityUiModal').close();
+                            });
+                        }
                     } else {
                         this.message = json.message || 'Gagal menyimpan lesson.';
                         this.message_type = 'error';

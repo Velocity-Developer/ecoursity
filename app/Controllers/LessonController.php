@@ -3,6 +3,7 @@
 namespace Ecoursity\App\Controllers;
 
 use Ecoursity\App\Models\Lesson;
+use Ecoursity\App\Models\Section;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -53,6 +54,7 @@ class LessonController
         }
 
         $this->saveMeta($lesson, $request);
+        $this->syncSectionItem($lesson, $request);
 
         return new WP_REST_Response([
             'success' => true,
@@ -92,6 +94,7 @@ class LessonController
         $lesson->status = 'publish';
         $lesson->save();
         $this->saveMeta($lesson, $request);
+        $this->syncSectionItem($lesson, $request);
 
         return new WP_REST_Response([
             'success' => true,
@@ -111,6 +114,7 @@ class LessonController
             ], 404);
         }
 
+        $this->removeLessonFromSections((int) $lesson->id);
         $lesson->delete();
 
         return new WP_REST_Response([
@@ -138,6 +142,86 @@ class LessonController
         }
     }
 
+    private function syncSectionItem(Lesson $lesson, WP_REST_Request $request): void
+    {
+        $lessonId = (int) $lesson->id;
+        $sectionId = absint($request->get_param('section_id'));
+
+        if ($lessonId < 1) {
+            return;
+        }
+
+        $this->removeLessonFromSections($lessonId);
+
+        if ($sectionId < 1) {
+            return;
+        }
+
+        $section = Section::find($sectionId);
+
+        if (! $section) {
+            return;
+        }
+
+        $items = $section->items;
+        $items[] = [
+            'item_id' => $lessonId,
+            'item_order' => count($items),
+            'item_type' => 'lesson',
+        ];
+
+        $section->saveItems($items);
+    }
+
+    private function removeLessonFromSections(int $lessonId): void
+    {
+        $assignedCourseId = (int) get_post_meta($lessonId, '_ecoursity_assigned', true);
+
+        if ($assignedCourseId < 1) {
+            return;
+        }
+
+        foreach (Section::allByCourse($assignedCourseId) as $section) {
+            $items = array_values(array_filter(
+                $section->items,
+                static fn(array $item): bool => (int) ($item['item_id'] ?? 0) !== $lessonId
+            ));
+
+            if (count($items) === count($section->items)) {
+                continue;
+            }
+
+            $normalizedItems = array_map(
+                static fn(array $item, int $index): array => [
+                    'item_id' => (int) ($item['item_id'] ?? 0),
+                    'item_order' => $index,
+                    'item_type' => (string) ($item['item_type'] ?? ''),
+                ],
+                $items,
+                array_keys($items)
+            );
+
+            $section->saveItems($normalizedItems);
+        }
+    }
+
+    private function resolveSectionId(int $lessonId, int $courseId): int
+    {
+        if ($lessonId < 1 || $courseId < 1) {
+            return 0;
+        }
+
+        foreach (Section::allByCourse($courseId) as $section) {
+            foreach ($section->items as $item) {
+                if ((int) ($item['item_id'] ?? 0) === $lessonId && (string) ($item['item_type'] ?? '') === 'lesson') {
+                    return (int) ($section->section_id ?? 0);
+                }
+            }
+        }
+
+        return 0;
+    }
+
     private function transformLesson(?Lesson $lesson): array
     {
         if (! $lesson) {
@@ -158,6 +242,7 @@ class LessonController
             'preview' => (bool) $lesson->preview,
             'assigned' => $assignedId,
             'assigned_title' => $assignedId > 0 ? (string) get_the_title($assignedId) : '',
+            'section_id' => $this->resolveSectionId((int) $lesson->id, $assignedId),
             'permalink' => $lesson->id ? (string) get_permalink($lesson->id) : '',
             'thumbnail' => $lesson->thumbnail(),
         ];
