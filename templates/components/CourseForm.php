@@ -3,6 +3,7 @@ wp_enqueue_editor();
 $course_id = $props['course_id'] ?? 0;
 $rest_url  = get_rest_url(null, 'ecoursity/v1/courses/');
 $sections_rest_url = get_rest_url(null, 'ecoursity/v1/sections/');
+$lessons_rest_url = get_rest_url(null, 'ecoursity/v1/lessons/');
 $lesson_form_component_url = get_rest_url(null, 'ecoursity/v1/template_component/LessonForm');
 $course_view_base_url = trailingslashit(home_url('kursus'));
 
@@ -255,6 +256,7 @@ $course_defaults = array_merge([
         <?php echo (int) $course_id; ?>,
         '<?php echo esc_js($rest_url); ?>',
         '<?php echo esc_js($sections_rest_url); ?>',
+        '<?php echo esc_js($lessons_rest_url); ?>',
         '<?php echo esc_js($lesson_form_component_url); ?>',
         <?php echo esc_attr(wp_json_encode($course_defaults)); ?>,
         <?php echo esc_attr(wp_json_encode($curriculum_section_payload)); ?>,
@@ -561,8 +563,27 @@ $course_defaults = array_merge([
                                         <ol class="ecoursity-curriculum__lessons" x-show="section.items.length">
                                             <template x-for="item in section.items" :key="`${section.section_id}-${item.section_item_id}-${item.item_id}`">
                                                 <li class="ecoursity-curriculum__lesson">
-                                                    <span class="ecoursity-curriculum__lesson-title" x-text="item.title || 'Lesson'"></span>
-                                                    <span class="ecoursity-curriculum__lesson-status" x-show="item.status" x-text="formatStatus(item.status)"></span>
+                                                    <div class="ecoursity-curriculum__lesson-main">
+                                                        <span class="ecoursity-curriculum__lesson-title" x-text="item.title || 'Lesson'"></span>
+                                                        <span class="ecoursity-curriculum__lesson-status" x-show="item.status" x-text="formatStatus(item.status)"></span>
+                                                    </div>
+
+                                                    <div class="ecoursity-curriculum__lesson-actions">
+                                                        <button type="button" class="ecoursity-curriculum__lesson-action" @click="editLesson(section, item)" aria-label="Edit lesson" title="Edit lesson">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                                                <path d="M11.333 2.00013C11.5081 1.82403 11.7162 1.6843 11.9454 1.58895C12.1747 1.49359 12.4205 1.44446 12.6688 1.44434C12.9171 1.44421 13.1629 1.49309 13.3922 1.58821C13.6215 1.68333 13.8297 1.82285 14.005 1.99876C14.1802 2.17467 14.3192 2.38346 14.414 2.61328C14.5088 2.84311 14.5575 3.08943 14.5573 3.33818C14.5571 3.58693 14.5081 3.83317 14.413 4.06284C14.3179 4.29252 14.1785 4.5011 14.003 4.67676L5.17033 13.5101L1.33301 14.6668L2.48967 10.8295L11.333 2.00013Z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                        <button type="button" class="ecoursity-curriculum__lesson-action ecoursity-curriculum__lesson-action--danger" @click="deleteLesson(item)" aria-label="Hapus lesson" title="Hapus lesson">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                                                <path d="M2.66699 4.00016H13.3337" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                                                <path d="M6.66699 7.3335V11.3335" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                                                <path d="M9.33301 7.3335V11.3335" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                                                <path d="M3.33301 4.00016L4.00004 12.0002C4.02842 12.3874 4.20239 12.7494 4.48691 13.0136C4.77143 13.2778 5.14515 13.4246 5.53301 13.4252H10.467C10.8549 13.4246 11.2286 13.2778 11.5131 13.0136C11.7976 12.7494 11.9716 12.3874 12 12.0002L12.667 4.00016" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                                                <path d="M6 4.00016V2.66683C6 2.49002 6.07024 2.32045 6.19526 2.19542C6.32029 2.0704 6.48986 2.00016 6.66667 2.00016H9.33333C9.51014 2.00016 9.67971 2.0704 9.80474 2.19542C9.92976 2.32045 10 2.49002 10 2.66683V4.00016" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </li>
                                             </template>
                                         </ol>
@@ -718,8 +739,51 @@ $course_defaults = array_merge([
         border-bottom: 1px solid #f0f0f0;
     }
 
+    .ecoursity-curriculum__lesson-main {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .ecoursity-curriculum__lesson-title {
+        color: #1a1a1a;
+    }
+
     .ecoursity-curriculum__lesson:last-child {
         border-bottom: 0;
+    }
+
+    .ecoursity-curriculum__lesson-actions {
+        display: inline-flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .ecoursity-curriculum__lesson-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #636363;
+        cursor: pointer;
+    }
+
+    .ecoursity-curriculum__lesson-action:hover {
+        color: #024ad8;
+        border-color: #c9e0fc;
+        background: #f7f7f7;
+    }
+
+    .ecoursity-curriculum__lesson-action--danger:hover {
+        color: #b3262b;
+        border-color: #f1c7ca;
+        background: #fff5f5;
     }
 
     .ecoursity-curriculum__lesson-status {
@@ -752,9 +816,15 @@ $course_defaults = array_merge([
     @media (max-width: 640px) {
 
         .ecoursity-curriculum__create-fields,
-        .ecoursity-curriculum__section-actions {
+        .ecoursity-curriculum__section-actions,
+        .ecoursity-curriculum__lesson {
             flex-direction: column;
             align-items: stretch;
+        }
+
+        .ecoursity-curriculum__lesson-main,
+        .ecoursity-curriculum__lesson-actions {
+            justify-content: space-between;
         }
 
         .ecoursity-button--fit {
@@ -765,7 +835,7 @@ $course_defaults = array_merge([
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl) => ({
+        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl) => ({
             loading: true,
             saving: false,
             sectionCreating: false,
@@ -847,6 +917,57 @@ $course_defaults = array_merge([
                     title: `Tambah Materi - ${section.section_name || 'Section'}`,
                     url: `${this.lessonFormComponentUrl}?${params.toString()}`,
                 });
+            },
+            editLesson(section, item) {
+                if (!window.Alpine?.store('EcoursityUiModal') || !item?.item_id) {
+                    return;
+                }
+
+                const params = new URLSearchParams({
+                    lesson_id: String(item.item_id),
+                    course_id: String(this.currentCourseId),
+                    section_id: String(section?.section_id || item.section_id || 0),
+                });
+
+                window.Alpine.store('EcoursityUiModal').open({
+                    title: `Edit Lesson - ${item.title || 'Lesson'}`,
+                    url: `${this.lessonFormComponentUrl}?${params.toString()}`,
+                });
+            },
+            async deleteLesson(item) {
+                const lessonId = parseInt(item?.item_id, 10) || 0;
+
+                if (lessonId < 1) {
+                    return;
+                }
+
+                if (!window.confirm(`Hapus lesson "${item.title || 'Lesson'}"?`)) {
+                    return;
+                }
+
+                this.message = '';
+
+                try {
+                    const res = await fetch(`${lessonsRestUrl}${lessonId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+                    const json = await res.json();
+
+                    if (json.success) {
+                        await this.reloadCurriculum();
+                        this.message = json.message || 'Lesson berhasil dihapus.';
+                        this.message_type = 'success';
+                    } else {
+                        this.message = json.message || 'Gagal menghapus lesson.';
+                        this.message_type = 'error';
+                    }
+                } catch (e) {
+                    this.message = 'Gagal menghapus lesson.';
+                    this.message_type = 'error';
+                }
             },
             async reloadCurriculum() {
                 if (!this.currentCourseId) {
