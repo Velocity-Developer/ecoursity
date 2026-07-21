@@ -1,5 +1,8 @@
 <?php
 
+wp_enqueue_editor();
+wp_enqueue_media();
+
 use Ecoursity\App\Models\Lesson;
 use Ecoursity\App\Models\Section;
 
@@ -47,8 +50,11 @@ $lesson_defaults = [
 ?>
 
 <div
-    x-data="lessonForm(<?php echo (int) $lesson_id; ?>, '<?php echo esc_js($rest_url); ?>', <?php echo esc_attr(wp_json_encode($lesson_defaults)); ?>)"
+    x-data="lessonForm(<?php echo (int) $lesson_id; ?>, <?php echo esc_attr(wp_json_encode($rest_url)); ?>, JSON.parse($refs.lessonDefaults.textContent))"
     x-cloak>
+    <script type="application/json" x-ref="lessonDefaults">
+        <?php echo wp_json_encode($lesson_defaults); ?>
+    </script>
     <form x-show="!loading" @submit.prevent="submit" class="ecoursity-course-form">
         <div x-show="message" class="ecoursity-form-message" :class="'ecoursity-form-message--' + message_type" x-text="message"></div>
 
