@@ -903,6 +903,21 @@ $course_defaults = array_merge([
 
                 return status.charAt(0).toUpperCase() + status.slice(1);
             },
+            getAuthHeaders(includeJson = false) {
+                const headers = {
+                    'X-Requested-With': 'XMLHttpRequest',
+                };
+
+                if (includeJson) {
+                    headers['Content-Type'] = 'application/json';
+                }
+
+                if (window.ecoursity?.restNonce) {
+                    headers['X-WP-Nonce'] = window.ecoursity.restNonce;
+                }
+
+                return headers;
+            },
             openLessonFormModal(section) {
                 if (!window.Alpine?.store('EcoursityUiModal')) {
                     return;
@@ -950,9 +965,7 @@ $course_defaults = array_merge([
                 try {
                     const res = await fetch(`${lessonsRestUrl}${lessonId}`, {
                         method: 'DELETE',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
+                        headers: this.getAuthHeaders(),
                     });
                     const json = await res.json();
 
@@ -1020,10 +1033,7 @@ $course_defaults = array_merge([
                 try {
                     const res = await fetch(sectionsRestUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
+                        headers: this.getAuthHeaders(true),
                         body: JSON.stringify({
                             course_id: this.currentCourseId,
                             title,
@@ -1066,10 +1076,7 @@ $course_defaults = array_merge([
                 try {
                     const res = await fetch(`${sectionsRestUrl}${section.section_id}`, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
+                        headers: this.getAuthHeaders(true),
                         body: JSON.stringify({
                             description: section.section_description || '',
                             title: section.section_name || '',
@@ -1206,10 +1213,7 @@ $course_defaults = array_merge([
                     const method = this.currentCourseId ? 'PUT' : 'POST';
                     const res = await fetch(endpoint, {
                         method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
+                        headers: this.getAuthHeaders(true),
                         body: JSON.stringify(this.course),
                     });
                     const json = await res.json();
