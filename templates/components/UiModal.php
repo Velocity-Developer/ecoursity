@@ -67,12 +67,30 @@ $props = isset($props) ? $props : [
                 this.url = payload.url ?? this.url;
             },
             close() {
+                this.destroyWpEditors();
                 this.show = false;
                 this.setContent({
                     title: null,
                     body: null,
                     footer: null,
                     url: null,
+                });
+            },
+            destroyWpEditors() {
+                document.querySelectorAll('.ecoursity-ui-modal-body-content textarea.wp-editor-area').forEach((textarea) => {
+                    const editorId = textarea.id;
+
+                    if (!editorId) {
+                        return;
+                    }
+
+                    if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                        tinymce.get(editorId).remove();
+                    }
+
+                    if (window.QTags?.instances?.[editorId]) {
+                        delete window.QTags.instances[editorId];
+                    }
                 });
             },
             initWpEditors(modalBody) {
@@ -89,11 +107,19 @@ $props = isset($props) ? $props : [
                         return;
                     }
 
-                    if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                    const editorWrap = modalBody.querySelector(`#wp-${editorId}-wrap`);
+                    const hasTinyMce = typeof tinymce !== 'undefined' && !!tinymce.get(editorId);
+                    const hasQuicktagsToolbar = !!editorWrap?.querySelector(`#qt_${editorId}_toolbar`);
+
+                    if (hasTinyMce && hasQuicktagsToolbar) {
+                        return;
+                    }
+
+                    if (hasTinyMce) {
                         tinymce.get(editorId).remove();
                     }
 
-                    if (typeof quicktags !== 'undefined' && window.QTags?.instances?.[editorId]) {
+                    if (window.QTags?.instances?.[editorId]) {
                         const quicktagsWrapper = document.getElementById(`qt_${editorId}_toolbar`);
 
                         if (quicktagsWrapper) {
@@ -103,18 +129,40 @@ $props = isset($props) ? $props : [
                         delete window.QTags.instances[editorId];
                     }
 
-                    const settings = window.wp.editor.getDefaultSettings();
+                    const settings = window.tinyMCEPreInit?.mceInit?.[editorId]
+                        ? {
+                            tinymce: window.tinyMCEPreInit.mceInit[editorId],
+                            quicktags: window.tinyMCEPreInit.qtInit?.[editorId] ?? true,
+                            mediaButtons: true,
+                        }
+                        : {
+                            ...window.wp.editor.getDefaultSettings(),
+                            mediaButtons: true,
+                            quicktags: true,
+                        };
                     const initialContent = textarea.value;
 
                     window.wp.editor.initialize(editorId, settings);
 
-                    if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
-                        tinymce.get(editorId).setContent(initialContent || '');
+                    if (typeof tinymce !== 'undefined') {
+                        const editor = tinymce.get(editorId);
+
+                        if (editor) {
+                            const setInitialContent = () => {
+                                editor.setContent(initialContent || '');
+                            };
+
+                            if (editor.initialized) {
+                                setInitialContent();
+                            } else {
+                                editor.on('init', setInitialContent);
+                            }
+                        }
                     }
                 });
             },
             refreshBody() {
-                queueMicrotask(() => {
+                const refresh = () => {
                     const modalBody = document.querySelector('.ecoursity-ui-modal-body-content');
 
                     if (!modalBody) {
@@ -139,7 +187,14 @@ $props = isset($props) ? $props : [
                     }
 
                     this.initWpEditors(modalBody);
-                });
+                };
+
+                if (window.Alpine?.nextTick) {
+                    window.Alpine.nextTick(refresh);
+                    return;
+                }
+
+                requestAnimationFrame(refresh);
             },
             async loadFromUrl() {
                 this.loading = true;

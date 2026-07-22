@@ -16,6 +16,9 @@ class EnqueueProvider
     public function register(): void
     {
         add_action('admin_enqueue_scripts', function (): void {
+            wp_enqueue_editor();
+            wp_enqueue_media();
+
             wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/ecoursity-main.css');
             wp_enqueue_style('ecoursity-admin-style', $this->resourceUri . 'css/ecoursity-admin.css');
             wp_enqueue_script(
@@ -28,7 +31,7 @@ class EnqueueProvider
             wp_enqueue_script(
                 'ecoursity-main-script',
                 $this->resourceUri . 'js/ecoursity-main.js',
-                ['alpinejs'],
+                ['alpinejs', 'editor', 'quicktags'],
                 null,
                 true
             );
