@@ -3,6 +3,7 @@
 namespace Ecoursity\App\Routes;
 
 use Ecoursity\App\Controllers\CourseController;
+use Ecoursity\App\Controllers\FileController;
 use Ecoursity\App\Controllers\LessonController;
 use Ecoursity\App\Controllers\SectionController;
 use Ecoursity\App\Controllers\TemplateController;
@@ -121,6 +122,24 @@ class ApiRoutes
             [
                 'route' => '/lessons/(?P<id>\d+)',
                 'callback' => [LessonController::class, 'delete'],
+                'methods' => 'DELETE',
+                'permission_callback' => fn() => current_user_can('delete_posts'),
+            ],
+            [
+                'route' => '/files/',
+                'callback' => [FileController::class, 'index'],
+                'methods' => 'GET',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
+                'route' => '/files/',
+                'callback' => [FileController::class, 'store'],
+                'methods' => 'POST',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
+                'route' => '/files/(?P<id>\d+)',
+                'callback' => [FileController::class, 'delete'],
                 'methods' => 'DELETE',
                 'permission_callback' => fn() => current_user_can('delete_posts'),
             ],

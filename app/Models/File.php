@@ -151,7 +151,7 @@ class File
         global $wpdb;
 
         $data = [
-            'file_name' => sanitize_file_name($this->file_name),
+            'file_name' => sanitize_text_field($this->file_name),
             'file_type' => sanitize_mime_type($this->file_type),
             'item_id' => absint($this->item_id),
             'item_type' => sanitize_key($this->item_type),
@@ -196,6 +196,23 @@ class File
         return $deleted !== false;
     }
 
+    public function url(): string
+    {
+        if ($this->method === self::METHOD_EXTERNAL) {
+            return esc_url_raw($this->file_path);
+        }
+
+        $uploads = wp_upload_dir();
+
+        if (! empty($uploads['error'])) {
+            return '';
+        }
+
+        return trailingslashit((string) $uploads['baseurl'])
+            . 'ecoursity-storage/'
+            . ltrim(str_replace('\\', '/', $this->file_path), '/');
+    }
+
     public function toArray(): array
     {
         return [
@@ -208,6 +225,7 @@ class File
             'file_path' => $this->file_path,
             'orders' => $this->orders,
             'created_at' => $this->created_at,
+            'url' => $this->url(),
         ];
     }
 
