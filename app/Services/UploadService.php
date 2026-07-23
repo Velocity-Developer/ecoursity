@@ -134,7 +134,64 @@ class UploadService
 
     private function uniqueFilename(string $directory, string $filename): string
     {
-        return wp_unique_filename($directory, sanitize_file_name($filename));
+        $filename = sanitize_file_name($filename);
+
+        if (! $this->hasSimilarFilename($directory, $filename)) {
+            return wp_unique_filename($directory, $filename);
+        }
+
+        return wp_unique_filename($directory, $this->prefixFilename($filename));
+    }
+
+    private function hasSimilarFilename(string $directory, string $filename): bool
+    {
+        if (! is_dir($directory)) {
+            return false;
+        }
+
+        $extension = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
+        $name = strtolower((string) pathinfo($filename, PATHINFO_FILENAME));
+        $files = scandir($directory);
+
+        if (! is_array($files)) {
+            return false;
+        }
+
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $existingExtension = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
+            $existingName = strtolower((string) pathinfo($file, PATHINFO_FILENAME));
+
+            if ($existingExtension !== $extension) {
+                continue;
+            }
+
+            if (
+                $existingName === $name
+                || str_starts_with($existingName, $name . '-')
+                || str_ends_with($existingName, '-' . $name)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function prefixFilename(string $filename): string
+    {
+        $extension = (string) pathinfo($filename, PATHINFO_EXTENSION);
+        $name = (string) pathinfo($filename, PATHINFO_FILENAME);
+        $prefix = current_time('YmdHis') . '-' . wp_generate_password(6, false, false);
+
+        if ($extension === '') {
+            return $prefix . '-' . $name;
+        }
+
+        return $prefix . '-' . $name . '.' . $extension;
     }
 
     private function resolvePath(string $path, bool $allowMissing = false): string
