@@ -23,6 +23,15 @@ class Template
         require $file;
     }
 
+    public static function get(string $view)
+    {
+
+        return ECOURSITY_PATH .
+            'templates/' .
+            str_replace('.', '/', $view) .
+            '.php';
+    }
+
     public static function component(string $component, array $data = [])
     {
         extract($data);
