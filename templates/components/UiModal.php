@@ -98,6 +98,41 @@ $props = isset($props) ? $props : [
                     return;
                 }
 
+                const dedupeEditorTabs = (editorWrap) => {
+                    if (!editorWrap) {
+                        return;
+                    }
+
+                    const tabGroups = Array.from(editorWrap.querySelectorAll('.wp-editor-tabs'));
+
+                    if (tabGroups.length < 2) {
+                        return;
+                    }
+
+                    const keepIndex = tabGroups.findIndex((tabGroup) => {
+                        const tools = tabGroup.closest('.wp-editor-tools');
+
+                        return !!tools?.querySelector('.wp-media-buttons, .insert-media');
+                    });
+                    const tabGroupToKeep = tabGroups[keepIndex >= 0 ? keepIndex : tabGroups.length - 1];
+
+                    tabGroups.forEach((tabGroup) => {
+                        if (tabGroup === tabGroupToKeep) {
+                            return;
+                        }
+
+                        const tools = tabGroup.closest('.wp-editor-tools');
+                        const hasMediaButtons = !!tools?.querySelector('.wp-media-buttons, .insert-media');
+
+                        if (tools && !hasMediaButtons) {
+                            tools.remove();
+                            return;
+                        }
+
+                        tabGroup.remove();
+                    });
+                };
+
                 const textareas = Array.from(modalBody.querySelectorAll('textarea.wp-editor-area'));
 
                 textareas.forEach((textarea) => {
@@ -110,6 +145,8 @@ $props = isset($props) ? $props : [
                     const editorWrap = modalBody.querySelector(`#wp-${editorId}-wrap`);
                     const hasTinyMce = typeof tinymce !== 'undefined' && !!tinymce.get(editorId);
                     const hasQuicktagsToolbar = !!editorWrap?.querySelector(`#qt_${editorId}_toolbar`);
+
+                    dedupeEditorTabs(editorWrap);
 
                     if (hasTinyMce && hasQuicktagsToolbar) {
                         return;
@@ -143,6 +180,7 @@ $props = isset($props) ? $props : [
                     const initialContent = textarea.value;
 
                     window.wp.editor.initialize(editorId, settings);
+                    dedupeEditorTabs(editorWrap);
 
                     if (typeof tinymce !== 'undefined') {
                         const editor = tinymce.get(editorId);
