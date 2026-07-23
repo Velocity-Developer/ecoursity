@@ -22,9 +22,16 @@ class EnqueueProvider
             wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/ecoursity-main.css');
             wp_enqueue_style('ecoursity-admin-style', $this->resourceUri . 'css/ecoursity-admin.css');
             wp_enqueue_script(
+                'alpinejs-sort',
+                'https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.9/dist/cdn.min.js',
+                [],
+                '3.14.9',
+                true
+            );
+            wp_enqueue_script(
                 'alpinejs',
                 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
-                [],
+                ['alpinejs-sort'],
                 '3.14.9',
                 true
             );
@@ -44,9 +51,16 @@ class EnqueueProvider
             wp_enqueue_style('ecoursity-main-style', $this->resourceUri . 'css/ecoursity-main.css');
             wp_enqueue_style('ecoursity-public-style', $this->resourceUri . 'css/ecoursity-public.css');
             wp_enqueue_script(
+                'alpinejs-sort',
+                'https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.9/dist/cdn.min.js',
+                [],
+                '3.14.9',
+                true
+            );
+            wp_enqueue_script(
                 'alpinejs',
                 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
-                [],
+                ['alpinejs-sort'],
                 '3.14.9',
                 true
             );

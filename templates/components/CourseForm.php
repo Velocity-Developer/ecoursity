@@ -528,11 +528,20 @@ $course_defaults = array_merge([
                             </div>
                         </template>
 
-                        <div class="ecoursity-curriculum__accordion" x-show="curriculumSections.length">
+                        <div
+                            class="ecoursity-curriculum__accordion"
+                            x-show="curriculumSections.length"
+                            x-sort="sortSectionsFromDom($el)"
+                            x-sort:config="{ handle: '.ecoursity-curriculum__section-sort-handle' }">
                             <template x-for="section in curriculumSections" :key="section.section_id">
-                                <div class="ecoursity-curriculum__section">
+                                <div class="ecoursity-curriculum__section" x-sort:item="section.section_id" :data-section-id="section.section_id">
                                     <button type="button" class="ecoursity-curriculum__section-toggle" @click="toggleSection(section.section_id)" :aria-expanded="isSectionOpen(section.section_id).toString()">
-                                        <span>
+                                        <span class="ecoursity-curriculum__sort-handle ecoursity-curriculum__section-sort-handle" @click.stop.prevent aria-label="Urutkan sesi" title="Urutkan sesi">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                                <path d="M5.333 3.333H5.34M10.667 3.333H10.674M5.333 8H5.34M10.667 8H10.674M5.333 12.667H5.34M10.667 12.667H10.674" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                            </svg>
+                                        </span>
+                                        <span class="ecoursity-curriculum__section-summary">
                                             <strong x-text="section.section_name"></strong>
                                             <small x-text="`${section.items.length} lesson`"></small>
                                         </span>
@@ -560,10 +569,19 @@ $course_defaults = array_merge([
                                             <div class="ecoursity-curriculum__empty ecoursity-curriculum__empty--inner">Belum ada lesson di section ini.</div>
                                         </template>
 
-                                        <ol class="ecoursity-curriculum__lessons" x-show="section.items.length">
+                                        <ol
+                                            class="ecoursity-curriculum__lessons"
+                                            x-show="section.items.length"
+                                            x-sort="sortLessonsFromDom(section, $el)"
+                                            x-sort:config="{ handle: '.ecoursity-curriculum__lesson-sort-handle' }">
                                             <template x-for="item in section.items" :key="`${section.section_id}-${item.section_item_id}-${item.item_id}`">
-                                                <li class="ecoursity-curriculum__lesson">
+                                                <li class="ecoursity-curriculum__lesson" x-sort:item="item.section_item_id || item.item_id" :data-section-item-key="item.section_item_id || item.item_id">
                                                     <div class="ecoursity-curriculum__lesson-main">
+                                                        <span class="ecoursity-curriculum__sort-handle ecoursity-curriculum__sort-handle--lesson ecoursity-curriculum__lesson-sort-handle" @click.stop.prevent aria-label="Urutkan lesson" title="Urutkan lesson">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                                                <path d="M5.333 3.333H5.34M10.667 3.333H10.674M5.333 8H5.34M10.667 8H10.674M5.333 12.667H5.34M10.667 12.667H10.674" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                                            </svg>
+                                                        </span>
                                                         <span class="ecoursity-curriculum__lesson-title" x-text="item.title || 'Lesson'"></span>
                                                         <span class="ecoursity-curriculum__lesson-status" x-show="item.status" x-text="formatStatus(item.status)"></span>
                                                     </div>
@@ -702,6 +720,11 @@ $course_defaults = array_merge([
         color: #636363;
     }
 
+    .ecoursity-curriculum__section-summary {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
     .ecoursity-curriculum__chevron {
         display: inline-flex;
         align-items: center;
@@ -712,6 +735,27 @@ $course_defaults = array_merge([
 
     .ecoursity-curriculum__chevron.is-open {
         transform: rotate(180deg);
+    }
+
+    .ecoursity-curriculum__sort-handle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        flex: 0 0 28px;
+        border-radius: 4px;
+        color: #858585;
+        cursor: grab;
+    }
+
+    .ecoursity-curriculum__sort-handle:active {
+        cursor: grabbing;
+    }
+
+    .ecoursity-curriculum__sort-handle:hover {
+        color: #024ad8;
+        background: #ffffff;
     }
 
     .ecoursity-curriculum__section-form {
@@ -748,6 +792,10 @@ $course_defaults = array_merge([
 
     .ecoursity-curriculum__lesson-title {
         color: #1a1a1a;
+    }
+
+    .ecoursity-curriculum__sort-handle--lesson:hover {
+        background: #f7f7f7;
     }
 
     .ecoursity-curriculum__lesson:last-child {
@@ -793,6 +841,10 @@ $course_defaults = array_merge([
         color: #334155;
         font-size: 12px;
         white-space: nowrap;
+    }
+
+    .sortable-ghost {
+        opacity: .45 !important;
     }
 
     .ecoursity-curriculum__empty {
@@ -917,6 +969,83 @@ $course_defaults = array_merge([
                 }
 
                 return headers;
+            },
+            reorderByKeys(items, orderedKeys, keyResolver) {
+                const keyedItems = new Map(items.map((item) => [String(keyResolver(item)), item]));
+                const orderedItems = orderedKeys
+                    .map((key) => keyedItems.get(String(key)))
+                    .filter(Boolean);
+
+                return orderedItems.length === items.length ? orderedItems : items;
+            },
+            readSortableKeys(sortableElement, dataKey) {
+                const ignoredClasses = ['sortable-ghost', 'sortable-drag', 'sortable-fallback'];
+
+                return Array.from(sortableElement.children)
+                    .filter((element) => !ignoredClasses.some((className) => element.classList.contains(className)))
+                    .map((element) => element.dataset[dataKey])
+                    .filter(Boolean);
+            },
+            afterSortSettled(callback) {
+                window.requestAnimationFrame(() => {
+                    window.requestAnimationFrame(callback);
+                });
+            },
+            normalizeSectionOrders() {
+                this.curriculumSections = this.curriculumSections.map((section, index) => ({
+                    ...section,
+                    section_order: index,
+                }));
+            },
+            normalizeLessonOrders(section) {
+                section.items = Array.isArray(section.items) ? section.items.map((item, index) => ({
+                    ...item,
+                    section_id: section.section_id,
+                    item_order: index,
+                })) : [];
+            },
+            sortSectionsFromDom(sortableElement) {
+                this.afterSortSettled(() => {
+                    const orderedSectionIds = this.readSortableKeys(sortableElement, 'sectionId');
+
+                    this.curriculumSections = this.reorderByKeys(
+                        this.curriculumSections,
+                        orderedSectionIds,
+                        (section) => section.section_id
+                    );
+                    this.normalizeSectionOrders();
+                });
+            },
+            sortLessonsFromDom(section, sortableElement) {
+                if (!section || !Array.isArray(section.items)) {
+                    return;
+                }
+
+                this.afterSortSettled(() => {
+                    const orderedItemKeys = this.readSortableKeys(sortableElement, 'sectionItemKey');
+
+                    section.items = this.reorderByKeys(
+                        section.items,
+                        orderedItemKeys,
+                        (item) => item.section_item_id || item.item_id
+                    );
+                    this.normalizeLessonOrders(section);
+                });
+            },
+            getCurriculumOrderPayload() {
+                this.normalizeSectionOrders();
+                this.curriculumSections.forEach((section) => this.normalizeLessonOrders(section));
+
+                return this.curriculumSections.map((section) => ({
+                    section_id: section.section_id,
+                    section_order: section.section_order,
+                    items: Array.isArray(section.items) ?
+                        section.items.map((item, index) => ({
+                            item_id: item.item_id,
+                            item_type: item.item_type || 'lesson',
+                            item_order: index,
+                        })) : [],
+                }));
             },
             openLessonFormModal(section) {
                 if (!window.Alpine?.store('EcoursityUiModal')) {
@@ -1205,6 +1334,7 @@ $course_defaults = array_merge([
                     .split(',')
                     .map((tag) => tag.trim())
                     .filter(Boolean);
+                this.course.curriculum_sections = this.getCurriculumOrderPayload();
                 this.syncEditorToModel();
                 this.saving = true;
                 this.message = '';

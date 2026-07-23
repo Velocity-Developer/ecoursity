@@ -58,6 +58,7 @@ class CourseController
 
         $this->saveMeta($course, $request);
         $this->saveTaxonomies($course, $request);
+        $this->saveCurriculumOrder($course, $request);
 
         return new WP_REST_Response([
             'success' => true,
@@ -87,6 +88,7 @@ class CourseController
         $course->save();
         $this->saveMeta($course, $request);
         $this->saveTaxonomies($course, $request);
+        $this->saveCurriculumOrder($course, $request);
 
         return new WP_REST_Response([
             'success' => true,
@@ -185,5 +187,40 @@ class CourseController
 
         $tags = array_values(array_filter(array_map('sanitize_text_field', (array) $tags)));
         wp_set_object_terms($course->id, $tags, 'ecoursity_course_tag');
+    }
+
+    private function saveCurriculumOrder(Course $course, WP_REST_Request $request): void
+    {
+        if (! $request->has_param('curriculum_sections')) {
+            return;
+        }
+
+        $sections = $request->get_param('curriculum_sections');
+
+        if (! is_array($sections)) {
+            return;
+        }
+
+        foreach ($sections as $index => $sectionData) {
+            if (! is_array($sectionData)) {
+                continue;
+            }
+
+            $sectionId = absint($sectionData['section_id'] ?? 0);
+            $section = Section::find($sectionId);
+
+            if (! $section || (int) $section->section_course_id !== (int) $course->id) {
+                continue;
+            }
+
+            $section->section_order = isset($sectionData['section_order'])
+                ? absint($sectionData['section_order'])
+                : $index;
+            $section->save();
+
+            if (isset($sectionData['items']) && is_array($sectionData['items'])) {
+                $section->saveItems($sectionData['items']);
+            }
+        }
     }
 }
