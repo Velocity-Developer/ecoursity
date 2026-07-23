@@ -46,7 +46,7 @@ $file_payload = array_map(
 
         <div class="ecoursity-form-group" x-show="form.method === 'upload'">
             <label class="ecoursity-form-label">Upload File</label>
-            <input type="file" class="ecoursity-form-input" x-ref="fileInput">
+            <input type="file" class="ecoursity-form-input ecoursity-file-form__input-file" x-ref="fileInput">
         </div>
 
         <div class="ecoursity-form-group" x-show="form.method === 'external'">
@@ -134,6 +134,36 @@ $file_payload = array_map(
     .ecoursity-file-form__actions {
         border-top: 0;
         padding-top: 0;
+    }
+
+    .ecoursity-file-form__input-file {
+        padding: 8px !important;
+        cursor: pointer !important;
+    }
+
+    .ecoursity-file-form__input-file::file-selector-button {
+        min-height: 38px;
+        margin-right: 12px;
+        padding: 8px 14px;
+        border: 1px solid #024ad8;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #024ad8;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .ecoursity-file-form__input-file:hover::file-selector-button {
+        background: #024ad8;
+        color: #ffffff;
+    }
+
+    .ecoursity-file-form__input-file:focus::file-selector-button {
+        border-color: #1a1a1a;
     }
 
     .ecoursity-file-form__empty {
