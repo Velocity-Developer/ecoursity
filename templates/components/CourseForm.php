@@ -515,8 +515,7 @@ $course_defaults = array_merge([
                         <div class="ecoursity-curriculum__create-card">
                             <div class="ecoursity-curriculum__create-fields">
                                 <div class="ecoursity-form-group">
-                                    <label class="ecoursity-form-label">Title Sesi</label>
-                                    <input type="text" class="ecoursity-form-input" x-model="newSectionTitle" placeholder="Masukkan title sesi">
+                                    <input type="text" class="ecoursity-form-input" x-model="newSectionTitle" placeholder="Buat sesi baru">
                                 </div>
                                 <button type="button" class="ecoursity-button ecoursity-button--primary ecoursity-button--fit" :disabled="sectionCreating" @click="createSection()" x-text="sectionCreating ? 'Menyimpan...' : 'Tambah Sesi'"></button>
                             </div>
@@ -919,10 +918,6 @@ $course_defaults = array_merge([
                 ...defaults,
             },
             async init() {
-                if (this.curriculumSections.length) {
-                    this.openSectionIds = [this.curriculumSections[0].section_id];
-                }
-
                 window.addEventListener('ecoursity:lesson-saved', async () => {
                     await this.reloadCurriculum();
                 });
@@ -1134,7 +1129,9 @@ $course_defaults = array_merge([
                         section_id: parseInt(section.section_id, 10) || 0,
                         items: Array.isArray(section.items) ? section.items : [],
                     }));
-                    this.openSectionIds = this.curriculumSections.map((section) => section.section_id);
+                    this.openSectionIds = this.openSectionIds.filter((sectionId) => (
+                        this.curriculumSections.some((section) => section.section_id === sectionId)
+                    ));
                     this.currentTab = 'curriculum';
                 } catch (e) {
                     this.message = 'Gagal memuat kurikulum.';
