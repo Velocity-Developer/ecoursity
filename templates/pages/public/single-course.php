@@ -11,6 +11,7 @@
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Lesson;
 use Ecoursity\App\Models\Section;
+use Ecoursity\App\Shortcodes\ButtonBuyCourseShortcode;
 
 defined('ABSPATH') || exit;
 
@@ -97,8 +98,6 @@ get_header();
     $target_audiences = array_filter($course->target_audiences);
     $key_features = array_filter($course->key_features);
     $faqs = array_filter($course->faqs, static fn(array $faq): bool => !empty($faq['question']) || !empty($faq['answer']));
-    $enroll_url = is_user_logged_in() ? '#ecoursity-course-curriculum' : wp_login_url(get_permalink((int) $course->id));
-    $enroll_label = is_user_logged_in() ? __('Mulai Belajar', 'ecoursity') : __('Login untuk Belajar', 'ecoursity');
     ?>
 
     <main class="ecoursity-single-course" x-data="{ tab: 'overview' }">
@@ -292,9 +291,12 @@ get_header();
                         <?php endif; ?>
                     </div>
 
-                    <a class="ecoursity-course-sidebar__button" href="<?php echo esc_url($enroll_url); ?>" <?php echo is_user_logged_in() ? '@click="tab = \'curriculum\'"' : ''; ?>>
-                        <?php echo esc_html($enroll_label); ?>
-                    </a>
+                    <?php
+                    echo ButtonBuyCourseShortcode::render([
+                        'course_id' => (int) $course->id,
+                        'class' => 'ecoursity-course-sidebar__button',
+                    ]);
+                    ?>
 
                     <ul class="ecoursity-course-sidebar__meta">
                         <li>

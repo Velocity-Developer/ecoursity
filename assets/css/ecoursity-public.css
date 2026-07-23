@@ -2,6 +2,31 @@
     display: none !important;
 }
 
+.ecoursity-buy-course-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 22px;
+    border: 1px solid #1d4ed8;
+    border-radius: 6px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ecoursity-buy-course-button:hover,
+.ecoursity-buy-course-button:focus {
+    background: #1d4ed8;
+    color: #ffffff;
+    text-decoration: none;
+}
+
 .ecoursity-single-course {
     --ecoursity-text: #1f2937;
     --ecoursity-muted: #6b7280;
