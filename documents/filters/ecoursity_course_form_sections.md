@@ -61,6 +61,11 @@ Field umum yang didukung dari implementasi saat ini:
 - `max`
 - `step`
 - `options`
+- `button_label` untuk `input = sortable_text_list`
+
+Input khusus yang juga didukung:
+
+- `sortable_text_list`: daftar input text yang bisa ditambah, dihapus, dan diurutkan. Gunakan `default` berupa array, misalnya `['']`.
 
 ### `special`
 
@@ -102,8 +107,27 @@ add_filter('ecoursity_course_form_sections', function (array $sections): array {
 });
 ```
 
+Contoh field array sortable:
+
+```php
+add_filter('ecoursity_course_form_sections', function (array $sections): array {
+    $sections[] = [
+        'type' => 'field',
+        'name' => 'requirements',
+        'label' => 'Persyaratan',
+        'input' => 'sortable_text_list',
+        'placeholder' => 'Contoh: Memahami dasar WordPress',
+        'button_label' => 'Tambah Persyaratan',
+        'default' => [''],
+    ];
+
+    return $sections;
+});
+```
+
 ## Catatan
 
 - Gunakan struktur array yang konsisten. Template tidak punya validasi schema mendalam.
 - Item `special` baru perlu dukungan render di `templates/components/CourseForm.php`.
+- Field `sortable_text_list` perlu didukung juga di backend jika datanya akan disimpan sebagai post meta.
 - Item non-`field` tidak ikut masuk ke default collector, kecuali dibungkus `row` yang berisi `field`.

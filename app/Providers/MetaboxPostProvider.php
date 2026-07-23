@@ -283,6 +283,7 @@ class MetaboxPostProvider
             '_ecoursity_price_sale_start', '_ecoursity_price_sale_end' => $this->sanitizeDateTimeLocal($value),
             '_ecoursity_course_evaluation' => $this->sanitizeCourseEvaluation($value),
             '_ecoursity_passing_grade' => $this->sanitizePassingGrade($value),
+            '_ecoursity_requirements', '_ecoursity_target_audiences' => $this->sanitizeTextList($value),
             default => sanitize_text_field((string) $value),
         };
     }
@@ -312,6 +313,23 @@ class MetaboxPostProvider
         }
 
         return [$amount, $unit];
+    }
+
+    private function sanitizeTextList(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $items = array_map(
+            static fn($item): string => sanitize_text_field((string) $item),
+            $value
+        );
+
+        return array_values(array_filter(
+            $items,
+            static fn(string $item): bool => $item !== ''
+        ));
     }
 
     private function sanitizeLessonDuration(mixed $value): array

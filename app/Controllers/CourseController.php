@@ -159,17 +159,45 @@ class CourseController
             'price_sale_end',
             'course_evaluation',
             'passing_grade',
+            'requirements',
+            'target_audiences',
+        ];
+
+        $arrayKeys = [
+            'requirements',
+            'target_audiences',
         ];
 
         foreach ($keys as $key) {
             if ($request->has_param($key)) {
-                $course->updateMeta("_ecoursity_{$key}", $request->get_param($key));
+                $value = in_array($key, $arrayKeys, true)
+                    ? $this->sanitizeTextList($request->get_param($key))
+                    : $request->get_param($key);
+
+                $course->updateMeta("_ecoursity_{$key}", $value);
             }
         }
 
         if ($request->has_param('thumbnail_id')) {
             $course->updateMeta('_thumbnail_id', (int) $request->get_param('thumbnail_id'));
         }
+    }
+
+    private function sanitizeTextList(mixed $items): array
+    {
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $items = array_map(
+            static fn($item): string => sanitize_text_field((string) $item),
+            $items
+        );
+
+        return array_values(array_filter(
+            $items,
+            static fn(string $item): bool => $item !== ''
+        ));
     }
 
     private function saveTaxonomies(Course $course, WP_REST_Request $request): void

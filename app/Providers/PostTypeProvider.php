@@ -35,6 +35,22 @@ class PostTypeProvider
             'supports' => ['title', 'editor'],
         ]);
 
+        register_post_meta(Course::POST_TYPE, '_ecoursity_requirements', [
+            'type' => 'array',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeTextListMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Course::POST_TYPE, '_ecoursity_target_audiences', [
+            'type' => 'array',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeTextListMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
         register_post_meta(Lesson::POST_TYPE, '_ecoursity_duration', [
             'type' => 'array',
             'single' => true,
@@ -75,6 +91,23 @@ class PostTypeProvider
         }
 
         return [$amount, $unit];
+    }
+
+    public function sanitizeTextListMeta(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $items = array_map(
+            static fn($item): string => sanitize_text_field((string) $item),
+            $value
+        );
+
+        return array_values(array_filter(
+            $items,
+            static fn(string $item): bool => $item !== ''
+        ));
     }
 
     public function sanitizeLessonAssignedMeta(mixed $value): int

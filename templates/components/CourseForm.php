@@ -217,6 +217,24 @@ $course_form_sections = apply_filters('ecoursity_course_form_sections', [
             ],
         ],
     ],
+    [
+        'type' => 'field',
+        'name' => 'requirements',
+        'label' => 'Persyaratan',
+        'input' => 'sortable_text_list',
+        'placeholder' => 'Contoh: Memahami dasar WordPress',
+        'button_label' => 'Tambah Persyaratan',
+        'default' => [''],
+    ],
+    [
+        'type' => 'field',
+        'name' => 'target_audiences',
+        'label' => 'Untuk siapa kursus ini',
+        'input' => 'sortable_text_list',
+        'placeholder' => 'Contoh: Pemula yang ingin membuat website',
+        'button_label' => 'Tambah Target Peserta',
+        'default' => [''],
+    ],
 ]);
 
 $collect_defaults = static function (array $items) use (&$collect_defaults): array {
@@ -237,6 +255,27 @@ $collect_defaults = static function (array $items) use (&$collect_defaults): arr
 
     return $defaults;
 };
+
+$collect_sortable_text_list_fields = static function (array $items) use (&$collect_sortable_text_list_fields): array {
+    $fields = [];
+
+    foreach ($items as $item) {
+        if (($item['type'] ?? '') === 'row') {
+            $fields = array_merge($fields, $collect_sortable_text_list_fields($item['fields'] ?? []));
+            continue;
+        }
+
+        if (($item['type'] ?? '') !== 'field' || ($item['input'] ?? '') !== 'sortable_text_list' || empty($item['name'])) {
+            continue;
+        }
+
+        $fields[] = $item['name'];
+    }
+
+    return array_values(array_unique($fields));
+};
+
+$course_sortable_text_list_fields = $collect_sortable_text_list_fields($course_form_sections);
 
 $course_defaults = array_merge([
     'slug' => '',
@@ -260,7 +299,8 @@ $course_defaults = array_merge([
         '<?php echo esc_js($lesson_form_component_url); ?>',
         <?php echo esc_attr(wp_json_encode($course_defaults)); ?>,
         <?php echo esc_attr(wp_json_encode($curriculum_section_payload)); ?>,
-        '<?php echo esc_js($course_view_base_url); ?>'
+        '<?php echo esc_js($course_view_base_url); ?>',
+        <?php echo esc_attr(wp_json_encode($course_sortable_text_list_fields)); ?>
     )"
     x-cloak>
     <template x-if="loading">
@@ -277,6 +317,7 @@ $course_defaults = array_merge([
             $input       = $field['input'] ?? 'text';
             $class       = $field['class'] ?? 'ecoursity-form-input';
             $placeholder = $field['placeholder'] ?? '';
+            $buttonLabel = $field['button_label'] ?? 'Tambah Item';
             $required    = !empty($field['required']);
             $rows        = (int) ($field['rows'] ?? 3);
             $min         = $field['min'] ?? null;
@@ -312,6 +353,36 @@ $course_defaults = array_merge([
                             <option value="<?php echo esc_attr((string) ($option['value'] ?? '')); ?>"><?php echo esc_html((string) ($option['label'] ?? '')); ?></option>
                         <?php endforeach; ?>
                     </select>
+                <?php elseif ($input === 'sortable_text_list') : ?>
+                    <div
+                        class="ecoursity-sortable-text-list"
+                        x-sort="sortListFieldFromDom('<?php echo esc_js($name); ?>', $el)"
+                        x-sort:config="{ handle: '.ecoursity-sortable-text-list__sort-handle' }">
+                        <template x-for="(item, index) in course['<?php echo esc_js($name); ?>']" :key="`<?php echo esc_attr($name); ?>-${index}`">
+                            <div class="ecoursity-sortable-text-list__item" x-sort:item="index" :data-list-item-index="index">
+                                <span class="ecoursity-sortable-text-list__sort-handle" @click.stop.prevent aria-label="Urutkan item" title="Urutkan item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M5.333 3.333H5.34M10.667 3.333H10.674M5.333 8H5.34M10.667 8H10.674M5.333 12.667H5.34M10.667 12.667H10.674" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                    </svg>
+                                </span>
+                                <input
+                                    type="text"
+                                    class="ecoursity-form-input"
+                                    x-model="course['<?php echo esc_js($name); ?>'][index]"
+                                    <?php if ($placeholder !== '') : ?>placeholder="<?php echo esc_attr($placeholder); ?>" <?php endif; ?>>
+                                <button type="button" class="ecoursity-sortable-text-list__remove" @click="removeListItem('<?php echo esc_js($name); ?>', index)" aria-label="Hapus item" title="Hapus item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M2.66699 4.00016H13.3337" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M6.66699 7.3335V11.3335" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M9.33301 7.3335V11.3335" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M3.33301 4.00016L4.00004 12.0002C4.02842 12.3874 4.20239 12.7494 4.48691 13.0136C4.77143 13.2778 5.14515 13.4246 5.53301 13.4252H10.467C10.8549 13.4246 11.2286 13.2778 11.5131 13.0136C11.7976 12.7494 11.9716 12.3874 12 12.0002L12.667 4.00016" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M6 4.00016V2.66683C6 2.49002 6.07024 2.32045 6.19526 2.19542C6.32029 2.0704 6.48986 2.00016 6.66667 2.00016H9.33333C9.51014 2.00016 9.67971 2.0704 9.80474 2.19542C9.92976 2.32045 10 2.49002 10 2.66683V4.00016" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--fit" @click="addListItem('<?php echo esc_js($name); ?>')"><?php echo esc_html($buttonLabel); ?></button>
                 <?php else : ?>
                     <input
                         type="<?php echo esc_attr($input); ?>"
@@ -413,6 +484,7 @@ $course_defaults = array_merge([
                                 ?>
                             </div>
                     <?php
+                            continue;
                         endif;
                     endforeach;
                     ?>
@@ -674,6 +746,57 @@ $course_defaults = array_merge([
         gap: 16px;
     }
 
+    .ecoursity-sortable-text-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ecoursity-sortable-text-list__item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ecoursity-sortable-text-list__sort-handle,
+    .ecoursity-sortable-text-list__remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        border-radius: 4px;
+    }
+
+    .ecoursity-sortable-text-list__sort-handle {
+        color: #858585;
+        cursor: grab;
+    }
+
+    .ecoursity-sortable-text-list__sort-handle:active {
+        cursor: grabbing;
+    }
+
+    .ecoursity-sortable-text-list__remove {
+        border: 1px solid #e8e8e8;
+        background: #ffffff;
+        color: #636363;
+        cursor: pointer;
+    }
+
+    .ecoursity-sortable-text-list__sort-handle:hover,
+    .ecoursity-sortable-text-list__remove:hover {
+        color: #024ad8;
+        background: #f7f7f7;
+    }
+
+    .ecoursity-sortable-text-list__remove:hover {
+        color: #b3262b;
+        border-color: #f1c7ca;
+        background: #fff5f5;
+    }
+
     .ecoursity-curriculum__create-card {
         padding: 20px;
         border: 1px solid #e8e8e8;
@@ -886,7 +1009,7 @@ $course_defaults = array_merge([
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl) => ({
+        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl, sortableTextListFields) => ({
             loading: true,
             saving: false,
             sectionCreating: false,
@@ -899,6 +1022,7 @@ $course_defaults = array_merge([
             currentCourseId: parseInt(courseId, 10) || 0,
             courseViewBaseUrl,
             lessonFormComponentUrl,
+            sortableTextListFields: Array.isArray(sortableTextListFields) ? sortableTextListFields : [],
             newSectionTitle: '',
             openSectionIds: [],
             curriculumSections: Array.isArray(initialSections) ?
@@ -999,6 +1123,30 @@ $course_defaults = array_merge([
                     item_order: index,
                 })) : [];
             },
+            normalizeListField(field, keepBlank = false) {
+                const items = Array.isArray(this.course[field]) ?
+                    this.course[field] : [];
+
+                this.course[field] = items
+                    .map((item) => String(item || '').trim())
+                    .filter((item) => keepBlank || item);
+
+                if (keepBlank && !this.course[field].length) {
+                    this.course[field] = [''];
+                }
+            },
+            normalizeListFields(keepBlank = false) {
+                this.sortableTextListFields.forEach((field) => this.normalizeListField(field, keepBlank));
+            },
+            addListItem(field) {
+                this.course[field] = Array.isArray(this.course[field]) ? [...this.course[field], ''] : [''];
+            },
+            removeListItem(field, index) {
+                this.course[field] = Array.isArray(this.course[field]) ?
+                    this.course[field].filter((_, itemIndex) => itemIndex !== index) : [];
+
+                this.normalizeListField(field, true);
+            },
             sortSectionsFromDom(sortableElement) {
                 this.afterSortSettled(() => {
                     const orderedSectionIds = this.readSortableKeys(sortableElement, 'sectionId');
@@ -1025,6 +1173,19 @@ $course_defaults = array_merge([
                         (item) => item.section_item_id || item.item_id
                     );
                     this.normalizeLessonOrders(section);
+                });
+            },
+            sortListFieldFromDom(field, sortableElement) {
+                this.afterSortSettled(() => {
+                    const list = Array.isArray(this.course[field]) ? this.course[field] : [];
+                    const orderedIndexes = this.readSortableKeys(sortableElement, 'listItemIndex');
+                    const orderedItems = orderedIndexes
+                        .map((index) => list[parseInt(index, 10)])
+                        .filter((item) => item !== undefined);
+
+                    if (orderedItems.length === list.length) {
+                        this.course[field] = orderedItems;
+                    }
                 });
             },
             getCurriculumOrderPayload() {
@@ -1277,6 +1438,7 @@ $course_defaults = array_merge([
                 this.course.course_tags = Array.isArray(this.course.course_tags) ?
                     this.course.course_tags : [];
                 this.course.course_tags_input = this.course.course_tags.join(', ');
+                this.normalizeListFields(true);
             },
             async loadCourse() {
                 this.loading = true;
@@ -1331,6 +1493,7 @@ $course_defaults = array_merge([
                     .split(',')
                     .map((tag) => tag.trim())
                     .filter(Boolean);
+                this.normalizeListFields();
                 this.course.curriculum_sections = this.getCurriculumOrderPayload();
                 this.syncEditorToModel();
                 this.saving = true;

@@ -20,6 +20,8 @@ class Course
     public int $author = 0;
     public array $course_category_ids = [];
     public array $course_tags = [];
+    public array $requirements = [];
+    public array $target_audiences = [];
 
     public string $level = '',
         $max_students = '',
@@ -43,6 +45,8 @@ class Course
         '_ecoursity_price_sale_end',
         '_ecoursity_course_evaluation',
         '_ecoursity_passing_grade',
+        '_ecoursity_requirements',
+        '_ecoursity_target_audiences',
     ];
 
     public function __construct(array $attributes = [])
@@ -188,6 +192,8 @@ class Course
             'price_sale_end'     => self::metaString($meta('_ecoursity_price_sale_end')),
             'course_evaluation'  => self::metaString($meta('_ecoursity_course_evaluation')),
             'passing_grade'      => self::metaString($meta('_ecoursity_passing_grade')),
+            'requirements'       => self::metaArray($meta('_ecoursity_requirements')),
+            'target_audiences'   => self::metaArray($meta('_ecoursity_target_audiences')),
         ]);
     }
 
@@ -198,5 +204,19 @@ class Course
         }
 
         return (string) ($value ?: $default);
+    }
+
+    private static function metaArray(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $items = array_map(static fn($item): string => (string) $item, $value);
+
+        return array_values(array_filter(
+            $items,
+            static fn(string $item): bool => $item !== ''
+        ));
     }
 }

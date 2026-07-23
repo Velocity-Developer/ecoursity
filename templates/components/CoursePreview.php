@@ -94,6 +94,8 @@ $metaLabels = [
     '_ecoursity_price_sale_end'    => 'Diskon berakhir',
     '_ecoursity_course_evaluation' => 'Evaluasi',
     '_ecoursity_passing_grade'     => 'Nilai kelulusan',
+    '_ecoursity_requirements'      => 'Persyaratan',
+    '_ecoursity_target_audiences'  => 'Untuk siapa kursus ini',
 ];
 ?>
 
@@ -193,7 +195,7 @@ $metaLabels = [
                 <?php foreach ($course->meta_keys as $metaKey): ?>
                     <?php
                     $metaValue = $course->meta($metaKey);
-                    if ($metaValue === null || $metaValue === '') {
+                    if ($metaValue === null || $metaValue === '' || (is_array($metaValue) && empty($metaValue))) {
                         continue;
                     }
                     $label = $metaLabels[$metaKey] ?? str_replace('_ecoursity_', '', $metaKey);
@@ -204,6 +206,8 @@ $metaLabels = [
                             <?php
                             if ($metaKey === '_ecoursity_duration') {
                                 echo esc_html((string) $metaValue[0] . ' ' . $metaValue[1]);
+                            } elseif (in_array($metaKey, ['_ecoursity_requirements', '_ecoursity_target_audiences'], true) && is_array($metaValue)) {
+                                echo esc_html(implode(', ', array_map('strval', $metaValue)));
                             } elseif (in_array($metaKey, ['_ecoursity_price', '_ecoursity_price_sale'], true)) {
                                 echo esc_html($formatCurrency($metaValue));
                             } else {
