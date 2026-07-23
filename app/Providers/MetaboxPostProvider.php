@@ -4,6 +4,7 @@ namespace Ecoursity\App\Providers;
 
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Lesson;
+use Ecoursity\App\Support\CourseFormSchema;
 use WP_Post;
 
 class MetaboxPostProvider
@@ -277,13 +278,19 @@ class MetaboxPostProvider
 
     private function sanitizeMetaValue(string $metaKey, mixed $value): mixed
     {
+        $field = str_replace('_ecoursity_', '', $metaKey);
+        $input = CourseFormSchema::metaFieldInputs(CourseFormSchema::sections())[$field] ?? '';
+
+        if ($input === 'sortable_text_list') {
+            return $this->sanitizeTextList($value);
+        }
+
         return match ($metaKey) {
             '_ecoursity_duration' => $this->sanitizeDuration($value),
             '_ecoursity_level' => $this->sanitizeLevel($value),
             '_ecoursity_price_sale_start', '_ecoursity_price_sale_end' => $this->sanitizeDateTimeLocal($value),
             '_ecoursity_course_evaluation' => $this->sanitizeCourseEvaluation($value),
             '_ecoursity_passing_grade' => $this->sanitizePassingGrade($value),
-            '_ecoursity_requirements', '_ecoursity_target_audiences' => $this->sanitizeTextList($value),
             default => sanitize_text_field((string) $value),
         };
     }

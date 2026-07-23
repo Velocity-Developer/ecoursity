@@ -5,6 +5,7 @@ namespace Ecoursity\App\Controllers;
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Lesson;
 use Ecoursity\App\Models\Section;
+use Ecoursity\App\Support\CourseFormSchema;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -26,13 +27,9 @@ class CourseController
             ], 404);
         }
 
-        $course->thumbnail = $course->thumbnail();
-        $course->thumbnail_id = get_post_thumbnail_id($course->id);
-        $course->curriculum_sections = $this->transformSections((int) $course->id);
-
         return new WP_REST_Response([
             'success' => true,
-            'data' => $course,
+            'data' => $this->prepareCourseResponse($course),
         ]);
     }
 
@@ -63,7 +60,7 @@ class CourseController
         return new WP_REST_Response([
             'success' => true,
             'message' => 'Course created.',
-            'data' => Course::find($id),
+            'data' => $this->prepareCourseResponse(Course::find($id)),
         ], 201);
     }
 
@@ -93,7 +90,7 @@ class CourseController
         return new WP_REST_Response([
             'success' => true,
             'message' => 'Course updated.',
-            'data' => Course::find($id),
+            'data' => $this->prepareCourseResponse(Course::find($id)),
         ], 200);
     }
 
@@ -115,6 +112,27 @@ class CourseController
             'success' => true,
             'message' => 'Course deleted.',
         ], 200);
+    }
+
+    private function prepareCourseResponse(?Course $course): ?array
+    {
+        if (! $course) {
+            return null;
+        }
+
+        $course->thumbnail = $course->thumbnail();
+        $course->thumbnail_id = get_post_thumbnail_id($course->id);
+        $course->curriculum_sections = $this->transformSections((int) $course->id);
+
+        $data = get_object_vars($course);
+
+        foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $field => $input) {
+            $data[$field] = $input === 'sortable_text_list'
+                ? $this->sanitizeTextList($course->meta("_ecoursity_{$field}", []))
+                : $course->meta("_ecoursity_{$field}", '');
+        }
+
+        return $data;
     }
 
     private function transformSections(int $courseId): array
@@ -149,30 +167,9 @@ class CourseController
 
     private function saveMeta(Course $course, WP_REST_Request $request): void
     {
-        $keys = [
-            'duration',
-            'level',
-            'max_students',
-            'price',
-            'price_sale',
-            'price_sale_start',
-            'price_sale_end',
-            'course_evaluation',
-            'passing_grade',
-            'requirements',
-            'target_audiences',
-        ];
-
-        $arrayKeys = [
-            'requirements',
-            'target_audiences',
-        ];
-
-        foreach ($keys as $key) {
+        foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $key => $input) {
             if ($request->has_param($key)) {
-                $value = in_array($key, $arrayKeys, true)
-                    ? $this->sanitizeTextList($request->get_param($key))
-                    : $request->get_param($key);
+                $value = $this->sanitizeMetaValue($input, $request->get_param($key));
 
                 $course->updateMeta("_ecoursity_{$key}", $value);
             }
@@ -181,6 +178,32 @@ class CourseController
         if ($request->has_param('thumbnail_id')) {
             $course->updateMeta('_thumbnail_id', (int) $request->get_param('thumbnail_id'));
         }
+    }
+
+    private function sanitizeMetaValue(string $input, mixed $value): mixed
+    {
+        return match ($input) {
+            'duration' => $this->sanitizeDuration($value),
+            'sortable_text_list' => $this->sanitizeTextList($value),
+            default => sanitize_text_field((string) $value),
+        };
+    }
+
+    private function sanitizeDuration(mixed $value): array
+    {
+        $amount = is_array($value) && isset($value[0]) ? absint($value[0]) : 1;
+        $unit = is_array($value) && isset($value[1]) ? sanitize_key((string) $value[1]) : 'week';
+        $allowedUnits = ['day', 'week', 'month', 'year'];
+
+        if (! in_array($unit, $allowedUnits, true)) {
+            $unit = 'week';
+        }
+
+        if ($amount < 1) {
+            $amount = 1;
+        }
+
+        return [$amount, $unit];
     }
 
     private function sanitizeTextList(mixed $items): array

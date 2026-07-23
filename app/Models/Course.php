@@ -2,6 +2,7 @@
 
 namespace Ecoursity\App\Models;
 
+use Ecoursity\App\Support\CourseFormSchema;
 use WP_Query;
 
 defined('ABSPATH') || exit;
@@ -22,6 +23,7 @@ class Course
     public array $course_tags = [];
     public array $requirements = [];
     public array $target_audiences = [];
+    public array $key_features = [];
 
     public string $level = '',
         $max_students = '',
@@ -56,6 +58,8 @@ class Course
                 $this->{$key} = $value;
             }
         }
+
+        $this->meta_keys = CourseFormSchema::metaKeys(CourseFormSchema::sections());
     }
 
     /**
@@ -194,6 +198,7 @@ class Course
             'passing_grade'      => self::metaString($meta('_ecoursity_passing_grade')),
             'requirements'       => self::metaArray($meta('_ecoursity_requirements')),
             'target_audiences'   => self::metaArray($meta('_ecoursity_target_audiences')),
+            'key_features'       => self::metaArray($meta('_ecoursity_key_features')),
         ]);
     }
 

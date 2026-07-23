@@ -4,6 +4,7 @@ namespace Ecoursity\App\Providers;
 
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Lesson;
+use Ecoursity\App\Support\CourseFormSchema;
 
 class PostTypeProvider
 {
@@ -35,21 +36,22 @@ class PostTypeProvider
             'supports' => ['title', 'editor'],
         ]);
 
-        register_post_meta(Course::POST_TYPE, '_ecoursity_requirements', [
-            'type' => 'array',
-            'single' => true,
-            'show_in_rest' => false,
-            'sanitize_callback' => [$this, 'sanitizeTextListMeta'],
-            'auth_callback' => [$this, 'canEditPostMeta'],
-        ]);
+        foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $field => $input) {
+            $isTextList = $input === 'sortable_text_list';
+            $isArray = $isTextList || $input === 'duration';
 
-        register_post_meta(Course::POST_TYPE, '_ecoursity_target_audiences', [
-            'type' => 'array',
-            'single' => true,
-            'show_in_rest' => false,
-            'sanitize_callback' => [$this, 'sanitizeTextListMeta'],
-            'auth_callback' => [$this, 'canEditPostMeta'],
-        ]);
+            register_post_meta(Course::POST_TYPE, "_ecoursity_{$field}", [
+                'type' => $isArray ? 'array' : 'string',
+                'single' => true,
+                'show_in_rest' => false,
+                'sanitize_callback' => match ($input) {
+                    'duration' => [$this, 'sanitizeCourseDurationMeta'],
+                    'sortable_text_list' => [$this, 'sanitizeTextListMeta'],
+                    default => 'sanitize_text_field',
+                },
+                'auth_callback' => [$this, 'canEditPostMeta'],
+            ]);
+        }
 
         register_post_meta(Lesson::POST_TYPE, '_ecoursity_duration', [
             'type' => 'array',
@@ -84,6 +86,23 @@ class PostTypeProvider
 
         if (!in_array($unit, $allowedUnits, true)) {
             $unit = 'minute';
+        }
+
+        if ($amount < 1) {
+            $amount = 1;
+        }
+
+        return [$amount, $unit];
+    }
+
+    public function sanitizeCourseDurationMeta(mixed $value): array
+    {
+        $amount = is_array($value) && isset($value[0]) ? absint($value[0]) : 1;
+        $unit = is_array($value) && isset($value[1]) ? sanitize_key((string) $value[1]) : 'week';
+        $allowedUnits = ['day', 'week', 'month', 'year'];
+
+        if (!in_array($unit, $allowedUnits, true)) {
+            $unit = 'week';
         }
 
         if ($amount < 1) {
