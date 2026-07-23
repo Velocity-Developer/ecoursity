@@ -11,6 +11,7 @@ class UploadService
     private const STORAGE_DIRECTORY = 'ecoursity-storage';
     public const PROFILE_DIRECTORY = 'profile';
     public const MATERI_DIRECTORY = 'materi';
+    public const FILES_DIRECTORY = 'files';
 
     public function upload(array $file, string $subdirectory = ''): array
     {

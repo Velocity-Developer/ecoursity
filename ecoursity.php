@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Ecoursity\App\Models\File;
 use Ecoursity\App\Models\Section;
 
 /**
@@ -54,6 +55,7 @@ final class EcoursityPlugin
     public static function activate(): void
     {
         Section::createTables();
+        File::createTable();
         flush_rewrite_rules();
     }
 
