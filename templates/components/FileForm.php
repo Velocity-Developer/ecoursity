@@ -67,11 +67,22 @@ $file_payload = array_map(
         <div class="ecoursity-file-form__empty">Belum ada file lampiran.</div>
     </template>
 
-    <div class="ecoursity-file-form__accordion" x-show="files.length">
+    <div
+        class="ecoursity-file-form__accordion"
+        x-show="files.length"
+        x-sort="sortFilesFromDom($el)"
+        x-sort:config="{ handle: '.ecoursity-file-form__sort-handle' }">
         <template x-for="file in files" :key="file.file_id">
-            <details class="ecoursity-file-form__item">
+            <details class="ecoursity-file-form__item" x-sort:item="file.file_id" :data-file-id="file.file_id">
                 <summary class="ecoursity-file-form__summary">
-                    <span class="ecoursity-file-form__title" x-text="file.file_name || 'File lampiran'"></span>
+                    <span class="ecoursity-file-form__summary-main">
+                        <span class="ecoursity-file-form__sort-handle" @click.stop.prevent aria-label="Urutkan file" title="Urutkan file">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M5.333 3.333H5.34M10.667 3.333H10.674M5.333 8H5.34M10.667 8H10.674M5.333 12.667H5.34M10.667 12.667H10.674" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </span>
+                        <span class="ecoursity-file-form__title" x-text="file.file_name || 'File lampiran'"></span>
+                    </span>
                     <span class="ecoursity-file-form__method" x-text="formatMethod(file.method)"></span>
                 </summary>
 
@@ -189,6 +200,10 @@ $file_payload = array_map(
         overflow: hidden;
     }
 
+    .ecoursity-file-form__item.sortable-ghost {
+        opacity: 0.5;
+    }
+
     .ecoursity-file-form__summary {
         display: flex;
         align-items: center;
@@ -197,6 +212,36 @@ $file_payload = array_map(
         padding: 14px 16px;
         cursor: pointer;
         list-style: none;
+    }
+
+    .ecoursity-file-form__summary-main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .ecoursity-file-form__sort-handle {
+        display: inline-flex;
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #d6d6d6;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #636363;
+        cursor: grab;
+    }
+
+    .ecoursity-file-form__sort-handle:active {
+        cursor: grabbing;
+    }
+
+    .ecoursity-file-form__sort-handle:hover {
+        border-color: #024ad8;
+        color: #024ad8;
     }
 
     .ecoursity-file-form__summary::-webkit-details-marker {
@@ -304,16 +349,71 @@ $file_payload = array_map(
                 formatMethod(method) {
                     return method === 'external' ? 'External' : 'Upload';
                 },
-                headers() {
+                headers(includeJson = false) {
                     const headers = {
                         'X-Requested-With': 'XMLHttpRequest',
                     };
+
+                    if (includeJson) {
+                        headers['Content-Type'] = 'application/json';
+                    }
 
                     if (window.ecoursity?.restNonce) {
                         headers['X-WP-Nonce'] = window.ecoursity.restNonce;
                     }
 
                     return headers;
+                },
+                sortFilesFromDom(element) {
+                    const fileIds = Array.from(element.querySelectorAll('[data-file-id]'))
+                        .map((item) => parseInt(item.dataset.fileId, 10))
+                        .filter((fileId) => fileId > 0);
+
+                    this.files = this.reorderByIds(fileIds);
+                    this.persistFileOrder(fileIds);
+                },
+                reorderByIds(fileIds) {
+                    const indexedFiles = new Map(this.files.map((file) => [parseInt(file.file_id, 10), file]));
+
+                    return fileIds
+                        .map((fileId, index) => {
+                            const file = indexedFiles.get(fileId);
+
+                            if (!file) {
+                                return null;
+                            }
+
+                            return {
+                                ...file,
+                                orders: index,
+                            };
+                        })
+                        .filter(Boolean);
+                },
+                async persistFileOrder(fileIds) {
+                    if (!this.itemId || !fileIds.length) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${this.restUrl}order`, {
+                            method: 'PUT',
+                            headers: this.headers(true),
+                            body: JSON.stringify({
+                                item_id: this.itemId,
+                                item_type: this.itemType,
+                                file_ids: fileIds,
+                            }),
+                        });
+                        const json = await response.json();
+
+                        if (json.success && Array.isArray(json.data)) {
+                            this.files = json.data;
+                        }
+                    } catch (error) {
+                        this.message = 'Gagal menyimpan urutan file.';
+                        this.messageType = 'error';
+                    }
                 },
                 async refresh() {
                     if (!this.itemId) {

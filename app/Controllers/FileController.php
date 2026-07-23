@@ -126,6 +126,31 @@ class FileController
         ]);
     }
 
+    public function sort(WP_REST_Request $request): WP_REST_Response
+    {
+        $itemId = absint($request->get_param('item_id'));
+        $itemType = sanitize_key((string) $request->get_param('item_type'));
+        $fileIds = $request->get_param('file_ids');
+
+        if ($itemId < 1 || ! is_array($fileIds)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => 'Data urutan file tidak valid.',
+            ], 422);
+        }
+
+        FileModel::syncOrders(array_map('absint', $fileIds), $itemId, $itemType);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => 'Urutan file berhasil disimpan.',
+            'data' => array_map(
+                fn(FileModel $file): array => $this->transformFile($file),
+                FileModel::allByItem($itemId, $itemType)
+            ),
+        ]);
+    }
+
     private function transformFile(FileModel $file): array
     {
         return $file->toArray();

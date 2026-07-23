@@ -146,6 +146,36 @@ class File
         return $file;
     }
 
+    public static function syncOrders(array $fileIds, int $itemId, string $itemType = ''): void
+    {
+        global $wpdb;
+
+        if ($itemId < 1) {
+            return;
+        }
+
+        foreach (array_values($fileIds) as $order => $fileId) {
+            $where = [
+                'file_id' => absint($fileId),
+                'item_id' => $itemId,
+            ];
+            $whereFormat = ['%d', '%d'];
+
+            if ($itemType !== '') {
+                $where['item_type'] = sanitize_key($itemType);
+                $whereFormat[] = '%s';
+            }
+
+            $wpdb->update(
+                self::tableName(),
+                ['orders' => absint($order)],
+                $where,
+                ['%d'],
+                $whereFormat
+            );
+        }
+    }
+
     public function save(): int
     {
         global $wpdb;

@@ -138,6 +138,12 @@ class ApiRoutes
                 'permission_callback' => fn() => current_user_can('edit_posts'),
             ],
             [
+                'route' => '/files/order',
+                'callback' => [FileController::class, 'sort'],
+                'methods' => 'PUT',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
                 'route' => '/files/(?P<id>\d+)',
                 'callback' => [FileController::class, 'delete'],
                 'methods' => 'DELETE',
