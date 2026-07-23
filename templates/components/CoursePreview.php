@@ -97,7 +97,23 @@ $metaLabels = [
     '_ecoursity_requirements'      => 'Persyaratan',
     '_ecoursity_target_audiences'  => 'Untuk siapa kursus ini',
     '_ecoursity_key_features'      => 'Fitur',
+    '_ecoursity_faqs'              => 'FAQ',
 ];
+
+$formatArrayMeta = static function (array $value): string {
+    $items = array_map(static function (mixed $item): string {
+        if (!is_array($item)) {
+            return (string) $item;
+        }
+
+        return implode(': ', array_filter(array_map(
+            static fn(mixed $subValue): string => (string) $subValue,
+            $item
+        )));
+    }, $value);
+
+    return implode(', ', array_filter($items));
+};
 ?>
 
 <article class="course-preview">
@@ -208,7 +224,7 @@ $metaLabels = [
                             if ($metaKey === '_ecoursity_duration') {
                                 echo esc_html((string) $metaValue[0] . ' ' . $metaValue[1]);
                             } elseif (is_array($metaValue)) {
-                                echo esc_html(implode(', ', array_map('strval', $metaValue)));
+                                echo esc_html($formatArrayMeta($metaValue));
                             } elseif (in_array($metaKey, ['_ecoursity_price', '_ecoursity_price_sale'], true)) {
                                 echo esc_html($formatCurrency($metaValue));
                             } else {

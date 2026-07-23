@@ -38,7 +38,8 @@ class PostTypeProvider
 
         foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $field => $input) {
             $isTextList = $input === 'sortable_text_list';
-            $isArray = $isTextList || $input === 'duration';
+            $isRepeatableGroup = $input === 'repeatable_group';
+            $isArray = $isTextList || $isRepeatableGroup || $input === 'duration';
 
             register_post_meta(Course::POST_TYPE, "_ecoursity_{$field}", [
                 'type' => $isArray ? 'array' : 'string',
@@ -47,6 +48,7 @@ class PostTypeProvider
                 'sanitize_callback' => match ($input) {
                     'duration' => [$this, 'sanitizeCourseDurationMeta'],
                     'sortable_text_list' => [$this, 'sanitizeTextListMeta'],
+                    'repeatable_group' => [$this, 'sanitizeRepeatableGroupMeta'],
                     default => 'sanitize_text_field',
                 },
                 'auth_callback' => [$this, 'canEditPostMeta'],
@@ -127,6 +129,27 @@ class PostTypeProvider
             $items,
             static fn(string $item): bool => $item !== ''
         ));
+    }
+
+    public function sanitizeRepeatableGroupMeta(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(
+            static function (mixed $item): array {
+                if (!is_array($item)) {
+                    return [];
+                }
+
+                return array_map(
+                    static fn(mixed $subValue): string => sanitize_text_field((string) $subValue),
+                    $item
+                );
+            },
+            $value
+        )));
     }
 
     public function sanitizeLessonAssignedMeta(mixed $value): int

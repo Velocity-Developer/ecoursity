@@ -285,6 +285,10 @@ class MetaboxPostProvider
             return $this->sanitizeTextList($value);
         }
 
+        if ($input === 'repeatable_group') {
+            return $this->sanitizeRepeatableGroup($field, $value);
+        }
+
         return match ($metaKey) {
             '_ecoursity_duration' => $this->sanitizeDuration($value),
             '_ecoursity_level' => $this->sanitizeLevel($value),
@@ -337,6 +341,43 @@ class MetaboxPostProvider
             $items,
             static fn(string $item): bool => $item !== ''
         ));
+    }
+
+    private function sanitizeRepeatableGroup(string $field, mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $groupFields = CourseFormSchema::repeatableGroupFields(CourseFormSchema::sections())[$field] ?? [];
+        $allowedNames = array_values(array_filter(array_map(
+            static fn(array $subfield): string => (string) ($subfield['name'] ?? ''),
+            $groupFields
+        )));
+
+        if (!$allowedNames) {
+            return [];
+        }
+
+        $items = [];
+
+        foreach ($value as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $row = [];
+
+            foreach ($allowedNames as $name) {
+                $row[$name] = sanitize_text_field((string) ($item[$name] ?? ''));
+            }
+
+            if (array_filter($row, static fn(string $subValue): bool => $subValue !== '')) {
+                $items[] = $row;
+            }
+        }
+
+        return $items;
     }
 
     private function sanitizeLessonDuration(mixed $value): array

@@ -127,9 +127,8 @@ class CourseController
         $data = get_object_vars($course);
 
         foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $field => $input) {
-            $data[$field] = $input === 'sortable_text_list'
-                ? $this->sanitizeTextList($course->meta("_ecoursity_{$field}", []))
-                : $course->meta("_ecoursity_{$field}", '');
+            $default = in_array($input, ['sortable_text_list', 'repeatable_group', 'duration'], true) ? [] : '';
+            $data[$field] = $this->sanitizeMetaValue($input, $course->meta("_ecoursity_{$field}", $default), $field);
         }
 
         return $data;
@@ -169,7 +168,7 @@ class CourseController
     {
         foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $key => $input) {
             if ($request->has_param($key)) {
-                $value = $this->sanitizeMetaValue($input, $request->get_param($key));
+                $value = $this->sanitizeMetaValue($input, $request->get_param($key), $key);
 
                 $course->updateMeta("_ecoursity_{$key}", $value);
             }
@@ -180,11 +179,12 @@ class CourseController
         }
     }
 
-    private function sanitizeMetaValue(string $input, mixed $value): mixed
+    private function sanitizeMetaValue(string $input, mixed $value, string $field = ''): mixed
     {
         return match ($input) {
             'duration' => $this->sanitizeDuration($value),
             'sortable_text_list' => $this->sanitizeTextList($value),
+            'repeatable_group' => $this->sanitizeRepeatableGroup($field, $value),
             default => sanitize_text_field((string) $value),
         };
     }
@@ -221,6 +221,43 @@ class CourseController
             $items,
             static fn(string $item): bool => $item !== ''
         ));
+    }
+
+    private function sanitizeRepeatableGroup(string $field, mixed $items): array
+    {
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $groupFields = CourseFormSchema::repeatableGroupFields(CourseFormSchema::sections())[$field] ?? [];
+        $allowedNames = array_values(array_filter(array_map(
+            static fn(array $subfield): string => (string) ($subfield['name'] ?? ''),
+            $groupFields
+        )));
+
+        if (! $allowedNames) {
+            return [];
+        }
+
+        $sanitized = [];
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $row = [];
+
+            foreach ($allowedNames as $name) {
+                $row[$name] = sanitize_text_field((string) ($item[$name] ?? ''));
+            }
+
+            if (array_filter($row, static fn(string $value): bool => $value !== '')) {
+                $sanitized[] = $row;
+            }
+        }
+
+        return $sanitized;
     }
 
     private function saveTaxonomies(Course $course, WP_REST_Request $request): void

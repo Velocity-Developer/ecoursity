@@ -58,6 +58,7 @@ $curriculum_section_payload = array_map(static function ($section): array {
 
 $course_form_sections = \Ecoursity\App\Support\CourseFormSchema::sections();
 $course_sortable_text_list_fields = \Ecoursity\App\Support\CourseFormSchema::sortableTextListFields($course_form_sections);
+$course_repeatable_group_fields = \Ecoursity\App\Support\CourseFormSchema::repeatableGroupFields($course_form_sections);
 
 $course_defaults = array_merge([
     'slug' => '',
@@ -82,7 +83,8 @@ $course_defaults = array_merge([
         <?php echo esc_attr(wp_json_encode($course_defaults)); ?>,
         <?php echo esc_attr(wp_json_encode($curriculum_section_payload)); ?>,
         '<?php echo esc_js($course_view_base_url); ?>',
-        <?php echo esc_attr(wp_json_encode($course_sortable_text_list_fields)); ?>
+        <?php echo esc_attr(wp_json_encode($course_sortable_text_list_fields)); ?>,
+        <?php echo esc_attr(wp_json_encode($course_repeatable_group_fields)); ?>
     )"
     x-cloak>
     <template x-if="loading">
@@ -165,6 +167,66 @@ $course_defaults = array_merge([
                         </template>
                     </div>
                     <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--fit" @click="addListItem('<?php echo esc_js($name); ?>')"><?php echo esc_html($buttonLabel); ?></button>
+                <?php elseif ($input === 'repeatable_group') : ?>
+                    <div
+                        class="ecoursity-repeatable-group"
+                        x-sort="sortRepeatableGroupFromDom('<?php echo esc_js($name); ?>', $el)"
+                        x-sort:config="{ handle: '.ecoursity-repeatable-group__sort-handle' }">
+                        <template x-for="(item, index) in course['<?php echo esc_js($name); ?>']" :key="`<?php echo esc_attr($name); ?>-${index}`">
+                            <div class="ecoursity-repeatable-group__item" x-sort:item="index" :data-group-item-index="index">
+                                <div class="ecoursity-repeatable-group__toolbar">
+                                    <span class="ecoursity-repeatable-group__sort-handle" @click.stop.prevent aria-label="Urutkan item" title="Urutkan item">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                            <path d="M5.333 3.333H5.34M10.667 3.333H10.674M5.333 8H5.34M10.667 8H10.674M5.333 12.667H5.34M10.667 12.667H10.674" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                        </svg>
+                                    </span>
+                                    <button type="button" class="ecoursity-repeatable-group__remove" @click="removeRepeatableGroupItem('<?php echo esc_js($name); ?>', index)" aria-label="Hapus item" title="Hapus item">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+                                            <path d="M2.66699 4.00016H13.3337" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M6.66699 7.3335V11.3335" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M9.33301 7.3335V11.3335" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3.33301 4.00016L4.00004 12.0002C4.02842 12.3874 4.20239 12.7494 4.48691 13.0136C4.77143 13.2778 5.14515 13.4246 5.53301 13.4252H10.467C10.8549 13.4246 11.2286 13.2778 11.5131 13.0136C11.7976 12.7494 11.9716 12.3874 12 12.0002L12.667 4.00016" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M6 4.00016V2.66683C6 2.49002 6.07024 2.32045 6.19526 2.19542C6.32029 2.0704 6.48986 2.00016 6.66667 2.00016H9.33333C9.51014 2.00016 9.67971 2.0704 9.80474 2.19542C9.92976 2.32045 10 2.49002 10 2.66683V4.00016" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="ecoursity-repeatable-group__fields">
+                                    <?php foreach (($field['fields'] ?? []) as $subfield) : ?>
+                                        <?php
+                                        $subName = $subfield['name'] ?? '';
+                                        $subLabel = $subfield['label'] ?? '';
+                                        $subInput = $subfield['input'] ?? 'text';
+                                        $subPlaceholder = $subfield['placeholder'] ?? '';
+                                        $subRows = (int) ($subfield['rows'] ?? 3);
+
+                                        if ($subName === '') {
+                                            continue;
+                                        }
+                                        ?>
+                                        <div class="ecoursity-form-group">
+                                            <?php if ($subLabel !== '') : ?>
+                                                <label class="ecoursity-form-label"><?php echo esc_html($subLabel); ?></label>
+                                            <?php endif; ?>
+                                            <?php if ($subInput === 'textarea') : ?>
+                                                <textarea
+                                                    class="ecoursity-form-textarea"
+                                                    rows="<?php echo esc_attr((string) $subRows); ?>"
+                                                    x-model="course['<?php echo esc_js($name); ?>'][index]['<?php echo esc_js($subName); ?>']"
+                                                    <?php if ($subPlaceholder !== '') : ?>placeholder="<?php echo esc_attr($subPlaceholder); ?>" <?php endif; ?>></textarea>
+                                            <?php else : ?>
+                                                <input
+                                                    type="<?php echo esc_attr($subInput); ?>"
+                                                    class="ecoursity-form-input"
+                                                    x-model="course['<?php echo esc_js($name); ?>'][index]['<?php echo esc_js($subName); ?>']"
+                                                    <?php if ($subPlaceholder !== '') : ?>placeholder="<?php echo esc_attr($subPlaceholder); ?>" <?php endif; ?>>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" class="ecoursity-button ecoursity-button--outline ecoursity-button--fit" @click="addRepeatableGroupItem('<?php echo esc_js($name); ?>')"><?php echo esc_html($buttonLabel); ?></button>
                 <?php else : ?>
                     <input
                         type="<?php echo esc_attr($input); ?>"
@@ -579,6 +641,74 @@ $course_defaults = array_merge([
         background: #fff5f5;
     }
 
+    .ecoursity-repeatable-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .ecoursity-repeatable-group__item {
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid #e8e8e8;
+        border-radius: 8px;
+        background: #ffffff;
+    }
+
+    .ecoursity-repeatable-group__toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ecoursity-repeatable-group__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .ecoursity-repeatable-group__sort-handle,
+    .ecoursity-repeatable-group__remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        border-radius: 4px;
+    }
+
+    .ecoursity-repeatable-group__sort-handle {
+        color: #858585;
+        cursor: grab;
+    }
+
+    .ecoursity-repeatable-group__sort-handle:active {
+        cursor: grabbing;
+    }
+
+    .ecoursity-repeatable-group__remove {
+        border: 1px solid #e8e8e8;
+        background: #ffffff;
+        color: #636363;
+        cursor: pointer;
+    }
+
+    .ecoursity-repeatable-group__sort-handle:hover,
+    .ecoursity-repeatable-group__remove:hover {
+        color: #024ad8;
+        background: #f7f7f7;
+    }
+
+    .ecoursity-repeatable-group__remove:hover {
+        color: #b3262b;
+        border-color: #f1c7ca;
+        background: #fff5f5;
+    }
+
     .ecoursity-curriculum__create-card {
         padding: 20px;
         border: 1px solid #e8e8e8;
@@ -791,7 +921,7 @@ $course_defaults = array_merge([
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl, sortableTextListFields) => ({
+        Alpine.data('courseForm', (courseId, restUrl, sectionsRestUrl, lessonsRestUrl, lessonFormComponentUrl, defaults, initialSections, courseViewBaseUrl, sortableTextListFields, repeatableGroupFields) => ({
             loading: true,
             saving: false,
             sectionCreating: false,
@@ -805,6 +935,7 @@ $course_defaults = array_merge([
             courseViewBaseUrl,
             lessonFormComponentUrl,
             sortableTextListFields: Array.isArray(sortableTextListFields) ? sortableTextListFields : [],
+            repeatableGroupFields: repeatableGroupFields && typeof repeatableGroupFields === 'object' ? repeatableGroupFields : {},
             newSectionTitle: '',
             openSectionIds: [],
             curriculumSections: Array.isArray(initialSections) ?
@@ -920,6 +1051,39 @@ $course_defaults = array_merge([
             normalizeListFields(keepBlank = false) {
                 this.sortableTextListFields.forEach((field) => this.normalizeListField(field, keepBlank));
             },
+            makeRepeatableGroupItem(field) {
+                const fields = Array.isArray(this.repeatableGroupFields[field]) ? this.repeatableGroupFields[field] : [];
+
+                return fields.reduce((item, subfield) => {
+                    if (subfield?.name) {
+                        item[subfield.name] = '';
+                    }
+
+                    return item;
+                }, {});
+            },
+            normalizeRepeatableGroup(field, keepBlank = false) {
+                const fields = Array.isArray(this.repeatableGroupFields[field]) ? this.repeatableGroupFields[field] : [];
+                const allowedNames = fields
+                    .map((subfield) => subfield?.name)
+                    .filter(Boolean);
+                const items = Array.isArray(this.course[field]) ? this.course[field] : [];
+
+                this.course[field] = items
+                    .filter((item) => item && typeof item === 'object' && !Array.isArray(item))
+                    .map((item) => allowedNames.reduce((normalized, name) => {
+                        normalized[name] = String(item[name] || '').trim();
+                        return normalized;
+                    }, {}))
+                    .filter((item) => keepBlank || Object.values(item).some(Boolean));
+
+                if (keepBlank && !this.course[field].length) {
+                    this.course[field] = [this.makeRepeatableGroupItem(field)];
+                }
+            },
+            normalizeRepeatableGroups(keepBlank = false) {
+                Object.keys(this.repeatableGroupFields).forEach((field) => this.normalizeRepeatableGroup(field, keepBlank));
+            },
             addListItem(field) {
                 this.course[field] = Array.isArray(this.course[field]) ? [...this.course[field], ''] : [''];
             },
@@ -928,6 +1092,18 @@ $course_defaults = array_merge([
                     this.course[field].filter((_, itemIndex) => itemIndex !== index) : [];
 
                 this.normalizeListField(field, true);
+            },
+            addRepeatableGroupItem(field) {
+                this.course[field] = Array.isArray(this.course[field]) ?
+                    [...this.course[field], this.makeRepeatableGroupItem(field)] :
+                    [this.makeRepeatableGroupItem(field)];
+            },
+            removeRepeatableGroupItem(field, index) {
+                this.course[field] = Array.isArray(this.course[field]) ?
+                    this.course[field].filter((_, itemIndex) => itemIndex !== index) :
+                    [];
+
+                this.normalizeRepeatableGroup(field, true);
             },
             sortSectionsFromDom(sortableElement) {
                 this.afterSortSettled(() => {
@@ -961,6 +1137,19 @@ $course_defaults = array_merge([
                 this.afterSortSettled(() => {
                     const list = Array.isArray(this.course[field]) ? this.course[field] : [];
                     const orderedIndexes = this.readSortableKeys(sortableElement, 'listItemIndex');
+                    const orderedItems = orderedIndexes
+                        .map((index) => list[parseInt(index, 10)])
+                        .filter((item) => item !== undefined);
+
+                    if (orderedItems.length === list.length) {
+                        this.course[field] = orderedItems;
+                    }
+                });
+            },
+            sortRepeatableGroupFromDom(field, sortableElement) {
+                this.afterSortSettled(() => {
+                    const list = Array.isArray(this.course[field]) ? this.course[field] : [];
+                    const orderedIndexes = this.readSortableKeys(sortableElement, 'groupItemIndex');
                     const orderedItems = orderedIndexes
                         .map((index) => list[parseInt(index, 10)])
                         .filter((item) => item !== undefined);
@@ -1221,6 +1410,7 @@ $course_defaults = array_merge([
                     this.course.course_tags : [];
                 this.course.course_tags_input = this.course.course_tags.join(', ');
                 this.normalizeListFields(true);
+                this.normalizeRepeatableGroups(true);
             },
             async loadCourse() {
                 this.loading = true;
@@ -1276,6 +1466,7 @@ $course_defaults = array_merge([
                     .map((tag) => tag.trim())
                     .filter(Boolean);
                 this.normalizeListFields();
+                this.normalizeRepeatableGroups();
                 this.course.curriculum_sections = this.getCurriculumOrderPayload();
                 this.syncEditorToModel();
                 this.saving = true;

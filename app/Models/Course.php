@@ -24,6 +24,7 @@ class Course
     public array $requirements = [];
     public array $target_audiences = [];
     public array $key_features = [];
+    public array $faqs = [];
 
     public string $level = '',
         $max_students = '',
@@ -199,6 +200,7 @@ class Course
             'requirements'       => self::metaArray($meta('_ecoursity_requirements')),
             'target_audiences'   => self::metaArray($meta('_ecoursity_target_audiences')),
             'key_features'       => self::metaArray($meta('_ecoursity_key_features')),
+            'faqs'               => self::metaRows($meta('_ecoursity_faqs')),
         ]);
     }
 
@@ -223,5 +225,26 @@ class Course
             $items,
             static fn(string $item): bool => $item !== ''
         ));
+    }
+
+    private static function metaRows(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(
+            static function (mixed $item): array {
+                if (!is_array($item)) {
+                    return [];
+                }
+
+                return array_map(
+                    static fn(mixed $subValue): string => (string) $subValue,
+                    $item
+                );
+            },
+            $value
+        )));
     }
 }

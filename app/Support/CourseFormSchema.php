@@ -37,6 +37,24 @@ class CourseFormSchema
         ));
     }
 
+    public static function repeatableGroupFields(array $sections): array
+    {
+        $fields = [];
+
+        foreach (self::fields($sections) as $field) {
+            if (($field['input'] ?? '') !== 'repeatable_group' || empty($field['name'])) {
+                continue;
+            }
+
+            $fields[$field['name']] = array_values(array_filter(
+                $field['fields'] ?? [],
+                static fn(array $subfield): bool => !empty($subfield['name'])
+            ));
+        }
+
+        return $fields;
+    }
+
     public static function metaFieldInputs(array $sections): array
     {
         $inputs = self::fieldInputs($sections);
@@ -77,9 +95,20 @@ class CourseFormSchema
     {
         $inputs = [];
 
+        foreach (self::fields($sections) as $field) {
+            $inputs[$field['name']] = $field['input'] ?? 'text';
+        }
+
+        return $inputs;
+    }
+
+    private static function fields(array $sections): array
+    {
+        $fields = [];
+
         foreach ($sections as $section) {
             if (($section['type'] ?? '') === 'row') {
-                $inputs = array_merge($inputs, self::fieldInputs($section['fields'] ?? []));
+                $fields = array_merge($fields, self::fields($section['fields'] ?? []));
                 continue;
             }
 
@@ -87,10 +116,10 @@ class CourseFormSchema
                 continue;
             }
 
-            $inputs[$section['name']] = $section['input'] ?? 'text';
+            $fields[] = $section;
         }
 
-        return $inputs;
+        return $fields;
     }
 
     private static function hasSpecial(array $sections, string $name): bool
@@ -297,6 +326,34 @@ class CourseFormSchema
                 'placeholder' => 'Contoh: Modul Materi PDF',
                 'button_label' => 'Tambah Fitur',
                 'default' => [''],
+            ],
+            [
+                'type' => 'field',
+                'name' => 'faqs',
+                'label' => 'FAQ',
+                'input' => 'repeatable_group',
+                'button_label' => 'Tambah FAQ',
+                'default' => [
+                    [
+                        'question' => '',
+                        'answer' => '',
+                    ],
+                ],
+                'fields' => [
+                    [
+                        'name' => 'question',
+                        'label' => 'Pertanyaan',
+                        'input' => 'text',
+                        'placeholder' => 'Contoh: Apakah kursus ini cocok untuk pemula?',
+                    ],
+                    [
+                        'name' => 'answer',
+                        'label' => 'Jawaban',
+                        'input' => 'textarea',
+                        'rows' => 3,
+                        'placeholder' => 'Tulis jawaban singkat',
+                    ],
+                ],
             ],
         ];
     }

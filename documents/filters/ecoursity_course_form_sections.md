@@ -62,10 +62,12 @@ Field umum yang didukung dari implementasi saat ini:
 - `step`
 - `options`
 - `button_label` untuk `input = sortable_text_list`
+- `fields` untuk `input = repeatable_group`
 
 Input khusus yang juga didukung:
 
 - `sortable_text_list`: daftar input text yang bisa ditambah, dihapus, dan diurutkan. Gunakan `default` berupa array, misalnya `['']`.
+- `repeatable_group`: daftar item yang bisa ditambah, dihapus, dan diurutkan; setiap item berisi beberapa key dari `fields`.
 
 ### `special`
 
@@ -125,9 +127,44 @@ add_filter('ecoursity_course_form_sections', function (array $sections): array {
 });
 ```
 
+Contoh field array multidimensi untuk FAQ:
+
+```php
+add_filter('ecoursity_course_form_sections', function (array $sections): array {
+    $sections[] = [
+        'type' => 'field',
+        'name' => 'faqs',
+        'label' => 'FAQ',
+        'input' => 'repeatable_group',
+        'button_label' => 'Tambah FAQ',
+        'default' => [
+            [
+                'question' => '',
+                'answer' => '',
+            ],
+        ],
+        'fields' => [
+            [
+                'name' => 'question',
+                'label' => 'Pertanyaan',
+                'input' => 'text',
+            ],
+            [
+                'name' => 'answer',
+                'label' => 'Jawaban',
+                'input' => 'textarea',
+                'rows' => 3,
+            ],
+        ],
+    ];
+
+    return $sections;
+});
+```
+
 ## Catatan
 
 - Gunakan struktur array yang konsisten. Template tidak punya validasi schema mendalam.
 - Item `special` baru perlu dukungan render di `templates/components/CourseForm.php`.
-- Field `sortable_text_list` perlu didukung juga di backend jika datanya akan disimpan sebagai post meta.
+- Field `sortable_text_list` dan `repeatable_group` otomatis disimpan sebagai array meta oleh REST course controller.
 - Item non-`field` tidak ikut masuk ke default collector, kecuali dibungkus `row` yang berisi `field`.
