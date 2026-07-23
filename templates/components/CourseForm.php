@@ -248,6 +248,7 @@ $course_defaults = array_merge([
         <div class="ecoursity-course-form__tabs" role="tablist" aria-label="Tab form kursus">
             <button type="button" class="ecoursity-course-form__tab" :class="{ 'is-active': currentTab === 'summary' }" @click="currentTab = 'summary'">Ringkasan</button>
             <button type="button" class="ecoursity-course-form__tab" :class="{ 'is-active': currentTab === 'curriculum' }" @click="currentTab = 'curriculum'">Kurikulum</button>
+            <button type="button" class="ecoursity-course-form__tab" :class="{ 'is-active': currentTab === 'files' }" @click="currentTab = 'files'">File Materi</button>
         </div>
 
         <div x-show="currentTab === 'summary'" class="ecoursity-course-form__tab-panel">
@@ -527,6 +528,17 @@ $course_defaults = array_merge([
                     </div>
                 </template>
             </div>
+        </div>
+
+        <div x-show="currentTab === 'files'" class="ecoursity-course-form__tab-panel">
+            <?php
+            \Ecoursity\App\Template::component('FileForm', [
+                'props' => [
+                    'post_id' => (int) $course_id,
+                    'item_type' => \Ecoursity\App\Models\Course::POST_TYPE,
+                ],
+            ]);
+            ?>
         </div>
 
         <div class="ecoursity-form-actions">

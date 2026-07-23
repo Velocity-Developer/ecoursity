@@ -26,7 +26,7 @@ $file_payload = array_map(
         <?php echo esc_attr(wp_json_encode($file_payload)); ?>
     )"
     x-cloak>
-    <form class="ecoursity-file-form__create" @submit.prevent="submit">
+    <div class="ecoursity-file-form__create">
         <div x-show="message" class="ecoursity-form-message" :class="'ecoursity-form-message--' + messageType" x-text="message"></div>
 
         <div class="ecoursity-file-form__grid">
@@ -55,9 +55,9 @@ $file_payload = array_map(
         </div>
 
         <div class="ecoursity-form-actions ecoursity-file-form__actions">
-            <button type="submit" class="ecoursity-button ecoursity-button--primary" :disabled="saving || !itemId" x-text="saving ? 'Menyimpan...' : 'Tambah File'"></button>
+            <button type="button" class="ecoursity-button ecoursity-button--primary" :disabled="saving || !itemId" @click="submit" x-text="saving ? 'Menyimpan...' : 'Tambah File'"></button>
         </div>
-    </form>
+    </div>
 
     <template x-if="!itemId">
         <div class="ecoursity-file-form__empty">Simpan post dulu sebelum menambahkan file.</div>
