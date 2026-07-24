@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ecoursity\App\Shortcodes;
 
+use Ecoursity\App\Models\Course;
+
 defined('ABSPATH') || exit;
 
 class CourseTabsShortcode extends CourseSingleShortcodeSupport
@@ -16,28 +18,42 @@ class CourseTabsShortcode extends CourseSingleShortcodeSupport
             return '';
         }
 
-        $faqs = self::faqs($course);
+        $tabs = self::tabs($course);
+
+        if (empty($tabs)) {
+            return '';
+        }
 
         ob_start();
         ?>
         <nav class="ecoursity-course-tabs" aria-label="<?php esc_attr_e('Navigasi kursus', 'ecoursity'); ?>">
-            <button type="button" :class="{ 'is-active': tab === 'overview' }" @click="tab = 'overview'">
-                <?php esc_html_e('Overview', 'ecoursity'); ?>
-            </button>
-            <button type="button" :class="{ 'is-active': tab === 'curriculum' }" @click="tab = 'curriculum'">
-                <?php esc_html_e('Kurikulum', 'ecoursity'); ?>
-            </button>
-            <button type="button" :class="{ 'is-active': tab === 'instructor' }" @click="tab = 'instructor'">
-                <?php esc_html_e('Instruktur', 'ecoursity'); ?>
-            </button>
-            <?php if (!empty($faqs)) : ?>
-                <button type="button" :class="{ 'is-active': tab === 'faq' }" @click="tab = 'faq'">
-                    <?php esc_html_e('FAQ', 'ecoursity'); ?>
+            <?php foreach ($tabs as $key => $label) : ?>
+                <button
+                    type="button"
+                    :class="{ 'is-active': tab === '<?php echo esc_js($key); ?>' }"
+                    @click="tab = '<?php echo esc_js($key); ?>'"
+                >
+                    <?php echo esc_html($label); ?>
                 </button>
-            <?php endif; ?>
+            <?php endforeach; ?>
         </nav>
         <?php
 
         return (string) ob_get_clean();
+    }
+
+    private static function tabs(Course $course): array
+    {
+        $tabs = [
+            'overview' => __('Overview', 'ecoursity'),
+            'curriculum' => __('Kurikulum', 'ecoursity'),
+            'instructor' => __('Instruktur', 'ecoursity'),
+        ];
+
+        if (!empty(self::faqs($course))) {
+            $tabs['faq'] = __('FAQ', 'ecoursity');
+        }
+
+        return (array) apply_filters('ecoursity_course_single_tabs', $tabs, $course);
     }
 }
