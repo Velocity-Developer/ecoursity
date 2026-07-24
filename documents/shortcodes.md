@@ -14,6 +14,16 @@ Daftar shortcode yang tersedia di Ecoursity.
 - Deskripsi: Menampilkan card course untuk katalog, archive, atau daftar course.
 - Dokumentasi detail: `documents/shortcodes/ecoursity-course-card.md`
 
+## Course Field Shortcodes
+
+- `[ecoursity-course-label]`: Menampilkan label kategori course.
+- `[ecoursity-course-level]`: Menampilkan level course.
+- `[ecoursity-course-duration]`: Menampilkan durasi course.
+- `[ecoursity-course-price]`: Menampilkan harga course.
+- `[ecoursity-course-title]`: Menampilkan judul course.
+- `[ecoursity-course-excerpt]`: Menampilkan excerpt course.
+- `[ecoursity-course-url]`: Menampilkan permalink course.
+
 ## `[ecoursity-course-hero]`
 
 - Lokasi: `app/Shortcodes/CourseHeroShortcode.php`

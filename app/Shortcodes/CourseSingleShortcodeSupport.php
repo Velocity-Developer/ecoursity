@@ -30,7 +30,7 @@ abstract class CourseSingleShortcodeSupport
         return $postId > 0 ? Course::find((int) $postId) : null;
     }
 
-    protected static function formatPrice(string $price): string
+    public static function formatPrice(string $price): string
     {
         $normalized = trim($price);
 
@@ -45,7 +45,7 @@ abstract class CourseSingleShortcodeSupport
             : 'Rp ' . number_format($numericValue, 0, ',', '.');
     }
 
-    protected static function hasPositivePrice(string $price): bool
+    public static function hasPositivePrice(string $price): bool
     {
         $numericValue = self::normalizePrice($price);
 
@@ -79,7 +79,7 @@ abstract class CourseSingleShortcodeSupport
         return is_numeric($numericValue) ? (float) $numericValue : null;
     }
 
-    protected static function formatDuration(mixed $duration): string
+    public static function formatDuration(mixed $duration): string
     {
         if (!is_array($duration) || empty($duration[0]) || empty($duration[1])) {
             return __('Akses fleksibel', 'ecoursity');
@@ -104,7 +104,7 @@ abstract class CourseSingleShortcodeSupport
         );
     }
 
-    protected static function formatLevel(string $level): string
+    public static function formatLevel(string $level): string
     {
         return [
             'all' => __('Semua level', 'ecoursity'),
@@ -140,7 +140,7 @@ abstract class CourseSingleShortcodeSupport
         return self::countLessons(Section::allByCourse((int) $course->id));
     }
 
-    protected static function categoryLabel(Course $course): string
+    public static function categoryLabel(Course $course): string
     {
         $categories = wp_get_post_terms((int) $course->id, 'ecoursity_course_category', ['fields' => 'names']);
 

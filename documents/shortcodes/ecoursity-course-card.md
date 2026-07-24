@@ -5,6 +5,7 @@
 Menampilkan card course berisi thumbnail, kategori, level, judul, excerpt, harga, dan durasi.
 
 - Lokasi: `app/Shortcodes/CourseCardShortcode.php`
+- Template: `templates/pages/public/content-course.php`
 - Terdaftar di: `app/Shortcode.php`
 
 ## Penggunaan
