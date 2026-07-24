@@ -16,7 +16,6 @@ class CourseCardShortcode extends CourseSingleShortcodeSupport
             return '';
         }
 
-        $thumbnail = $course->thumbnail();
         $categoryLabel = self::categoryLabel($course);
         $levelLabel = self::formatLevel($course->level);
         $durationLabel = self::formatDuration($course->duration);
@@ -25,19 +24,16 @@ class CourseCardShortcode extends CourseSingleShortcodeSupport
         $regularPrice = $saleActive ? self::formatPrice($course->price) : '';
         $title = get_the_title((int) $course->id);
         $permalink = get_permalink((int) $course->id);
-
         ob_start();
         ?>
         <article class="ecoursity-course-card">
             <a class="ecoursity-course-card__media" href="<?php echo esc_url($permalink); ?>">
-                <?php if ($thumbnail !== '') : ?>
-                    <img
-                        class="ecoursity-course-card__image"
-                        src="<?php echo esc_url($thumbnail); ?>"
-                        alt="<?php echo esc_attr($title); ?>">
-                <?php else : ?>
-                    <span class="ecoursity-course-card__image-placeholder" aria-hidden="true"></span>
-                <?php endif; ?>
+                <?php
+                echo do_shortcode(sprintf(
+                    '[ecoursity-course-image course_id="%d" size="large" ratio="16/10"]',
+                    (int) $course->id
+                ));
+                ?>
             </a>
 
             <div class="ecoursity-course-card__body">

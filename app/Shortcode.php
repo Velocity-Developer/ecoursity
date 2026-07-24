@@ -7,6 +7,7 @@ use Ecoursity\App\Shortcodes\CourseCardShortcode;
 use Ecoursity\App\Shortcodes\CourseCurriculumShortcode;
 use Ecoursity\App\Shortcodes\CourseFaqShortcode;
 use Ecoursity\App\Shortcodes\CourseHeroShortcode;
+use Ecoursity\App\Shortcodes\CourseImageShortcode;
 use Ecoursity\App\Shortcodes\CourseInstructorShortcode;
 use Ecoursity\App\Shortcodes\CourseOverviewShortcode;
 use Ecoursity\App\Shortcodes\CourseSidebarShortcode;
@@ -22,6 +23,7 @@ class Shortcode
         add_shortcode('ecoursity-button-buy-course', [ButtonBuyCourseShortcode::class, 'render']);
         add_shortcode('ecoursity-course-card', [CourseCardShortcode::class, 'render']);
         add_shortcode('ecoursity-course-hero', [CourseHeroShortcode::class, 'render']);
+        add_shortcode('ecoursity-course-image', [CourseImageShortcode::class, 'render']);
         add_shortcode('ecoursity-course-tabs', [CourseTabsShortcode::class, 'render']);
         add_shortcode('ecoursity-course-overview', [CourseOverviewShortcode::class, 'render']);
         add_shortcode('ecoursity-course-curriculum', [CourseCurriculumShortcode::class, 'render']);

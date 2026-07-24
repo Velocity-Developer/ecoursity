@@ -238,6 +238,22 @@
     color: var(--ecoursity-muted);
 }
 
+.ecoursity-course-image {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    margin: 0;
+    aspect-ratio: var(--ecoursity-course-image-ratio, 16 / 9);
+    background: #f8fafc;
+}
+
+.ecoursity-course-image__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .ecoursity-single-course {
     --ecoursity-text: #1f2937;
     --ecoursity-muted: #6b7280;

@@ -20,6 +20,12 @@ Daftar shortcode yang tersedia di Ecoursity.
 - Deskripsi: Menampilkan area hero pada halaman detail course.
 - Dokumentasi detail: `documents/shortcodes/ecoursity-course-hero.md`
 
+## `[ecoursity-course-image]`
+
+- Lokasi: `app/Shortcodes/CourseImageShortcode.php`
+- Deskripsi: Menampilkan featured image course dengan pilihan size dan ratio.
+- Dokumentasi detail: `documents/shortcodes/ecoursity-course-image.md`
+
 ## `[ecoursity-course-tabs]`
 
 - Lokasi: `app/Shortcodes/CourseTabsShortcode.php`
