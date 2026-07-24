@@ -17,7 +17,7 @@ class CourseSidebarShortcode extends CourseSingleShortcodeSupport
         }
 
         $thumbnail = $course->thumbnail();
-        $saleActive = $course->price_sale !== '' && (float) $course->price_sale > 0;
+        $saleActive = self::hasPositivePrice($course->price_sale);
         $mainPrice = $saleActive ? self::formatPrice($course->price_sale) : self::formatPrice($course->price);
         $regularPrice = $saleActive ? self::formatPrice($course->price) : '';
         $lessonCount = self::lessonCount($course);

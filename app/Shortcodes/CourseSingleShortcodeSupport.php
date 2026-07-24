@@ -34,13 +34,49 @@ abstract class CourseSingleShortcodeSupport
     {
         $normalized = trim($price);
 
-        if ($normalized === '' || (float) $normalized <= 0) {
+        $numericValue = self::normalizePrice($normalized);
+
+        if ($numericValue === null || $numericValue <= 0) {
             return __('Gratis', 'ecoursity');
         }
 
         return function_exists('number_format_i18n')
-            ? 'Rp ' . number_format_i18n((float) $normalized)
-            : 'Rp ' . number_format((float) $normalized, 0, ',', '.');
+            ? 'Rp ' . number_format_i18n($numericValue)
+            : 'Rp ' . number_format($numericValue, 0, ',', '.');
+    }
+
+    protected static function hasPositivePrice(string $price): bool
+    {
+        $numericValue = self::normalizePrice($price);
+
+        return $numericValue !== null && $numericValue > 0;
+    }
+
+    protected static function normalizePrice(string $price): ?float
+    {
+        $numericValue = preg_replace('/[^\d.,]/', '', trim($price));
+
+        if (!is_string($numericValue) || $numericValue === '') {
+            return null;
+        }
+
+        if (str_contains($numericValue, ',') && str_contains($numericValue, '.')) {
+            $numericValue = str_replace('.', '', str_replace(',', '.', $numericValue));
+        } elseif (str_contains($numericValue, '.')) {
+            $parts = explode('.', $numericValue);
+            $hasThousandsGroups = count($parts) > 1
+                && array_reduce(
+                    array_slice($parts, 1),
+                    static fn(bool $valid, string $part): bool => $valid && strlen($part) === 3,
+                    true
+                );
+
+            $numericValue = $hasThousandsGroups ? str_replace('.', '', $numericValue) : $numericValue;
+        } else {
+            $numericValue = str_replace(',', '.', $numericValue);
+        }
+
+        return is_numeric($numericValue) ? (float) $numericValue : null;
     }
 
     protected static function formatDuration(mixed $duration): string
@@ -75,6 +111,7 @@ abstract class CourseSingleShortcodeSupport
             'beginner' => __('Pemula', 'ecoursity'),
             'intermediate' => __('Menengah', 'ecoursity'),
             'advanced' => __('Lanjutan', 'ecoursity'),
+            'expert' => __('Master', 'ecoursity'),
         ][$level] ?? __('Semua level', 'ecoursity');
     }
 
