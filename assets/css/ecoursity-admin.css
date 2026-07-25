@@ -623,16 +623,58 @@
 
 /* Settings */
 .ecoursity-settings__tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
     margin-top: 16px;
+    margin-bottom: 16px;
+    padding: 4px;
+    border: 1px solid #e8e8e8;
+    border-radius: 9999px;
+    background: #f7f7f7;
+}
+
+.ecoursity-settings__tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    margin: 0;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 9999px;
+    background: transparent;
+    color: #636363;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ecoursity-settings__tab:hover,
+.ecoursity-settings__tab:focus {
+    color: #1a1a1a;
+    outline: none;
+    box-shadow: none;
+}
+
+.ecoursity-settings__tab.is-active,
+.ecoursity-settings__tab.is-active:hover,
+.ecoursity-settings__tab.is-active:focus {
+    background: #ffffff;
+    color: #024ad8;
+    box-shadow: 0 1px 2px rgba(26, 26, 26, 0.08);
 }
 
 .ecoursity-settings__panel {
     margin-top: 0;
     padding: 20px;
     background: #ffffff;
-    border: 1px solid #c3c4c7;
-    border-top: 0;
-    border-radius: 0 0 6px 6px;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08);
 }
 
 .ecoursity-settings__section-header {
@@ -670,6 +712,18 @@
 }
 
 @media (max-width: 782px) {
+    .ecoursity-settings__tabs {
+        display: flex;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .ecoursity-settings__tab {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 128px;
+        padding: 0 12px;
+    }
+
     .ecoursity-settings__panel {
         padding: 16px;
     }

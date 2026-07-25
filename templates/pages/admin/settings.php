@@ -19,7 +19,7 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
         </div>
     <?php endif; ?>
 
-    <nav class="nav-tab-wrapper ecoursity-settings__tabs" aria-label="<?php echo esc_attr__('Tab Pengaturan', 'ecoursity'); ?>">
+    <nav class="ecoursity-settings__tabs" aria-label="<?php echo esc_attr__('Tab Pengaturan', 'ecoursity'); ?>">
         <?php foreach ($tabs as $tabKey => $tab) : ?>
             <?php
             $tabUrl = add_query_arg([
@@ -28,7 +28,7 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
             ], admin_url('admin.php'));
             ?>
             <a
-                class="nav-tab <?php echo $activeTab === $tabKey ? 'nav-tab-active' : ''; ?>"
+                class="ecoursity-settings__tab <?php echo $activeTab === $tabKey ? 'is-active' : ''; ?>"
                 href="<?php echo esc_url($tabUrl); ?>"
             >
                 <?php echo esc_html($tab['label']); ?>
