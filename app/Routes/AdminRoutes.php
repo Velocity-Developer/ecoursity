@@ -53,10 +53,24 @@ class AdminRoutes
 
             add_submenu_page(
                 'ecoursity-dashboard',
-                __('Kursus'),
-                __('Kursus'),
+                __('Pesanan'),
+                __('Pesanan'),
                 'edit_posts',
-                'edit.php?post_type=ecoursity_course'
+                'edit.php?post_type=ecoursity_order'
+            );
+            add_submenu_page(
+                'ecoursity-dashboard',
+                __('Kategori'),
+                __('Kategori'),
+                'manage_options',
+                'edit-tags.php?taxonomy=ecoursity_course_category'
+            );
+            add_submenu_page(
+                'ecoursity-dashboard',
+                __('Tag'),
+                __('Tag'),
+                'manage_options',
+                'edit-tags.php?taxonomy=ecoursity_course_tag'
             );
         });
     }

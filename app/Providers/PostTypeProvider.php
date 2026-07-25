@@ -4,6 +4,7 @@ namespace Ecoursity\App\Providers;
 
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Lesson;
+use Ecoursity\App\Models\Order;
 use Ecoursity\App\Support\CourseFormSchema;
 
 class PostTypeProvider
@@ -34,6 +35,17 @@ class PostTypeProvider
             'show_in_menu' => false,
             'show_in_rest' => false,
             'supports' => ['title', 'editor'],
+        ]);
+
+        register_post_type(Order::POST_TYPE, [
+            'labels' => $this->makeLabels(__('Pesanan Kursus')),
+            'public' => false,
+            'has_archive' => false,
+            'show_ui' => true,
+            'show_in_menu' => false,
+            'show_in_rest' => false,
+            'supports' => ['editor'],
+            'capability_type' => 'post',
         ]);
 
         foreach (CourseFormSchema::metaFieldInputs(CourseFormSchema::sections()) as $field => $input) {
@@ -76,6 +88,22 @@ class PostTypeProvider
             'single' => true,
             'show_in_rest' => false,
             'sanitize_callback' => [$this, 'sanitizeLessonAssignedMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, '_ecoursity_user_id', [
+            'type' => 'integer',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderUserMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, '_ecoursity_course_id', [
+            'type' => 'integer',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderCourseMeta'],
             'auth_callback' => [$this, 'canEditPostMeta'],
         ]);
     }
@@ -153,6 +181,26 @@ class PostTypeProvider
     }
 
     public function sanitizeLessonAssignedMeta(mixed $value): int
+    {
+        $courseId = absint($value);
+
+        if ($courseId < 1) {
+            return 0;
+        }
+
+        $course = get_post($courseId);
+
+        return $course && $course->post_type === Course::POST_TYPE ? $courseId : 0;
+    }
+
+    public function sanitizeOrderUserMeta(mixed $value): int
+    {
+        $userId = absint($value);
+
+        return $userId > 0 && get_user_by('id', $userId) ? $userId : 0;
+    }
+
+    public function sanitizeOrderCourseMeta(mixed $value): int
     {
         $courseId = absint($value);
 
