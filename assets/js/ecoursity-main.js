@@ -1,4 +1,213 @@
 (() => {
+    const registerCartStore = () => {
+        if (!window.Alpine) {
+            return;
+        }
+
+        if (window.__ecoursityCartStoreRegistered) {
+            return;
+        }
+
+        window.__ecoursityCartStoreRegistered = true;
+
+        window.Alpine.store('EcoursityCart', {
+            items: [],
+            courses: [],
+            count: 0,
+            loading: false,
+            saving: false,
+            loaded: false,
+            message: '',
+            messageType: 'success',
+            endpoint: `${window.ecoursity?.restUrl || '/wp-json/ecoursity/v1/'}cart/`,
+
+            async init() {
+                await this.load();
+            },
+
+            has(courseId) {
+                return this.items.includes(parseInt(courseId, 10) || 0);
+            },
+
+            async load() {
+                this.loading = true;
+                this.message = '';
+
+                try {
+                    const json = await this.request(this.endpoint);
+                    this.sync(json.data);
+                    this.loaded = true;
+                } catch (error) {
+                    this.fail('Gagal memuat cart.');
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async add(courseId) {
+                const normalizedCourseId = parseInt(courseId, 10) || 0;
+
+                if (normalizedCourseId < 1) {
+                    this.fail('Course tidak valid.');
+                    return false;
+                }
+
+                this.saving = true;
+                this.message = '';
+
+                try {
+                    const json = await this.request(this.endpoint, {
+                        method: 'POST',
+                        body: JSON.stringify({ course_id: normalizedCourseId }),
+                    });
+
+                    this.sync(json.data);
+                    this.succeed(json.message || 'Course ditambahkan ke cart.');
+
+                    return true;
+                } catch (error) {
+                    this.fail(error.message || 'Gagal menambahkan course ke cart.');
+
+                    return false;
+                } finally {
+                    this.saving = false;
+                }
+            },
+
+            async remove(courseId) {
+                const normalizedCourseId = parseInt(courseId, 10) || 0;
+
+                if (normalizedCourseId < 1) {
+                    this.fail('Course tidak valid.');
+                    return false;
+                }
+
+                this.saving = true;
+                this.message = '';
+
+                try {
+                    const json = await this.request(`${this.endpoint}${normalizedCourseId}`, {
+                        method: 'DELETE',
+                    });
+
+                    this.sync(json.data);
+                    this.succeed(json.message || 'Course dihapus dari cart.');
+
+                    return true;
+                } catch (error) {
+                    this.fail(error.message || 'Gagal menghapus course dari cart.');
+
+                    return false;
+                } finally {
+                    this.saving = false;
+                }
+            },
+
+            async replace(courseIds) {
+                this.saving = true;
+                this.message = '';
+
+                try {
+                    const json = await this.request(this.endpoint, {
+                        method: 'PUT',
+                        body: JSON.stringify({ course_ids: Array.isArray(courseIds) ? courseIds : [] }),
+                    });
+
+                    this.sync(json.data);
+                    this.succeed(json.message || 'Cart diperbarui.');
+
+                    return true;
+                } catch (error) {
+                    this.fail(error.message || 'Gagal memperbarui cart.');
+
+                    return false;
+                } finally {
+                    this.saving = false;
+                }
+            },
+
+            async clear() {
+                this.saving = true;
+                this.message = '';
+
+                try {
+                    const json = await this.request(this.endpoint, {
+                        method: 'DELETE',
+                    });
+
+                    this.sync(json.data);
+                    this.succeed(json.message || 'Cart dikosongkan.');
+
+                    return true;
+                } catch (error) {
+                    this.fail(error.message || 'Gagal mengosongkan cart.');
+
+                    return false;
+                } finally {
+                    this.saving = false;
+                }
+            },
+
+            sync(data = {}) {
+                this.items = Array.isArray(data.items)
+                    ? data.items.map((item) => parseInt(item, 10)).filter((item) => item > 0)
+                    : [];
+                this.courses = Array.isArray(data.courses) ? data.courses : [];
+                this.count = Number.isInteger(data.count) ? data.count : this.items.length;
+
+                window.dispatchEvent(new CustomEvent('ecoursity:cart-updated', {
+                    detail: {
+                        items: [...this.items],
+                        courses: [...this.courses],
+                        count: this.count,
+                    },
+                }));
+            },
+
+            succeed(message) {
+                this.message = message;
+                this.messageType = 'success';
+            },
+
+            fail(message) {
+                this.message = message;
+                this.messageType = 'error';
+            },
+
+            async request(url, options = {}) {
+                const response = await fetch(url, {
+                    method: options.method || 'GET',
+                    headers: this.getAuthHeaders(options.body !== undefined),
+                    body: options.body,
+                    credentials: 'same-origin',
+                });
+                const json = await response.json();
+
+                if (!response.ok || json.success === false) {
+                    throw new Error(json.message || 'Request cart gagal.');
+                }
+
+                return json;
+            },
+
+            getAuthHeaders(includeJson = false) {
+                const headers = {
+                    'X-Requested-With': 'XMLHttpRequest',
+                };
+
+                if (includeJson) {
+                    headers['Content-Type'] = 'application/json';
+                }
+
+                if (window.ecoursity?.restNonce) {
+                    headers['X-WP-Nonce'] = window.ecoursity.restNonce;
+                }
+
+                return headers;
+            },
+        });
+    };
+
     const registerLessonForm = () => {
         if (!window.Alpine) {
             return;
@@ -162,6 +371,8 @@
         }));
     };
 
+    registerCartStore();
     registerLessonForm();
+    document.addEventListener('alpine:init', registerCartStore);
     document.addEventListener('alpine:init', registerLessonForm);
 })();

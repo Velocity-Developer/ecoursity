@@ -157,3 +157,40 @@ Hapus satu course dari cart.
 ## Catatan Login
 
 Saat user guest login, cart dari PHP session otomatis digabungkan ke user meta `_ecoursity_cart`.
+
+## Alpine Store
+
+Global store cart tersedia sebagai `Alpine.store('EcoursityCart')` atau `$store.EcoursityCart` dari template Alpine.
+
+State utama:
+
+- `items`: array ID course di cart.
+- `courses`: array detail ringkas course.
+- `count`: jumlah item cart.
+- `loading`: status saat memuat cart.
+- `saving`: status saat menyimpan perubahan cart.
+- `message`: pesan terakhir dari operasi cart.
+- `messageType`: `success` atau `error`.
+
+Method utama:
+
+- `load()`: ambil cart dari REST API.
+- `add(courseId)`: tambah course ke cart.
+- `remove(courseId)`: hapus course dari cart.
+- `replace(courseIds)`: ganti seluruh isi cart.
+- `clear()`: kosongkan cart.
+- `has(courseId)`: cek apakah course ada di cart.
+
+Contoh:
+
+```html
+<div x-data>
+  <button type="button" @click="$store.EcoursityCart.add(12)">
+    Tambah ke Cart
+  </button>
+
+  <span x-text="$store.EcoursityCart.count"></span>
+</div>
+```
+
+Setiap perubahan cart akan mengirim browser event `ecoursity:cart-updated`.
