@@ -91,6 +91,12 @@ class ApiRoutes
                 'permission_callback' => '__return_true',
             ],
             [
+                'route' => '/order-course-options/',
+                'callback' => [CourseController::class, 'orderOptions'],
+                'methods' => 'GET',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
                 'route' => '/courses/(?P<id>\d+)',
                 'callback' => [CourseController::class, 'show'],
                 'methods' => 'GET',

@@ -16,6 +16,35 @@ class CourseController
         return Course::all();
     }
 
+    public function orderOptions(): WP_REST_Response
+    {
+        $courses = Course::all([
+            'post_status' => ['publish', 'draft', 'pending', 'private'],
+            'posts_per_page' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC',
+        ]);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => array_map(
+                static function (Course $course): array {
+                    $price = (float) $course->meta('_ecoursity_price', 0);
+                    $priceSale = (float) $course->meta('_ecoursity_price_sale', 0);
+
+                    return [
+                        'id' => (int) $course->id,
+                        'name' => $course->title,
+                        'price' => $price,
+                        'price_sale' => $priceSale,
+                        'price_real' => $priceSale > 0 ? $priceSale : $price,
+                    ];
+                },
+                $courses
+            ),
+        ]);
+    }
+
     public function show(WP_REST_Request $request): WP_REST_Response
     {
         $course = Course::find($request->get_param('id'));

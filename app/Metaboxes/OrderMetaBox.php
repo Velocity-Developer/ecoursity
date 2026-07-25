@@ -3,7 +3,6 @@
 namespace Ecoursity\App\Metaboxes;
 
 use Ecoursity\App\Helpers\Str;
-use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Order;
 use WP_Post;
 
@@ -94,7 +93,8 @@ class OrderMetaBox
         $payload = [
             'editable' => $editable,
             'items' => $order->order_items,
-            'courses' => $this->courseOptions(),
+            'coursesUrl' => esc_url_raw(rest_url('ecoursity/v1/order-course-options/')),
+            'restNonce' => wp_create_nonce('wp_rest'),
         ];
 
         echo '<div class="ecoursity-order-items" x-data="ecoursityOrderItems(' . esc_attr(wp_json_encode($payload)) . ')">';
@@ -142,6 +142,9 @@ class OrderMetaBox
         echo '</div>';
         echo '<input type="search" class="widefat" placeholder="' . esc_attr__('Cari course') . '" x-model="search">';
         echo '<div class="ecoursity-order-items__course-list">';
+        echo '<p class="description" x-show="coursesLoading">' . esc_html__('Memuat course...') . '</p>';
+        echo '<p class="description" x-show="coursesError" x-text="coursesError"></p>';
+        echo '<template x-if="!coursesLoading && !coursesError && filteredCourses().length === 0"><p class="description">' . esc_html__('Course tidak ditemukan.') . '</p></template>';
         echo '<template x-for="course in filteredCourses()" x-bind:key="course.id">';
         echo '<div class="ecoursity-order-items__course">';
         echo '<div><strong x-text="course.name"></strong><div class="description" x-text="money(course.price_real)"></div></div>';
@@ -268,31 +271,6 @@ class OrderMetaBox
         echo '</tr>';
     }
 
-    private function courseOptions(): array
-    {
-        return array_map(
-            static function (Course $course): array {
-                $price = (float) $course->meta('_ecoursity_price', 0);
-                $priceSale = (float) $course->meta('_ecoursity_price_sale', 0);
-                $priceReal = $priceSale > 0 ? $priceSale : $price;
-
-                return [
-                    'id' => (int) $course->id,
-                    'name' => $course->title,
-                    'price' => $price,
-                    'price_sale' => $priceSale,
-                    'price_real' => $priceReal,
-                ];
-            },
-            Course::all([
-                'post_status' => ['publish', 'draft', 'pending', 'private'],
-                'posts_per_page' => -1,
-                'orderby' => 'title',
-                'order' => 'ASC',
-            ])
-        );
-    }
-
     private function calculateSubtotal(array $items): float
     {
         return array_reduce(
@@ -403,7 +381,12 @@ class OrderMetaBox
                 Alpine.data('ecoursityOrderItems', (payload) => ({
                     editable: Boolean(payload.editable),
                     items: Array.isArray(payload.items) ? payload.items : [],
-                    courses: Array.isArray(payload.courses) ? payload.courses : [],
+                    courses: [],
+                    coursesLoaded: false,
+                    coursesLoading: false,
+                    coursesError: '',
+                    coursesUrl: String(payload.coursesUrl || ''),
+                    restNonce: String(payload.restNonce || ''),
                     modalOpen: false,
                     search: '',
                     get subtotal() {
@@ -415,12 +398,13 @@ class OrderMetaBox
                     get itemsJson() {
                         return JSON.stringify(this.items);
                     },
-                    openModal() {
+                    async openModal() {
                         if (!this.editable) {
                             return;
                         }
 
                         this.modalOpen = true;
+                        await this.loadCourses();
                     },
                     closeModal() {
                         this.modalOpen = false;
@@ -433,6 +417,35 @@ class OrderMetaBox
                         }
 
                         return this.courses.filter((course) => String(course.name || '').toLowerCase().includes(keyword));
+                    },
+                    async loadCourses() {
+                        if (this.coursesLoaded || this.coursesLoading) {
+                            return;
+                        }
+
+                        this.coursesLoading = true;
+                        this.coursesError = '';
+
+                        try {
+                            const response = await fetch(this.coursesUrl, {
+                                headers: {
+                                    'X-WP-Nonce': this.restNonce,
+                                    'Accept': 'application/json',
+                                },
+                            });
+                            const result = await response.json();
+
+                            if (!response.ok || !result.success) {
+                                throw new Error(result.message || 'Failed to load courses.');
+                            }
+
+                            this.courses = Array.isArray(result.data) ? result.data : [];
+                            this.coursesLoaded = true;
+                        } catch (error) {
+                            this.coursesError = error.message || 'Failed to load courses.';
+                        } finally {
+                            this.coursesLoading = false;
+                        }
                     },
                     hasItem(courseId) {
                         return this.items.some((item) => Number(item.id) === Number(courseId));
