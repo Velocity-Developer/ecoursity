@@ -47,13 +47,17 @@ class ButtonBuyCourseShortcode
         }
 
         $classes = self::classes((string) $attributes['class']);
+        $cartAttributes = $requiresLogin && !$isLoggedIn
+            ? ''
+            : self::cartAttributes((int) $course->id);
 
         return sprintf(
-            '<a href="%s" class="%s" data-ecoursity-buy-course data-course-id="%d" data-course-price="%s">%s</a>',
+            '<a href="%s" class="%s" data-ecoursity-buy-course data-course-id="%d" data-course-price="%s"%s>%s</a>',
             esc_url($targetUrl),
             esc_attr($classes),
             (int) $course->id,
             esc_attr((string) self::effectivePrice($course)),
+            $cartAttributes,
             esc_html($label)
         );
     }
@@ -111,5 +115,13 @@ class ButtonBuyCourseShortcode
         array_unshift($classes, 'ecoursity-buy-course-button');
 
         return implode(' ', array_unique($classes));
+    }
+
+    private static function cartAttributes(int $courseId): string
+    {
+        return sprintf(
+            ' x-data x-on:click.prevent="$store.EcoursityCart.add(%1$d)" x-bind:class="{ \'is-in-cart\': $store.EcoursityCart.has(%1$d) }" x-bind:aria-busy="$store.EcoursityCart.saving ? \'true\' : \'false\'"',
+            $courseId
+        );
     }
 }
