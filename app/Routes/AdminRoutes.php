@@ -4,6 +4,7 @@ namespace Ecoursity\App\Routes;
 
 use Ecoursity\App\Template;
 use Ecoursity\App\Controllers\Admin\DashboardController;
+use Ecoursity\App\Controllers\Admin\SettingController;
 use Ecoursity\App\Controllers\Admin\StudentController;
 
 class AdminRoutes
@@ -98,6 +99,14 @@ class AdminRoutes
                 'menu_title' => 'Siswa',
                 'slug' => 'ecoursity-student',
                 'controller' => StudentController::class,
+                'method' => 'index',
+                'parent_slug' => 'ecoursity-dashboard',
+            ],
+            [
+                'page_title' => 'Pengaturan Ecoursity',
+                'menu_title' => 'Pengaturan',
+                'slug' => 'ecoursity-settings',
+                'controller' => SettingController::class,
                 'method' => 'index',
                 'parent_slug' => 'ecoursity-dashboard',
             ],
