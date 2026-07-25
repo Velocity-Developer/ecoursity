@@ -55,6 +55,15 @@ class MetaboxPostProvider
             'normal',
             'default'
         );
+
+        add_meta_box(
+            'ecoursity-order-items',
+            __('Item Pesanan'),
+            [$this, 'renderOrderItemsMetaBox'],
+            Order::POST_TYPE,
+            'normal',
+            'default'
+        );
     }
 
     public function renderCourseMetaBox(WP_Post $post): void
@@ -230,7 +239,12 @@ class MetaboxPostProvider
 
     public function renderOrderMetaBox(WP_Post $post): void
     {
-        (new OrderMetaBox())->render($post);
+        (new OrderMetaBox())->renderDetails($post);
+    }
+
+    public function renderOrderItemsMetaBox(WP_Post $post): void
+    {
+        (new OrderMetaBox())->renderItems($post);
     }
 
     public function saveCourseMeta(int $postId, WP_Post $post): void

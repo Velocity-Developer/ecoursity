@@ -2,6 +2,7 @@
 
 namespace Ecoursity\App\Metaboxes;
 
+use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Order;
 use WP_Post;
 
@@ -13,7 +14,7 @@ class OrderMetaBox
     public const NONCE_NAME = 'ecoursity_order_meta_nonce';
     public const FIELD_NAME = 'ecoursity_order_meta';
 
-    public function render(WP_Post $post): void
+    public function renderDetails(WP_Post $post): void
     {
         $order = Order::find($post->ID);
 
@@ -75,17 +76,84 @@ class OrderMetaBox
         echo '<td><input type="text" class="regular-text" id="' . esc_attr(Order::META_ORDER_PAYMENT) . '" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_PAYMENT) . ']" value="' . esc_attr($order->order_payment) . '"></td>';
         echo '</tr>';
 
-        echo '<tr>';
-        echo '<th scope="row"><label for="' . esc_attr(Order::META_ORDER_ITEMS) . '">' . esc_html__('Order Items') . '</label></th>';
-        echo '<td>';
-        echo '<textarea class="large-text code" rows="8" id="' . esc_attr(Order::META_ORDER_ITEMS) . '" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_ITEMS) . ']">' . esc_textarea($this->encodeItems($order->order_items)) . '</textarea>';
-        echo '<p class="description">' . esc_html__('Isi dengan JSON array. Setiap item: id, name, price, price_sale, price_real.') . '</p>';
-        echo '</td>';
-        echo '</tr>';
-
-        $this->renderAmountField(Order::META_ORDER_SUBTOTAL, __('Subtotal'), $order->order_subtotal);
-        $this->renderAmountField(Order::META_ORDER_TOTAL, __('Total'), $order->order_total);
         echo '</tbody></table>';
+    }
+
+    public function renderItems(WP_Post $post): void
+    {
+        $order = Order::find($post->ID);
+
+        if (!$order) {
+            $order = new Order(['id' => $post->ID]);
+        }
+
+        wp_nonce_field(self::NONCE_ACTION, self::NONCE_NAME);
+
+        $editable = $order->order_method === '' || $order->order_method === Order::METHOD_MANUALLY;
+        $payload = [
+            'editable' => $editable,
+            'items' => $order->order_items,
+            'courses' => $this->courseOptions(),
+        ];
+
+        echo '<div class="ecoursity-order-items" x-data="ecoursityOrderItems(' . esc_attr(wp_json_encode($payload)) . ')">';
+        echo '<input type="hidden" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_ITEMS) . ']" x-bind:value="itemsJson">';
+        echo '<input type="hidden" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_SUBTOTAL) . ']" x-bind:value="subtotal">';
+        echo '<input type="hidden" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_TOTAL) . ']" x-bind:value="total">';
+
+        echo '<div class="ecoursity-order-items__toolbar">';
+        echo '<p class="description">' . esc_html($editable ? __('Order manual dapat diedit.') : __('Order dari checkout tidak dapat diedit.')) . '</p>';
+        echo '<button type="button" class="button button-primary" x-show="editable" x-on:click="openModal()">' . esc_html__('Tambah Item') . '</button>';
+        echo '</div>';
+
+        echo '<table class="widefat striped ecoursity-order-items__table">';
+        echo '<thead><tr>';
+        echo '<th>' . esc_html__('Course') . '</th>';
+        echo '<th style="width:120px;">' . esc_html__('Price') . '</th>';
+        echo '<th style="width:120px;">' . esc_html__('Sale') . '</th>';
+        echo '<th style="width:120px;">' . esc_html__('Real') . '</th>';
+        echo '<th style="width:80px;" x-show="editable">' . esc_html__('Action') . '</th>';
+        echo '</tr></thead>';
+        echo '<tbody>';
+        echo '<template x-if="items.length === 0"><tr><td colspan="5">' . esc_html__('Belum ada item.') . '</td></tr></template>';
+        echo '<template x-for="item in items" x-bind:key="item.id">';
+        echo '<tr>';
+        echo '<td><strong x-text="item.name"></strong><div class="row-actions">ID: <span x-text="item.id"></span></div></td>';
+        echo '<td x-text="money(item.price)"></td>';
+        echo '<td x-text="money(item.price_sale)"></td>';
+        echo '<td x-text="money(item.price_real)"></td>';
+        echo '<td x-show="editable"><button type="button" class="button-link-delete" x-on:click="removeItem(item.id)">' . esc_html__('Hapus') . '</button></td>';
+        echo '</tr>';
+        echo '</template>';
+        echo '</tbody>';
+        echo '<tfoot>';
+        echo '<tr><th colspan="3" style="text-align:right;">' . esc_html__('Subtotal') . '</th><th colspan="2" x-text="money(subtotal)"></th></tr>';
+        echo '<tr><th colspan="3" style="text-align:right;">' . esc_html__('Total') . '</th><th colspan="2" x-text="money(total)"></th></tr>';
+        echo '</tfoot>';
+        echo '</table>';
+
+        echo '<div class="ecoursity-order-items__modal" x-cloak x-show="modalOpen" x-on:keydown.escape.window="closeModal()">';
+        echo '<div class="ecoursity-order-items__backdrop" x-on:click="closeModal()"></div>';
+        echo '<div class="ecoursity-order-items__dialog" role="dialog" aria-modal="true">';
+        echo '<div class="ecoursity-order-items__dialog-header">';
+        echo '<h3>' . esc_html__('Pilih Course') . '</h3>';
+        echo '<button type="button" class="button" x-on:click="closeModal()">' . esc_html__('Tutup') . '</button>';
+        echo '</div>';
+        echo '<input type="search" class="widefat" placeholder="' . esc_attr__('Cari course') . '" x-model="search">';
+        echo '<div class="ecoursity-order-items__course-list">';
+        echo '<template x-for="course in filteredCourses()" x-bind:key="course.id">';
+        echo '<div class="ecoursity-order-items__course">';
+        echo '<div><strong x-text="course.name"></strong><div class="description" x-text="money(course.price_real)"></div></div>';
+        echo '<button type="button" class="button" x-bind:disabled="hasItem(course.id)" x-on:click="addItem(course)" x-text="hasItem(course.id) ? \'' . esc_js(__('Sudah Ditambahkan')) . '\' : \'' . esc_js(__('Tambahkan')) . '\'"></button>';
+        echo '</div>';
+        echo '</template>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+
+        $this->renderOrderItemsScript();
+        $this->renderOrderItemsStyle();
+        echo '</div>';
     }
 
     public function save(int $postId, WP_Post $post): void
@@ -105,9 +173,15 @@ class OrderMetaBox
         $order->updateMeta(Order::META_ORDER_STATUS, $this->sanitizeStatus($submittedMeta[Order::META_ORDER_STATUS] ?? ''));
         $order->updateMeta(Order::META_ORDER_USER, $this->sanitizeUser($submittedMeta[Order::META_ORDER_USER] ?? 0));
         $order->updateMeta(Order::META_ORDER_PAYMENT, sanitize_text_field((string) ($submittedMeta[Order::META_ORDER_PAYMENT] ?? '')));
-        $order->updateMeta(Order::META_ORDER_ITEMS, $this->sanitizeItems($submittedMeta[Order::META_ORDER_ITEMS] ?? []));
-        $order->updateMeta(Order::META_ORDER_SUBTOTAL, $this->sanitizeAmount($submittedMeta[Order::META_ORDER_SUBTOTAL] ?? 0));
-        $order->updateMeta(Order::META_ORDER_TOTAL, $this->sanitizeAmount($submittedMeta[Order::META_ORDER_TOTAL] ?? 0));
+
+        if ($order->order_method === Order::METHOD_MANUALLY) {
+            $items = $this->sanitizeItems($submittedMeta[Order::META_ORDER_ITEMS] ?? []);
+            $subtotal = $this->calculateSubtotal($items);
+
+            $order->updateMeta(Order::META_ORDER_ITEMS, $items);
+            $order->updateMeta(Order::META_ORDER_SUBTOTAL, $subtotal);
+            $order->updateMeta(Order::META_ORDER_TOTAL, $subtotal);
+        }
     }
 
     private function canSave(int $postId, WP_Post $post): bool
@@ -153,21 +227,38 @@ class OrderMetaBox
         echo '</tr>';
     }
 
-    private function renderAmountField(string $id, string $label, float $value): void
+    private function courseOptions(): array
     {
-        echo '<tr>';
-        echo '<th scope="row"><label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></th>';
-        echo '<td><input type="number" min="0" step="0.01" class="regular-text" id="' . esc_attr($id) . '" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr($id) . ']" value="' . esc_attr((string) $value) . '"></td>';
-        echo '</tr>';
+        return array_map(
+            static function (Course $course): array {
+                $price = (float) $course->meta('_ecoursity_price', 0);
+                $priceSale = (float) $course->meta('_ecoursity_price_sale', 0);
+                $priceReal = $priceSale > 0 ? $priceSale : $price;
+
+                return [
+                    'id' => (int) $course->id,
+                    'name' => $course->title,
+                    'price' => $price,
+                    'price_sale' => $priceSale,
+                    'price_real' => $priceReal,
+                ];
+            },
+            Course::all([
+                'post_status' => ['publish', 'draft', 'pending', 'private'],
+                'posts_per_page' => -1,
+                'orderby' => 'title',
+                'order' => 'ASC',
+            ])
+        );
     }
 
-    private function encodeItems(array $items): string
+    private function calculateSubtotal(array $items): float
     {
-        if ($items === []) {
-            return '';
-        }
-
-        return (string) wp_json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return array_reduce(
+            $items,
+            static fn(float $subtotal, array $item): float => $subtotal + (float) $item['price_real'],
+            0.0
+        );
     }
 
     private function sanitizeStatus(mixed $value): string
@@ -227,8 +318,160 @@ class OrderMetaBox
         )));
     }
 
-    private function sanitizeAmount(mixed $value): float
+    private function renderOrderItemsScript(): void
     {
-        return max(0, (float) $value);
+        static $rendered = false;
+
+        if ($rendered) {
+            return;
+        }
+
+        $rendered = true;
+        ?>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('ecoursityOrderItems', (payload) => ({
+                    editable: Boolean(payload.editable),
+                    items: Array.isArray(payload.items) ? payload.items : [],
+                    courses: Array.isArray(payload.courses) ? payload.courses : [],
+                    modalOpen: false,
+                    search: '',
+                    get subtotal() {
+                        return this.items.reduce((sum, item) => sum + Number(item.price_real || 0), 0);
+                    },
+                    get total() {
+                        return this.subtotal;
+                    },
+                    get itemsJson() {
+                        return JSON.stringify(this.items);
+                    },
+                    openModal() {
+                        if (!this.editable) {
+                            return;
+                        }
+
+                        this.modalOpen = true;
+                    },
+                    closeModal() {
+                        this.modalOpen = false;
+                    },
+                    filteredCourses() {
+                        const keyword = this.search.trim().toLowerCase();
+
+                        if (!keyword) {
+                            return this.courses;
+                        }
+
+                        return this.courses.filter((course) => String(course.name || '').toLowerCase().includes(keyword));
+                    },
+                    hasItem(courseId) {
+                        return this.items.some((item) => Number(item.id) === Number(courseId));
+                    },
+                    addItem(course) {
+                        if (!this.editable || this.hasItem(course.id)) {
+                            return;
+                        }
+
+                        this.items.push({
+                            id: Number(course.id),
+                            name: String(course.name || ''),
+                            price: Number(course.price || 0),
+                            price_sale: Number(course.price_sale || 0),
+                            price_real: Number(course.price_real || 0),
+                        });
+                    },
+                    removeItem(courseId) {
+                        if (!this.editable) {
+                            return;
+                        }
+
+                        this.items = this.items.filter((item) => Number(item.id) !== Number(courseId));
+                    },
+                    money(value) {
+                        return new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            maximumFractionDigits: 0,
+                        }).format(Number(value || 0));
+                    },
+                }));
+            });
+        </script>
+        <?php
+    }
+
+    private function renderOrderItemsStyle(): void
+    {
+        static $rendered = false;
+
+        if ($rendered) {
+            return;
+        }
+
+        $rendered = true;
+        ?>
+        <style>
+            .ecoursity-order-items__toolbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            .ecoursity-order-items__modal {
+                position: fixed;
+                inset: 0;
+                z-index: 100000;
+            }
+
+            .ecoursity-order-items__backdrop {
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.45);
+            }
+
+            .ecoursity-order-items__dialog {
+                position: relative;
+                width: min(720px, calc(100vw - 32px));
+                max-height: calc(100vh - 80px);
+                overflow: auto;
+                margin: 40px auto;
+                padding: 20px;
+                background: #fff;
+                border-radius: 4px;
+                box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            }
+
+            .ecoursity-order-items__dialog-header,
+            .ecoursity-order-items__course {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+            .ecoursity-order-items__dialog-header {
+                margin-bottom: 16px;
+            }
+
+            .ecoursity-order-items__dialog-header h3 {
+                margin: 0;
+            }
+
+            .ecoursity-order-items__course-list {
+                display: grid;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .ecoursity-order-items__course {
+                padding: 12px;
+                border: 1px solid #dcdcde;
+                border-radius: 4px;
+                background: #fff;
+            }
+        </style>
+        <?php
     }
 }
