@@ -2,50 +2,26 @@
 
 namespace Ecoursity\App\Controllers\Admin;
 
-use Ecoursity\App\Models\Course;
+use Ecoursity\App\Services\Admin\DashboardService;
 use Ecoursity\App\Template;
 
 class DashboardController
 {
-    public function index()
+    public function index(): void
     {
-        $courseCounts = wp_count_posts(Course::POST_TYPE);
-        $userCounts = count_users();
-        $roleCounts = $userCounts['avail_roles'] ?? [];
+        wp_enqueue_script(
+            'chartjs',
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js',
+            [],
+            '4.4.7',
+            true
+        );
 
-        $publishedCourses = (int) ($courseCounts->publish ?? 0);
-        $draftCourses = (int) ($courseCounts->draft ?? 0);
+        $dashboard = new DashboardService();
+        $stats = $dashboard->stats();
+        $chartData = $dashboard->purchaseChartData();
+        $list_newest_courses = $dashboard->newestCourses();
 
-        $stats = [
-            'courses' => [
-                'title' => __('Total Kursus'),
-                'value' => $publishedCourses + $draftCourses,
-                'icon' => 'dashicons dashicons-book',
-            ],
-            'courses_published' => [
-                'title' => __('Kursus Terbit'),
-                'value' => $publishedCourses,
-                'icon' => 'dashicons dashicons-book',
-            ],
-            'courses_draft' => [
-                'title' => __('Kursus Draf'),
-                'value' => $draftCourses,
-                'icon' => 'dashicons dashicons-book',
-            ],
-            'students' => [
-                'title' => __('Total Siswa'),
-                'value' => (int) ($roleCounts['ecoursity_student'] ?? 0),
-                'icon' => 'dashicons dashicons-admin-users',
-            ],
-            'instructors' => [
-                'title' => __('Total Guru'),
-                'value' => (int) ($roleCounts['ecoursity_instructor'] ?? 0),
-                'icon' => 'dashicons dashicons-admin-users',
-            ],
-        ];
-
-        $list_newest_courses = Course::all();
-
-        return Template::view('pages/admin/dashboard', compact('stats', 'list_newest_courses'));
+        Template::view('pages/admin/dashboard', compact('stats', 'chartData', 'list_newest_courses'));
     }
 }
