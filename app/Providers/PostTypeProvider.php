@@ -91,7 +91,39 @@ class PostTypeProvider
             'auth_callback' => [$this, 'canEditPostMeta'],
         ]);
 
-        register_post_meta(Order::POST_TYPE, '_ecoursity_user_id', [
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_NUMBER, [
+            'type' => 'string',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => 'sanitize_text_field',
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_DATE, [
+            'type' => 'string',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderDateMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_METHOD, [
+            'type' => 'string',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderMethodMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_STATUS, [
+            'type' => 'string',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderStatusMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_USER, [
             'type' => 'integer',
             'single' => true,
             'show_in_rest' => false,
@@ -99,11 +131,35 @@ class PostTypeProvider
             'auth_callback' => [$this, 'canEditPostMeta'],
         ]);
 
-        register_post_meta(Order::POST_TYPE, '_ecoursity_course_id', [
-            'type' => 'integer',
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_PAYMENT, [
+            'type' => 'string',
             'single' => true,
             'show_in_rest' => false,
-            'sanitize_callback' => [$this, 'sanitizeOrderCourseMeta'],
+            'sanitize_callback' => 'sanitize_text_field',
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_ITEMS, [
+            'type' => 'array',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderItemsMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_SUBTOTAL, [
+            'type' => 'number',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderAmountMeta'],
+            'auth_callback' => [$this, 'canEditPostMeta'],
+        ]);
+
+        register_post_meta(Order::POST_TYPE, Order::META_ORDER_TOTAL, [
+            'type' => 'number',
+            'single' => true,
+            'show_in_rest' => false,
+            'sanitize_callback' => [$this, 'sanitizeOrderAmountMeta'],
             'auth_callback' => [$this, 'canEditPostMeta'],
         ]);
     }
@@ -200,17 +256,70 @@ class PostTypeProvider
         return $userId > 0 && get_user_by('id', $userId) ? $userId : 0;
     }
 
-    public function sanitizeOrderCourseMeta(mixed $value): int
+    public function sanitizeOrderDateMeta(mixed $value): string
     {
-        $courseId = absint($value);
+        $date = preg_replace('/\D/', '', (string) $value);
 
-        if ($courseId < 1) {
-            return 0;
+        return strlen($date) === 14 ? $date : date_i18n('YmdHis');
+    }
+
+    public function sanitizeOrderMethodMeta(mixed $value): string
+    {
+        $method = sanitize_key((string) $value);
+
+        return in_array($method, [Order::METHOD_MANUALLY, Order::METHOD_CHECKOUT], true)
+            ? $method
+            : Order::METHOD_MANUALLY;
+    }
+
+    public function sanitizeOrderStatusMeta(mixed $value): string
+    {
+        $status = sanitize_key((string) $value);
+        $allowedStatuses = [
+            Order::STATUS_COMPLETED,
+            Order::STATUS_PENDING,
+            Order::STATUS_PROCESSING,
+            Order::STATUS_CANCELLED,
+            Order::STATUS_REFUNDED,
+            Order::STATUS_FAILED,
+        ];
+
+        return in_array($status, $allowedStatuses, true) ? $status : Order::STATUS_PENDING;
+    }
+
+    public function sanitizeOrderItemsMeta(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
         }
 
-        $course = get_post($courseId);
+        return array_values(array_filter(array_map(
+            static function (mixed $item): array {
+                if (!is_array($item)) {
+                    return [];
+                }
 
-        return $course && $course->post_type === Course::POST_TYPE ? $courseId : 0;
+                $courseId = absint($item['id'] ?? 0);
+
+                if ($courseId < 1) {
+                    return [];
+                }
+
+                return [
+                    'id' => $courseId,
+                    'name' => sanitize_text_field((string) ($item['name'] ?? '')),
+                    'price' => max(0, (float) ($item['price'] ?? 0)),
+                    'price_sale' => max(0, (float) ($item['price_sale'] ?? 0)),
+                    'price_real' => max(0, (float) ($item['price_real'] ?? 0)),
+                ];
+            },
+            $value
+        )));
+    }
+
+    public function sanitizeOrderAmountMeta(mixed $value): float
+    {
+        return max(0, (float) $value);
     }
 
     public function canEditPostMeta(): bool
