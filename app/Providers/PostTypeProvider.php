@@ -44,7 +44,7 @@ class PostTypeProvider
             'show_ui' => true,
             'show_in_menu' => false,
             'show_in_rest' => false,
-            'supports' => ['editor'],
+            'supports' => ['custom-fields'],
             'capability_type' => 'post',
         ]);
 

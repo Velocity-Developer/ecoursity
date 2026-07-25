@@ -2,8 +2,10 @@
 
 namespace Ecoursity\App\Providers;
 
+use Ecoursity\App\Metaboxes\OrderMetaBox;
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Lesson;
+use Ecoursity\App\Models\Order;
 use Ecoursity\App\Support\CourseFormSchema;
 use WP_Post;
 
@@ -13,8 +15,10 @@ class MetaboxPostProvider
     {
         add_action('add_meta_boxes', [$this, 'registerCourseMetaBox']);
         add_action('add_meta_boxes', [$this, 'registerLessonMetaBox']);
+        add_action('add_meta_boxes', [$this, 'registerOrderMetaBox']);
         add_action('save_post_' . Course::POST_TYPE, [$this, 'saveCourseMeta'], 10, 2);
         add_action('save_post_' . Lesson::POST_TYPE, [$this, 'saveLessonMeta'], 10, 2);
+        add_action('save_post_' . Order::POST_TYPE, [$this, 'saveOrderMeta'], 10, 2);
     }
 
     public function registerCourseMetaBox(): void
@@ -36,6 +40,18 @@ class MetaboxPostProvider
             __('Detail Materi Kursus'),
             [$this, 'renderLessonMetaBox'],
             Lesson::POST_TYPE,
+            'normal',
+            'default'
+        );
+    }
+
+    public function registerOrderMetaBox(): void
+    {
+        add_meta_box(
+            'ecoursity-order-meta',
+            __('Detail Pesanan Kursus'),
+            [$this, 'renderOrderMetaBox'],
+            Order::POST_TYPE,
             'normal',
             'default'
         );
@@ -212,6 +228,11 @@ class MetaboxPostProvider
         echo '</tbody></table>';
     }
 
+    public function renderOrderMetaBox(WP_Post $post): void
+    {
+        (new OrderMetaBox())->render($post);
+    }
+
     public function saveCourseMeta(int $postId, WP_Post $post): void
     {
         if (!isset($_POST['ecoursity_course_meta_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ecoursity_course_meta_nonce'])), 'ecoursity_course_meta')) {
@@ -274,6 +295,11 @@ class MetaboxPostProvider
             $value = $submittedMeta[$metaKey] ?? '';
             $lesson->updateMeta($metaKey, $this->sanitizeLessonMetaValue($metaKey, $value));
         }
+    }
+
+    public function saveOrderMeta(int $postId, WP_Post $post): void
+    {
+        (new OrderMetaBox())->save($postId, $post);
     }
 
     private function sanitizeMetaValue(string $metaKey, mixed $value): mixed
