@@ -2,11 +2,14 @@
 
 namespace Ecoursity\App\Providers;
 
+use Ecoursity\App\Models\Cart;
+
 class UserServiceProvider
 {
     public function boot(): void
     {
         add_action('init', [$this, 'registerRoles']);
+        add_action('wp_login', [$this, 'syncCartSessionToUser'], 10, 2);
     }
 
     public function registerRoles(): void
@@ -19,5 +22,10 @@ class UserServiceProvider
             'read' => true,
             'upload_files' => true,
         ]);
+    }
+
+    public function syncCartSessionToUser(string $userLogin, \WP_User $user): void
+    {
+        Cart::syncSessionToUser((int) $user->ID);
     }
 }
