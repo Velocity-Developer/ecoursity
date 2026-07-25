@@ -2,6 +2,7 @@
 
 namespace Ecoursity\App\Models;
 
+use Ecoursity\App\Helpers\Str;
 use WP_Query;
 
 defined('ABSPATH') || exit;
@@ -223,9 +224,9 @@ class Order
     private function generateOrderNumber(): string
     {
         return sprintf(
-            'ECO-%s-%s',
-            date_i18n('YmdHis'),
-            strtoupper(wp_generate_password(6, false, false))
+            'ORDER%s%s',
+            date_i18n('ymdH'),
+            strtoupper(Str::random(6))
         );
     }
 

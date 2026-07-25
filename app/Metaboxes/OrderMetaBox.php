@@ -2,6 +2,7 @@
 
 namespace Ecoursity\App\Metaboxes;
 
+use Ecoursity\App\Helpers\Str;
 use Ecoursity\App\Models\Course;
 use Ecoursity\App\Models\Order;
 use WP_Post;
@@ -44,7 +45,7 @@ class OrderMetaBox
 
         echo '<table class="form-table" role="presentation"><tbody>';
         $this->renderReadonlyTextField(Order::META_ORDER_NUMBER, __('Order Number'), $order->order_number);
-        $this->renderReadonlyTextField(Order::META_ORDER_DATE, __('Order Date'), $order->order_date);
+        $this->renderOrderDateField($order);
         $this->renderReadonlyTextField(Order::META_ORDER_METHOD, __('Order Method'), $methodOptions[$order->order_method] ?? $order->order_method);
 
         echo '<tr>';
@@ -175,6 +176,8 @@ class OrderMetaBox
         $order->updateMeta(Order::META_ORDER_PAYMENT, sanitize_text_field((string) ($submittedMeta[Order::META_ORDER_PAYMENT] ?? '')));
 
         if ($order->order_method === Order::METHOD_MANUALLY) {
+            $order->updateMeta(Order::META_ORDER_DATE, $this->sanitizeOrderDate($submittedMeta[Order::META_ORDER_DATE] ?? $order->order_date, $order->order_date));
+
             $items = $this->sanitizeItems($submittedMeta[Order::META_ORDER_ITEMS] ?? []);
             $subtotal = $this->calculateSubtotal($items);
 
@@ -182,6 +185,25 @@ class OrderMetaBox
             $order->updateMeta(Order::META_ORDER_SUBTOTAL, $subtotal);
             $order->updateMeta(Order::META_ORDER_TOTAL, $subtotal);
         }
+    }
+
+    public function ensureGeneratedMetaForPost(int $postId, WP_Post $post): void
+    {
+        if ($post->post_type !== Order::POST_TYPE) {
+            return;
+        }
+
+        if (wp_is_post_autosave($postId) || wp_is_post_revision($postId)) {
+            return;
+        }
+
+        $order = Order::find($postId);
+
+        if (!$order) {
+            return;
+        }
+
+        $this->ensureGeneratedMeta($order);
     }
 
     private function canSave(int $postId, WP_Post $post): bool
@@ -201,9 +223,9 @@ class OrderMetaBox
     {
         if ($order->order_number === '') {
             $order->order_number = sprintf(
-                'ECO-%s-%s',
-                date_i18n('YmdHis'),
-                strtoupper(wp_generate_password(6, false, false))
+                'ORDER%s%s',
+                date_i18n('ymdH'),
+                strtoupper(Str::random(6))
             );
             $order->updateMeta(Order::META_ORDER_NUMBER, $order->order_number);
         }
@@ -224,6 +246,25 @@ class OrderMetaBox
         echo '<tr>';
         echo '<th scope="row"><label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></th>';
         echo '<td><input type="text" class="regular-text" id="' . esc_attr($id) . '" value="' . esc_attr($value) . '" readonly></td>';
+        echo '</tr>';
+    }
+
+    private function renderOrderDateField(Order $order): void
+    {
+        $isManual = $order->order_method === '' || $order->order_method === Order::METHOD_MANUALLY;
+
+        echo '<tr>';
+        echo '<th scope="row"><label for="' . esc_attr(Order::META_ORDER_DATE) . '">' . esc_html__('Order Date') . '</label></th>';
+        echo '<td>';
+
+        if ($isManual) {
+            echo '<input type="datetime-local" class="regular-text" id="' . esc_attr(Order::META_ORDER_DATE) . '" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_DATE) . ']" value="' . esc_attr($this->formatOrderDateInput($order->order_date)) . '">';
+            echo '<p class="description">' . esc_html__('Tanggal akan disimpan dengan format YmdHis.') . '</p>';
+        } else {
+            echo '<input type="text" class="regular-text" id="' . esc_attr(Order::META_ORDER_DATE) . '" value="' . esc_attr($order->order_date) . '" readonly>';
+        }
+
+        echo '</td>';
         echo '</tr>';
     }
 
@@ -283,6 +324,35 @@ class OrderMetaBox
         return $userId > 0 && get_user_by('id', $userId) ? $userId : 0;
     }
 
+    private function sanitizeOrderDate(mixed $value, string $fallback): string
+    {
+        $value = trim((string) $value);
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $value)) {
+            return str_replace(['-', 'T', ':'], '', $value) . '00';
+        }
+
+        $date = preg_replace('/\D/', '', (string) $value);
+
+        return strlen($date) === 14 ? $date : $fallback;
+    }
+
+    private function formatOrderDateInput(string $value): string
+    {
+        if (!preg_match('/^\d{14}$/', $value)) {
+            return '';
+        }
+
+        return sprintf(
+            '%s-%s-%sT%s:%s',
+            substr($value, 0, 4),
+            substr($value, 4, 2),
+            substr($value, 6, 2),
+            substr($value, 8, 2),
+            substr($value, 10, 2)
+        );
+    }
+
     private function sanitizeItems(mixed $value): array
     {
         if (is_string($value)) {
@@ -327,7 +397,7 @@ class OrderMetaBox
         }
 
         $rendered = true;
-        ?>
+?>
         <script>
             document.addEventListener('alpine:init', () => {
                 Alpine.data('ecoursityOrderItems', (payload) => ({
@@ -397,7 +467,7 @@ class OrderMetaBox
                 }));
             });
         </script>
-        <?php
+    <?php
     }
 
     private function renderOrderItemsStyle(): void
@@ -409,7 +479,7 @@ class OrderMetaBox
         }
 
         $rendered = true;
-        ?>
+    ?>
         <style>
             .ecoursity-order-items__toolbar {
                 display: flex;
@@ -472,6 +542,6 @@ class OrderMetaBox
                 background: #fff;
             }
         </style>
-        <?php
+<?php
     }
 }

@@ -313,7 +313,9 @@ class MetaboxPostProvider
 
     public function saveOrderMeta(int $postId, WP_Post $post): void
     {
-        (new OrderMetaBox())->save($postId, $post);
+        $metaBox = new OrderMetaBox();
+        $metaBox->ensureGeneratedMetaForPost($postId, $post);
+        $metaBox->save($postId, $post);
     }
 
     private function sanitizeMetaValue(string $metaKey, mixed $value): mixed
