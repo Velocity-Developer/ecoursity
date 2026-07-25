@@ -8,6 +8,7 @@ use Ecoursity\App\Controllers\FileController;
 use Ecoursity\App\Controllers\LessonController;
 use Ecoursity\App\Controllers\SectionController;
 use Ecoursity\App\Controllers\TemplateController;
+use Ecoursity\App\Controllers\UserController;
 
 class ApiRoutes
 {
@@ -93,6 +94,12 @@ class ApiRoutes
             [
                 'route' => '/order-course-options/',
                 'callback' => [CourseController::class, 'orderOptions'],
+                'methods' => 'GET',
+                'permission_callback' => fn() => current_user_can('edit_posts'),
+            ],
+            [
+                'route' => '/order-user-options/',
+                'callback' => [UserController::class, 'orderOptions'],
                 'methods' => 'GET',
                 'permission_callback' => fn() => current_user_can('edit_posts'),
             ],

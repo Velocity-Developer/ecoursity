@@ -36,12 +36,6 @@ class OrderMetaBox
             Order::STATUS_REFUNDED => __('Refunded'),
             Order::STATUS_FAILED => __('Failed'),
         ];
-        $users = get_users([
-            'fields' => ['ID', 'display_name', 'user_email'],
-            'orderby' => 'display_name',
-            'order' => 'ASC',
-        ]);
-
         echo '<table class="form-table" role="presentation"><tbody>';
         $this->renderReadonlyTextField(Order::META_ORDER_NUMBER, __('Order Number'), $order->order_number);
         $this->renderOrderDateField($order);
@@ -58,18 +52,7 @@ class OrderMetaBox
         echo '</select></td>';
         echo '</tr>';
 
-        echo '<tr>';
-        echo '<th scope="row"><label for="' . esc_attr(Order::META_ORDER_USER) . '">' . esc_html__('Order User') . '</label></th>';
-        echo '<td><select id="' . esc_attr(Order::META_ORDER_USER) . '" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_USER) . ']">';
-        echo '<option value="0">' . esc_html__('Pilih User') . '</option>';
-
-        foreach ($users as $user) {
-            $label = sprintf('%s (%s)', $user->display_name, $user->user_email);
-            echo '<option value="' . esc_attr((string) $user->ID) . '" ' . selected($order->order_user, (int) $user->ID, false) . '>' . esc_html($label) . '</option>';
-        }
-
-        echo '</select></td>';
-        echo '</tr>';
+        $this->renderOrderUserField($order);
 
         echo '<tr>';
         echo '<th scope="row"><label for="' . esc_attr(Order::META_ORDER_PAYMENT) . '">' . esc_html__('Order Payment') . '</label></th>';
@@ -269,6 +252,83 @@ class OrderMetaBox
 
         echo '</td>';
         echo '</tr>';
+    }
+
+    private function renderOrderUserField(Order $order): void
+    {
+        $payload = [
+            'selectedUser' => $this->userOption($order->order_user),
+            'usersUrl' => esc_url_raw(rest_url('ecoursity/v1/order-user-options/')),
+            'restNonce' => wp_create_nonce('wp_rest'),
+        ];
+
+        echo '<tr>';
+        echo '<th scope="row"><label for="' . esc_attr(Order::META_ORDER_USER) . '">' . esc_html__('Order User') . '</label></th>';
+        echo '<td>';
+        echo '<div class="ecoursity-order-user" x-data="ecoursityOrderUser(' . esc_attr(wp_json_encode($payload)) . ')">';
+        echo '<input type="hidden" id="' . esc_attr(Order::META_ORDER_USER) . '" name="' . esc_attr(self::FIELD_NAME) . '[' . esc_attr(Order::META_ORDER_USER) . ']" x-bind:value="selectedUserId">';
+        echo '<button type="button" class="button-link" x-on:click="openModal()" x-text="selectedUserLabel"></button>';
+        echo '<p class="description" x-show="selectedUserId">ID: <span x-text="selectedUserId"></span></p>';
+
+        echo '<div class="ecoursity-order-items__modal" x-cloak x-show="modalOpen" x-on:keydown.escape.window="closeModal()">';
+        echo '<div class="ecoursity-order-items__backdrop" x-on:click="closeModal()"></div>';
+        echo '<div class="ecoursity-order-items__dialog" role="dialog" aria-modal="true">';
+        echo '<div class="ecoursity-order-items__dialog-header">';
+        echo '<h3>' . esc_html__('Pilih User') . '</h3>';
+        echo '<button type="button" class="button" x-on:click="closeModal()">' . esc_html__('Tutup') . '</button>';
+        echo '</div>';
+        echo '<input type="search" class="widefat" placeholder="' . esc_attr__('Cari nama, username, atau email') . '" x-model="search">';
+        echo '<div class="ecoursity-order-items__toolbar" style="margin-top:12px;">';
+        echo '<button type="button" class="button" x-on:click="searchUsers()">' . esc_html__('Cari') . '</button>';
+        echo '<button type="button" class="button" x-show="search" x-on:click="clearSearch()">' . esc_html__('Reset') . '</button>';
+        echo '</div>';
+        echo '<div class="ecoursity-order-items__course-list">';
+        echo '<p class="description" x-show="usersLoading">' . esc_html__('Memuat user...') . '</p>';
+        echo '<p class="description" x-show="usersError" x-text="usersError"></p>';
+        echo '<template x-if="!usersLoading && !usersError && users.length === 0"><p class="description">' . esc_html__('User tidak ditemukan.') . '</p></template>';
+        echo '<template x-for="user in users" x-bind:key="user.id">';
+        echo '<div class="ecoursity-order-items__course">';
+        echo '<div><strong x-text="user.label"></strong><div class="description" x-text="user.email"></div></div>';
+        echo '<button type="button" class="button" x-on:click="selectUser(user)">' . esc_html__('Pilih') . '</button>';
+        echo '</div>';
+        echo '</template>';
+        echo '</div>';
+        echo '<div class="ecoursity-order-items__pagination" x-show="totalPages > 1">';
+        echo '<button type="button" class="button" x-bind:disabled="usersLoading || page <= 1" x-on:click="goToPage(page - 1)">' . esc_html__('Sebelumnya') . '</button>';
+        echo '<span class="description"><span x-text="page"></span> / <span x-text="totalPages"></span></span>';
+        echo '<button type="button" class="button" x-bind:disabled="usersLoading || page >= totalPages" x-on:click="goToPage(page + 1)">' . esc_html__('Berikutnya') . '</button>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+
+        $this->renderOrderUserScript();
+        $this->renderOrderItemsStyle();
+        echo '</div>';
+        echo '</td>';
+        echo '</tr>';
+    }
+
+    private function userOption(int $userId): ?array
+    {
+        if ($userId < 1) {
+            return null;
+        }
+
+        $user = get_user_by('id', $userId);
+
+        if (!$user instanceof \WP_User) {
+            return null;
+        }
+
+        $displayName = trim((string) $user->display_name);
+        $username = (string) $user->user_login;
+
+        return [
+            'id' => (int) $user->ID,
+            'label' => $displayName !== '' ? $displayName : $username,
+            'username' => $username,
+            'email' => (string) $user->user_email,
+        ];
     }
 
     private function calculateSubtotal(array $items): float
@@ -483,6 +543,112 @@ class OrderMetaBox
     <?php
     }
 
+    private function renderOrderUserScript(): void
+    {
+        static $rendered = false;
+
+        if ($rendered) {
+            return;
+        }
+
+        $rendered = true;
+?>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('ecoursityOrderUser', (payload) => ({
+                    selectedUser: payload.selectedUser || null,
+                    users: [],
+                    usersLoaded: false,
+                    usersLoading: false,
+                    usersError: '',
+                    usersUrl: String(payload.usersUrl || ''),
+                    restNonce: String(payload.restNonce || ''),
+                    page: 1,
+                    perPage: 15,
+                    totalPages: 1,
+                    totalUsers: 0,
+                    modalOpen: false,
+                    search: '',
+                    get selectedUserId() {
+                        return this.selectedUser ? Number(this.selectedUser.id || 0) : 0;
+                    },
+                    get selectedUserLabel() {
+                        if (!this.selectedUser) {
+                            return '<?php echo esc_js(__('Pilih User')); ?>';
+                        }
+
+                        return this.selectedUser.label || this.selectedUser.username || ('User #' + this.selectedUserId);
+                    },
+                    async openModal() {
+                        this.modalOpen = true;
+                        await this.loadUsers(this.page);
+                    },
+                    closeModal() {
+                        this.modalOpen = false;
+                    },
+                    selectUser(user) {
+                        this.selectedUser = user;
+                        this.closeModal();
+                    },
+                    async searchUsers() {
+                        await this.loadUsers(1);
+                    },
+                    async clearSearch() {
+                        this.search = '';
+                        await this.loadUsers(1);
+                    },
+                    async goToPage(page) {
+                        const targetPage = Math.max(1, Math.min(Number(page || 1), this.totalPages));
+
+                        if (targetPage === this.page || this.usersLoading) {
+                            return;
+                        }
+
+                        await this.loadUsers(targetPage);
+                    },
+                    async loadUsers(page = 1) {
+                        this.usersLoading = true;
+                        this.usersError = '';
+
+                        try {
+                            const url = new URL(this.usersUrl, window.location.origin);
+                            url.searchParams.set('page', String(page));
+                            url.searchParams.set('per_page', String(this.perPage));
+
+                            if (this.search.trim()) {
+                                url.searchParams.set('search', this.search.trim());
+                            }
+
+                            const response = await fetch(url.toString(), {
+                                headers: {
+                                    'X-WP-Nonce': this.restNonce,
+                                    'Accept': 'application/json',
+                                },
+                            });
+                            const result = await response.json();
+
+                            if (!response.ok || !result.success) {
+                                throw new Error(result.message || 'Failed to load users.');
+                            }
+
+                            this.users = Array.isArray(result.data) ? result.data : [];
+                            this.page = Number(result.meta?.page || page);
+                            this.perPage = Number(result.meta?.per_page || this.perPage);
+                            this.totalUsers = Number(result.meta?.total || 0);
+                            this.totalPages = Number(result.meta?.total_pages || 1);
+                            this.usersLoaded = true;
+                        } catch (error) {
+                            this.usersError = error.message || 'Failed to load users.';
+                        } finally {
+                            this.usersLoading = false;
+                        }
+                    },
+                }));
+            });
+        </script>
+    <?php
+    }
+
     private function renderOrderItemsStyle(): void
     {
         static $rendered = false;
@@ -544,6 +710,14 @@ class OrderMetaBox
 
             .ecoursity-order-items__course-list {
                 display: grid;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .ecoursity-order-items__pagination {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
                 gap: 8px;
                 margin-top: 12px;
             }
