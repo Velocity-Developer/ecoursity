@@ -23,6 +23,13 @@ class SettingSchema
                         'description' => __('Nama yang ditampilkan pada area pembelajaran LMS.', 'ecoursity'),
                     ],
                     [
+                        'key' => 'brand_logo',
+                        'label' => __('Logo Brand', 'ecoursity'),
+                        'type' => 'image',
+                        'default' => '',
+                        'description' => __('Upload logo yang digunakan untuk identitas Ecoursity.', 'ecoursity'),
+                    ],
+                    [
                         'key' => 'support_email',
                         'label' => __('Email Dukungan', 'ecoursity'),
                         'type' => 'email',
@@ -35,30 +42,6 @@ class SettingSchema
                         'type' => 'checkbox',
                         'default' => true,
                         'description' => __('Izinkan instruktur mendaftar di LMS Anda.', 'ecoursity'),
-                    ],
-                ],
-            ],
-            'courses' => [
-                'label' => __('Kursus', 'ecoursity'),
-                'description' => __('Atur perilaku daftar dan konten kursus.', 'ecoursity'),
-                'fields' => [
-                    [
-                        'key' => 'courses_per_page',
-                        'label' => __('Kursus Per Halaman', 'ecoursity'),
-                        'type' => 'number',
-                        'default' => 12,
-                        'min' => 1,
-                        'max' => 100,
-                    ],
-                    [
-                        'key' => 'default_course_status',
-                        'label' => __('Status Kursus Default', 'ecoursity'),
-                        'type' => 'select',
-                        'default' => 'draft',
-                        'options' => [
-                            'draft' => __('Draft', 'ecoursity'),
-                            'publish' => __('Terbit', 'ecoursity'),
-                        ],
                     ],
                 ],
             ],
@@ -99,7 +82,7 @@ class SettingSchema
             ],
             'email' => [
                 'label' => __('Email', 'ecoursity'),
-                'description' => __('Identitas pengirim email dari Ecoursity.', 'ecoursity'),
+                'description' => __('Identitas pengirim email dari LMS.', 'ecoursity'),
                 'fields' => [
                     [
                         'key' => 'email_sender_name',
@@ -112,6 +95,27 @@ class SettingSchema
                         'label' => __('Email Pengirim', 'ecoursity'),
                         'type' => 'email',
                         'default' => get_option('admin_email'),
+                    ],
+                    [
+                        'key' => 'email_template_order_course_student',
+                        'label' => __('Template Email Order Course ke Siswa', 'ecoursity'),
+                        'type' => 'editor',
+                        'default' => self::defaultOrderCourseStudentTemplate(),
+                        'description' => __('Template email yang dikirim ke siswa setelah order kursus dibuat.', 'ecoursity'),
+                    ],
+                    [
+                        'key' => 'email_template_order_course_instructor',
+                        'label' => __('Template Email Order Course ke Instruktur', 'ecoursity'),
+                        'type' => 'editor',
+                        'default' => self::defaultOrderCourseInstructorTemplate(),
+                        'description' => __('Template email yang dikirim ke instruktur saat ada order kursus baru.', 'ecoursity'),
+                    ],
+                    [
+                        'key' => 'email_template_register_user',
+                        'label' => __('Template Email Register User Baru', 'ecoursity'),
+                        'type' => 'editor',
+                        'default' => self::defaultRegisterUserTemplate(),
+                        'description' => __('Template email sambutan untuk user baru setelah registrasi.', 'ecoursity'),
                     ],
                 ],
             ],
@@ -133,5 +137,28 @@ class SettingSchema
     public static function hasTab(string $tab): bool
     {
         return array_key_exists($tab, self::tabs());
+    }
+
+    private static function defaultOrderCourseStudentTemplate(): string
+    {
+        return '<p>Halo {student_name},</p>'
+            . '<p>Order kursus <strong>{course_title}</strong> berhasil dibuat.</p>'
+            . '<p>Nomor order: <strong>{order_number}</strong></p>'
+            . '<p>Terima kasih telah belajar bersama kami.</p>';
+    }
+
+    private static function defaultOrderCourseInstructorTemplate(): string
+    {
+        return '<p>Halo {instructor_name},</p>'
+            . '<p>Ada order baru untuk kursus <strong>{course_title}</strong>.</p>'
+            . '<p>Siswa: <strong>{student_name}</strong></p>'
+            . '<p>Nomor order: <strong>{order_number}</strong></p>';
+    }
+
+    private static function defaultRegisterUserTemplate(): string
+    {
+        return '<p>Halo {user_name},</p>'
+            . '<p>Selamat datang di {site_name}. Akun Anda sudah berhasil dibuat.</p>'
+            . '<p>Silakan login dan mulai belajar.</p>';
     }
 }

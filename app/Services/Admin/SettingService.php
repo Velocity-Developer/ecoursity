@@ -42,7 +42,9 @@ class SettingService
 
         return match ($type) {
             'checkbox' => !empty($value),
+            'editor' => wp_kses_post((string) $value),
             'email' => sanitize_email((string) $value),
+            'image' => esc_url_raw((string) $value),
             'number' => $this->sanitizeNumber($field, $value),
             'select' => $this->sanitizeSelect($field, $value),
             'textarea' => sanitize_textarea_field((string) $value),

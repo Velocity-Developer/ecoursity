@@ -711,6 +711,54 @@
     margin-top: 2px;
 }
 
+.ecoursity-settings__editor {
+    max-width: 820px;
+}
+
+.ecoursity-settings__editor .wp-editor-wrap {
+    border-radius: 4px;
+}
+
+.ecoursity-settings__image {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ecoursity-settings__image-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 220px;
+    min-height: 96px;
+    padding: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.ecoursity-settings__image-preview.is-empty {
+    border-style: dashed;
+    background: #f7f7f7;
+    color: #636363;
+    font-size: 13px;
+}
+
+.ecoursity-settings__image-preview img {
+    display: block;
+    max-width: 100%;
+    max-height: 96px;
+    object-fit: contain;
+}
+
+.ecoursity-settings__image-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 @media (max-width: 782px) {
     .ecoursity-settings__tabs {
         display: flex;

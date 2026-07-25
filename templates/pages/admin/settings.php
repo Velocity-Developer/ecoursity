@@ -94,6 +94,43 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
                                     rows="4"
                                     class="large-text"
                                 ><?php echo esc_textarea((string) $value); ?></textarea>
+                            <?php elseif ($type === 'editor') : ?>
+                                <div class="ecoursity-settings__editor">
+                                    <?php
+                                    wp_editor((string) $value, $inputId, [
+                                        'textarea_name' => 'ecoursity_settings[' . $key . ']',
+                                        'textarea_rows' => (int) ($field['rows'] ?? 8),
+                                        'media_buttons' => (bool) ($field['media_buttons'] ?? false),
+                                        'teeny' => false,
+                                        'quicktags' => true,
+                                    ]);
+                                    ?>
+                                </div>
+                            <?php elseif ($type === 'image') : ?>
+                                <div class="ecoursity-settings__image" data-ecoursity-image-field>
+                                    <input
+                                        id="<?php echo esc_attr($inputId); ?>"
+                                        type="hidden"
+                                        name="ecoursity_settings[<?php echo esc_attr($key); ?>]"
+                                        value="<?php echo esc_url((string) $value); ?>"
+                                        data-ecoursity-image-input
+                                    >
+                                    <div class="ecoursity-settings__image-preview <?php echo empty($value) ? 'is-empty' : ''; ?>" data-ecoursity-image-preview>
+                                        <?php if (!empty($value)) : ?>
+                                            <img src="<?php echo esc_url((string) $value); ?>" alt="<?php echo esc_attr($field['label']); ?>">
+                                        <?php else : ?>
+                                            <span><?php echo esc_html__('Belum ada logo.', 'ecoursity'); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="ecoursity-settings__image-actions">
+                                        <button type="button" class="button button-secondary" data-ecoursity-image-upload>
+                                            <?php echo esc_html__('Pilih Logo', 'ecoursity'); ?>
+                                        </button>
+                                        <button type="button" class="button button-link-delete" data-ecoursity-image-remove <?php disabled(empty($value)); ?>>
+                                            <?php echo esc_html__('Hapus', 'ecoursity'); ?>
+                                        </button>
+                                    </div>
+                                </div>
                             <?php else : ?>
                                 <input
                                     id="<?php echo esc_attr($inputId); ?>"
@@ -118,3 +155,69 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
         <?php submit_button(__('Simpan Pengaturan', 'ecoursity')); ?>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-ecoursity-image-field]').forEach((field) => {
+            const input = field.querySelector('[data-ecoursity-image-input]');
+            const preview = field.querySelector('[data-ecoursity-image-preview]');
+            const uploadButton = field.querySelector('[data-ecoursity-image-upload]');
+            const removeButton = field.querySelector('[data-ecoursity-image-remove]');
+            let mediaFrame = null;
+
+            if (!input || !preview || !uploadButton || !removeButton) {
+                return;
+            }
+
+            const setImage = (url) => {
+                input.value = url;
+
+                if (url) {
+                    const image = document.createElement('img');
+
+                    image.src = url;
+                    image.alt = '';
+                    preview.classList.remove('is-empty');
+                    preview.replaceChildren(image);
+                    removeButton.disabled = false;
+                    return;
+                }
+
+                preview.classList.add('is-empty');
+                preview.textContent = '<?php echo esc_js(__('Belum ada logo.', 'ecoursity')); ?>';
+                removeButton.disabled = true;
+            };
+
+            uploadButton.addEventListener('click', () => {
+                if (typeof wp === 'undefined' || !wp.media) {
+                    return;
+                }
+
+                if (mediaFrame) {
+                    mediaFrame.open();
+                    return;
+                }
+
+                mediaFrame = wp.media({
+                    title: '<?php echo esc_js(__('Pilih Logo Brand', 'ecoursity')); ?>',
+                    button: {
+                        text: '<?php echo esc_js(__('Gunakan Logo Ini', 'ecoursity')); ?>',
+                    },
+                    library: {
+                        type: 'image',
+                    },
+                    multiple: false,
+                });
+
+                mediaFrame.on('select', () => {
+                    const attachment = mediaFrame.state().get('selection').first().toJSON();
+                    setImage(attachment.url || '');
+                });
+
+                mediaFrame.open();
+            });
+
+            removeButton.addEventListener('click', () => setImage(''));
+        });
+    });
+</script>
