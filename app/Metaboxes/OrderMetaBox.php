@@ -216,6 +216,8 @@ class OrderMetaBox
             $order->updateMeta(Order::META_ORDER_NUMBER, $order->order_number);
         }
 
+        $this->syncPostTitle($order);
+
         if ($order->order_date === '') {
             $order->order_date = date_i18n('YmdHis');
             $order->updateMeta(Order::META_ORDER_DATE, $order->order_date);
@@ -225,6 +227,28 @@ class OrderMetaBox
             $order->order_method = Order::METHOD_MANUALLY;
             $order->updateMeta(Order::META_ORDER_METHOD, $order->order_method);
         }
+    }
+
+    private function syncPostTitle(Order $order): void
+    {
+        static $syncing = false;
+
+        if ($syncing) {
+            return;
+        }
+
+        if (!$order->id || $order->order_number === '' || $order->title === $order->order_number) {
+            return;
+        }
+
+        $syncing = true;
+        wp_update_post([
+            'ID' => $order->id,
+            'post_title' => $order->order_number,
+        ]);
+        $syncing = false;
+
+        $order->title = $order->order_number;
     }
 
     private function renderReadonlyTextField(string $id, string $label, string $value): void

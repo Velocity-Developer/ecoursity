@@ -100,7 +100,7 @@ class Order
         $data = [
             'ID' => $this->id,
             'post_type' => self::POST_TYPE,
-            'post_title' => $this->title ?: $this->defaultTitle(),
+            'post_title' => $this->defaultTitle(),
             'post_name' => $this->slug,
             'post_content' => $this->content,
             'post_excerpt' => $this->excerpt,
