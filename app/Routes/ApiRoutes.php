@@ -2,6 +2,7 @@
 
 namespace Ecoursity\App\Routes;
 
+use Ecoursity\App\Controllers\CartController;
 use Ecoursity\App\Controllers\CourseController;
 use Ecoursity\App\Controllers\FileController;
 use Ecoursity\App\Controllers\LessonController;
@@ -51,6 +52,36 @@ class ApiRoutes
                 'route' => '/template_component/(?P<component_name>\w+)',
                 'callback' => [TemplateController::class, 'component'],
                 'methods' => 'GET',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/cart/',
+                'callback' => [CartController::class, 'index'],
+                'methods' => 'GET',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/cart/',
+                'callback' => [CartController::class, 'store'],
+                'methods' => 'POST',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/cart/',
+                'callback' => [CartController::class, 'replace'],
+                'methods' => 'PUT',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/cart/',
+                'callback' => [CartController::class, 'clear'],
+                'methods' => 'DELETE',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/cart/(?P<course_id>\d+)',
+                'callback' => [CartController::class, 'delete'],
+                'methods' => 'DELETE',
                 'permission_callback' => '__return_true',
             ],
             [

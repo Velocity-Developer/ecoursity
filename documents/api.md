@@ -14,6 +14,36 @@ Daftar API yang tersedia di Ecoursity.
 - Deskripsi: Ambil render component template berdasarkan nama component.
 - Dokumentasi detail: `documents/api/template_component.md`
 
+## `GET /wp-json/ecoursity/v1/cart/`
+
+- Lokasi: `app/Routes/ApiRoutes.php`
+- Deskripsi: Ambil isi cart course.
+- Dokumentasi detail: `documents/api/cart.md`
+
+## `POST /wp-json/ecoursity/v1/cart/`
+
+- Lokasi: `app/Routes/ApiRoutes.php`
+- Deskripsi: Tambah course ke cart.
+- Dokumentasi detail: `documents/api/cart.md`
+
+## `PUT /wp-json/ecoursity/v1/cart/`
+
+- Lokasi: `app/Routes/ApiRoutes.php`
+- Deskripsi: Ganti seluruh isi cart.
+- Dokumentasi detail: `documents/api/cart.md`
+
+## `DELETE /wp-json/ecoursity/v1/cart/`
+
+- Lokasi: `app/Routes/ApiRoutes.php`
+- Deskripsi: Kosongkan cart.
+- Dokumentasi detail: `documents/api/cart.md`
+
+## `DELETE /wp-json/ecoursity/v1/cart/{course_id}`
+
+- Lokasi: `app/Routes/ApiRoutes.php`
+- Deskripsi: Hapus satu course dari cart.
+- Dokumentasi detail: `documents/api/cart.md`
+
 ## `GET /wp-json/ecoursity/v1/courses/`
 
 - Lokasi: `app/Routes/ApiRoutes.php`
