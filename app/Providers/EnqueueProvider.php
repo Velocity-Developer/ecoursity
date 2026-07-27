@@ -31,14 +31,14 @@ class EnqueueProvider
             wp_enqueue_script(
                 'alpinejs',
                 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
-                ['alpinejs-sort'],
+                ['alpinejs-sort', 'ecoursity-main-script'],
                 '3.14.9',
                 true
             );
             wp_enqueue_script(
                 'ecoursity-main-script',
                 $this->resourceUri . 'js/ecoursity-main.js',
-                ['alpinejs', 'editor', 'quicktags'],
+                ['alpinejs-sort', 'editor', 'quicktags'],
                 null,
                 true
             );
@@ -61,14 +61,14 @@ class EnqueueProvider
             wp_enqueue_script(
                 'alpinejs',
                 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
-                ['alpinejs-sort'],
+                ['alpinejs-sort', 'ecoursity-main-script'],
                 '3.14.9',
                 true
             );
             wp_enqueue_script(
                 'ecoursity-main-script',
                 $this->resourceUri . 'js/ecoursity-main.js',
-                ['alpinejs'],
+                ['alpinejs-sort'],
                 null,
                 true
             );

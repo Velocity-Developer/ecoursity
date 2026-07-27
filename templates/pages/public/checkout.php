@@ -23,8 +23,18 @@ $loginUrl = wp_login_url(get_permalink());
         message: '',
         messageType: 'success',
         order: null,
+        emptyCart: {
+            items: [],
+            courses: [],
+            count: 0,
+            loading: true,
+            saving: false,
+            remove() {
+                return false;
+            },
+        },
         get cart() {
-            return $store.EcoursityCart;
+            return $store.EcoursityCart || this.emptyCart;
         },
         get subtotal() {
             return this.cart.courses.reduce((total, course) => total + this.coursePrice(course), 0);
