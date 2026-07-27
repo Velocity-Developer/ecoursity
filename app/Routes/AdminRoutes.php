@@ -29,7 +29,7 @@ class AdminRoutes
                 };
 
                 if (isset($route['parent_slug'])) {
-                    add_submenu_page(
+                    $hookSuffix = add_submenu_page(
                         $route['parent_slug'],
                         $route['page_title'],
                         $route['menu_title'],
@@ -37,6 +37,16 @@ class AdminRoutes
                         $route['slug'],
                         $callback
                     );
+
+                    if (($route['slug'] ?? '') === 'ecoursity-settings') {
+                        add_action('load-' . $hookSuffix, function () use ($route) {
+                            $controller = new $route['controller'];
+
+                            if (method_exists($controller, 'handlePost')) {
+                                call_user_func([$controller, 'handlePost']);
+                            }
+                        });
+                    }
 
                     continue;
                 }

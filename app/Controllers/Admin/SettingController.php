@@ -16,15 +16,16 @@ class SettingController
     {
         $activeTab = $this->activeTab();
         $service = new SettingService();
+        $saved = false;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->save($service, $activeTab);
+            $saved = $this->save($service, $activeTab, false);
         }
 
         $tabs = SettingSchema::tabs();
         $activeSchema = SettingSchema::tab($activeTab);
         $values = $service->valuesForTab($activeTab);
-        $updated = isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true';
+        $updated = $saved || (isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true');
 
         Template::view('pages/admin/settings', compact(
             'tabs',
@@ -35,7 +36,16 @@ class SettingController
         ));
     }
 
-    private function save(SettingService $service, string $activeTab): void
+    public function handlePost(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return;
+        }
+
+        $this->save(new SettingService(), $this->activeTab(), true);
+    }
+
+    private function save(SettingService $service, string $activeTab, bool $redirect): bool
     {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Anda tidak memiliki akses untuk mengubah pengaturan Ecoursity.', 'ecoursity'));
@@ -51,12 +61,15 @@ class SettingController
 
         $service->saveTab($activeTab, $settings);
 
-        wp_safe_redirect(add_query_arg([
+        if ($redirect && !headers_sent() && wp_safe_redirect(add_query_arg([
             'page' => 'ecoursity-settings',
             'tab' => $activeTab,
             'settings-updated' => 'true',
-        ], admin_url('admin.php')));
-        exit;
+        ], admin_url('admin.php')))) {
+            exit;
+        }
+
+        return true;
     }
 
     private function activeTab(): string
