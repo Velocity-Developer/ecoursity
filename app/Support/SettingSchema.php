@@ -79,6 +79,22 @@ class SettingSchema
                         ],
                     ],
                     [
+                        'key' => 'qris_image',
+                        'label' => __('Gambar QRIS', 'ecoursity'),
+                        'type' => 'image',
+                        'default' => '',
+                        'description' => __('Upload gambar QRIS yang ditampilkan sebagai pilihan pembayaran di checkout.', 'ecoursity'),
+                        'button_label' => __('Pilih Gambar QRIS', 'ecoursity'),
+                        'empty_label' => __('Belum ada gambar QRIS.', 'ecoursity'),
+                    ],
+                    [
+                        'key' => 'qris_nmid',
+                        'label' => __('NMID QRIS', 'ecoursity'),
+                        'type' => 'text',
+                        'default' => '',
+                        'description' => __('ID merchant QRIS yang ditampilkan pada pilihan pembayaran QRIS.', 'ecoursity'),
+                    ],
+                    [
                         'key' => 'bank_transfer_accounts',
                         'label' => __('Daftar Bank Transfer', 'ecoursity'),
                         'type' => 'repeater',

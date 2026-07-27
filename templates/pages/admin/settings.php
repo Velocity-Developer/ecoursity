@@ -193,7 +193,27 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
                                     </template>
                                 </div>
                             <?php elseif ($type === 'image') : ?>
-                                <div class="ecoursity-settings__image" data-ecoursity-image-field>
+                                <?php
+                                $emptyImageLabel = (string) ($field['empty_label'] ?? __('Belum ada gambar.', 'ecoursity'));
+                                $uploadImageLabel = (string) ($field['button_label'] ?? __('Pilih Gambar', 'ecoursity'));
+                                $mediaTitle = sprintf(
+                                    /* translators: %s: setting field label */
+                                    __('Pilih %s', 'ecoursity'),
+                                    (string) $field['label']
+                                );
+                                $mediaButtonLabel = sprintf(
+                                    /* translators: %s: setting field label */
+                                    __('Gunakan %s Ini', 'ecoursity'),
+                                    (string) $field['label']
+                                );
+                                ?>
+                                <div
+                                    class="ecoursity-settings__image"
+                                    data-ecoursity-image-field
+                                    data-empty-label="<?php echo esc_attr($emptyImageLabel); ?>"
+                                    data-media-title="<?php echo esc_attr($mediaTitle); ?>"
+                                    data-media-button-label="<?php echo esc_attr($mediaButtonLabel); ?>"
+                                >
                                     <input
                                         id="<?php echo esc_attr($inputId); ?>"
                                         type="hidden"
@@ -205,12 +225,12 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
                                         <?php if (!empty($value)) : ?>
                                             <img src="<?php echo esc_url((string) $value); ?>" alt="<?php echo esc_attr($field['label']); ?>">
                                         <?php else : ?>
-                                            <span><?php echo esc_html__('Belum ada logo.', 'ecoursity'); ?></span>
+                                            <span><?php echo esc_html($emptyImageLabel); ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="ecoursity-settings__image-actions">
                                         <button type="button" class="button button-secondary" data-ecoursity-image-upload>
-                                            <?php echo esc_html__('Pilih Logo', 'ecoursity'); ?>
+                                            <?php echo esc_html($uploadImageLabel); ?>
                                         </button>
                                         <button type="button" class="button button-link-delete" data-ecoursity-image-remove <?php disabled(empty($value)); ?>>
                                             <?php echo esc_html__('Hapus', 'ecoursity'); ?>
@@ -318,7 +338,7 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
                 }
 
                 preview.classList.add('is-empty');
-                preview.textContent = '<?php echo esc_js(__('Belum ada logo.', 'ecoursity')); ?>';
+                preview.textContent = field.dataset.emptyLabel || '<?php echo esc_js(__('Belum ada gambar.', 'ecoursity')); ?>';
                 removeButton.disabled = true;
             };
 
@@ -333,9 +353,9 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
                 }
 
                 mediaFrame = wp.media({
-                    title: '<?php echo esc_js(__('Pilih Logo Brand', 'ecoursity')); ?>',
+                    title: field.dataset.mediaTitle || '<?php echo esc_js(__('Pilih Gambar', 'ecoursity')); ?>',
                     button: {
-                        text: '<?php echo esc_js(__('Gunakan Logo Ini', 'ecoursity')); ?>',
+                        text: field.dataset.mediaButtonLabel || '<?php echo esc_js(__('Gunakan Gambar Ini', 'ecoursity')); ?>',
                     },
                     library: {
                         type: 'image',

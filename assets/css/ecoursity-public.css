@@ -993,7 +993,7 @@
     line-height: 1.55;
 }
 
-.ecoursity-checkout__bank-empty {
+.ecoursity-checkout__payment-empty {
     padding: 14px;
     border: 1px solid var(--ecoursity-line);
     background: #f8fafc;
@@ -1020,7 +1020,7 @@
 }
 
 .ecoursity-checkout__bank-detail dt,
-.ecoursity-checkout__bank-empty {
+.ecoursity-checkout__payment-empty {
     color: var(--ecoursity-muted);
     font-size: 14px;
     line-height: 1.5;
@@ -1031,6 +1031,28 @@
     font-weight: 800;
     text-align: right;
     word-break: break-word;
+}
+
+.ecoursity-checkout__qris-detail {
+    margin-top: 8px;
+}
+
+.ecoursity-checkout__qris {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 220px);
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid var(--ecoursity-line);
+    background: #ffffff;
+}
+
+.ecoursity-checkout__qris img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
 }
 
 .ecoursity-checkout__summary {

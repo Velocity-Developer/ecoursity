@@ -12,6 +12,8 @@ defined('ABSPATH') || exit;
 
 $coursesUrl = get_post_type_archive_link('ecoursity_course') ?: home_url('/');
 $loginUrl = wp_login_url(get_permalink());
+$qrisImage = esc_url_raw((string) \Ecoursity\App\Models\Setting::get('qris_image', ''));
+$qrisNmid = sanitize_text_field((string) \Ecoursity\App\Models\Setting::get('qris_nmid', ''));
 $bankAccounts = \Ecoursity\App\Models\Setting::get('bank_transfer_accounts', []);
 
 if (!is_array($bankAccounts)) {
@@ -34,13 +36,13 @@ $bankAccounts = array_values(array_filter(array_map(static function (mixed $acco
 
 foreach ($bankAccounts as $index => $bankAccount) {
     $bankAccounts[$index]['payment'] = sanitize_text_field(sprintf(
-        'Transfer Bank - %s%s',
+        'transfer_bank - %s%s',
         $bankAccount['bank'],
         $bankAccount['norek'] !== '' ? ' - ' . $bankAccount['norek'] : ''
     ));
 }
 
-$defaultPayment = (string) ($bankAccounts[0]['payment'] ?? '');
+$defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 'QRIS' : ''));
 
 ?>
 
@@ -183,9 +185,36 @@ $defaultPayment = (string) ($bankAccounts[0]['payment'] ?? '');
                                     </span>
                                 </label>
                             <?php endforeach; ?>
-                        <?php else : ?>
-                            <div class="ecoursity-checkout__bank-empty">
-                                <?php esc_html_e('Rekening bank belum tersedia. Silakan hubungi admin untuk instruksi pembayaran.', 'ecoursity'); ?>
+                        <?php endif; ?>
+
+                        <?php if ($qrisImage !== '') : ?>
+                            <label class="ecoursity-checkout__payment">
+                                <input
+                                    type="radio"
+                                    name="ecoursity_payment"
+                                    value="qris"
+                                    x-model="payment">
+                                <span>
+                                    <strong><?php esc_html_e('QRIS', 'ecoursity'); ?></strong>
+                                    <small><?php esc_html_e('Scan QRIS berikut untuk melakukan pembayaran.', 'ecoursity'); ?></small>
+                                    <?php if ($qrisNmid !== '') : ?>
+                                        <dl class="ecoursity-checkout__bank-detail ecoursity-checkout__qris-detail">
+                                            <div>
+                                                <dt><?php esc_html_e('NMID', 'ecoursity'); ?></dt>
+                                                <dd><?php echo esc_html($qrisNmid); ?></dd>
+                                            </div>
+                                        </dl>
+                                    <?php endif; ?>
+                                    <span class="ecoursity-checkout__qris">
+                                        <img src="<?php echo esc_url($qrisImage); ?>" alt="<?php echo esc_attr__('QRIS Pembayaran', 'ecoursity'); ?>">
+                                    </span>
+                                </span>
+                            </label>
+                        <?php endif; ?>
+
+                        <?php if (empty($bankAccounts) && $qrisImage === '') : ?>
+                            <div class="ecoursity-checkout__payment-empty">
+                                <?php esc_html_e('Metode pembayaran belum tersedia. Silakan hubungi admin untuk instruksi pembayaran.', 'ecoursity'); ?>
                             </div>
                         <?php endif; ?>
                     </div>
