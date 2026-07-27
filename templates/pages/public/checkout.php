@@ -190,7 +190,7 @@ $checkoutNonce = is_user_logged_in() ? $checkoutService->checkoutNonce(get_curre
                             x-bind:disabled="!canCheckout"
                             x-bind:aria-busy="processing ? 'true' : 'false'"
                             x-on:click="submit()">
-                            <span x-show="!processing"><?php esc_html_e('Buat Pesanan', 'ecoursity'); ?></span>
+                            <span x-show="!processing"><?php esc_html_e('Buat ', 'ecoursity'); ?></span>
                             <span x-show="processing"><?php esc_html_e('Memproses...', 'ecoursity'); ?></span>
                         </button>
                     <?php else : ?>

@@ -49,7 +49,7 @@ class MetaboxPostProvider
     {
         add_meta_box(
             'ecoursity-order-meta',
-            __('Detail Pesanan Kursus'),
+            __('Detail Order Kursus'),
             [$this, 'renderOrderMetaBox'],
             Order::POST_TYPE,
             'normal',
@@ -58,7 +58,7 @@ class MetaboxPostProvider
 
         add_meta_box(
             'ecoursity-order-items',
-            __('Item Pesanan'),
+            __('Item Order'),
             [$this, 'renderOrderItemsMetaBox'],
             Order::POST_TYPE,
             'normal',

@@ -38,7 +38,7 @@ class PostTypeProvider
         ]);
 
         register_post_type(Order::POST_TYPE, [
-            'labels' => $this->makeLabels(__('Pesanan Kursus')),
+            'labels' => $this->makeLabels(__('Order Kursus')),
             'public' => false,
             'has_archive' => false,
             'show_ui' => true,

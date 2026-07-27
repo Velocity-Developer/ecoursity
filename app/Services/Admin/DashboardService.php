@@ -34,7 +34,7 @@ class DashboardService
                 'icon' => 'dashicons dashicons-book',
             ],
             'orders' => [
-                'title' => __('Total Pesanan', 'ecoursity'),
+                'title' => __('Total Order', 'ecoursity'),
                 'value' => $totalOrders,
                 'meta' => sprintf(
                     /* translators: %d: completed order count */

@@ -64,8 +64,8 @@ class AdminRoutes
 
             add_submenu_page(
                 'ecoursity-dashboard',
-                __('Pesanan'),
-                __('Pesanan'),
+                __('Order'),
+                __('Order'),
                 'edit_posts',
                 'edit.php?post_type=ecoursity_order'
             );

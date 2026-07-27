@@ -55,7 +55,7 @@ $has_chart_data = !empty(array_filter($chart_data['orders'] ?? [])) || !empty(ar
                     <p class="ecoursity-dashboard__eyebrow"><?php echo esc_html__('30 hari terakhir', 'ecoursity'); ?></p>
                     <h2 class="ecoursity-dashboard__card-title"><?php echo esc_html__('Grafik Pembelian Kursus', 'ecoursity'); ?></h2>
                 </div>
-                <span class="ecoursity-dashboard__badge"><?php echo esc_html__('Pesanan', 'ecoursity'); ?></span>
+                <span class="ecoursity-dashboard__badge"><?php echo esc_html__('Order', 'ecoursity'); ?></span>
             </div>
 
             <div class="ecoursity-dashboard__chart-wrap">
@@ -120,7 +120,7 @@ $has_chart_data = !empty(array_filter($chart_data['orders'] ?? [])) || !empty(ar
                 labels: chartData.labels || [],
                 datasets: [{
                         type: 'bar',
-                        label: '<?php echo esc_js(__('Pesanan', 'ecoursity')); ?>',
+                        label: '<?php echo esc_js(__('Order', 'ecoursity')); ?>',
                         data: chartData.orders || [],
                         backgroundColor: 'rgba(2, 74, 216, 0.14)',
                         borderColor: '#024ad8',
