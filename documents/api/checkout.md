@@ -20,11 +20,11 @@ Membuat order dengan metode `checkout`, status awal `pending`, dan item dari car
 
 ```json
 {
-  "payment": "bank_transfer"
+  "payment": "transfer_bank"
 }
 ```
 
-`payment` opsional dan disimpan sebagai teks sederhana pada meta order.
+`payment` menerima `transfer_bank` atau `qris`. Jika dikosongkan, service memakai metode pertama yang tersedia dari pengaturan pembayaran.
 
 ### Response sukses
 
@@ -39,7 +39,7 @@ Membuat order dengan metode `checkout`, status awal `pending`, dan item dari car
     "order_method": "checkout",
     "order_status": "pending",
     "order_user": 7,
-    "order_payment": "bank_transfer",
+    "order_payment": "transfer_bank",
     "order_items": [
       {
         "id": 12,
@@ -50,12 +50,24 @@ Membuat order dengan metode `checkout`, status awal `pending`, dan item dari car
       }
     ],
     "order_subtotal": 75000,
-    "order_total": 75000
+    "order_total": 75000,
+    "payment_instructions": {
+      "type": "transfer_bank",
+      "label": "Transfer Bank",
+      "banks": [
+        {
+          "bank": "BCA",
+          "atasnama": "PT Ecoursity Indonesia",
+          "norek": "1234567890"
+        }
+      ]
+    }
   }
 }
 ```
 
 Setelah order berhasil dibuat, cart user akan dikosongkan.
+Daftar rekening bank atau gambar QRIS dikirim pada `payment_instructions` setelah checkout berhasil dibuat.
 
 ### Response gagal
 

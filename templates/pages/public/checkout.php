@@ -13,7 +13,6 @@ defined('ABSPATH') || exit;
 $coursesUrl = get_post_type_archive_link('ecoursity_course') ?: home_url('/');
 $loginUrl = wp_login_url(get_permalink());
 $qrisImage = esc_url_raw((string) \Ecoursity\App\Models\Setting::get('qris_image', ''));
-$qrisNmid = sanitize_text_field((string) \Ecoursity\App\Models\Setting::get('qris_nmid', ''));
 $bankAccounts = \Ecoursity\App\Models\Setting::get('bank_transfer_accounts', []);
 
 if (!is_array($bankAccounts)) {
@@ -35,14 +34,12 @@ $bankAccounts = array_values(array_filter(array_map(static function (mixed $acco
 }));
 
 foreach ($bankAccounts as $index => $bankAccount) {
-    $bankAccounts[$index]['payment'] = sanitize_text_field(sprintf(
-        'transfer_bank - %s%s',
-        $bankAccount['bank'],
-        $bankAccount['norek'] !== '' ? ' - ' . $bankAccount['norek'] : ''
-    ));
+    unset($bankAccounts[$index]['payment']);
 }
 
-$defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 'QRIS' : ''));
+$hasBankTransfer = !empty($bankAccounts);
+$hasQris = $qrisImage !== '';
+$defaultPayment = $hasBankTransfer ? 'transfer_bank' : ($hasQris ? 'qris' : '');
 
 ?>
 
@@ -135,9 +132,9 @@ $defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 
                                 </a>
 
                                 <div class="ecoursity-checkout__item-body">
-                                    <h3>
+                                    <div>
                                         <a x-bind:href="course.permalink" x-text="course.title"></a>
-                                    </h3>
+                                    </div>
                                     <div class="ecoursity-checkout__item-meta">
                                         <strong x-text="money(coursePrice(course))"></strong>
                                         <del x-show="Number(course.price_sale || 0) > 0" x-text="money(course.price)"></del>
@@ -149,7 +146,10 @@ $defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 
                                     class="ecoursity-checkout__remove"
                                     x-bind:disabled="cart.saving || processing"
                                     x-on:click="cart.remove(course.id)">
-                                    <?php esc_html_e('Hapus', 'ecoursity'); ?>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                    </svg>
                                 </button>
                             </article>
                         </template>
@@ -162,32 +162,20 @@ $defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 
                     </div>
 
                     <div class="ecoursity-checkout__payments">
-                        <?php if (!empty($bankAccounts)) : ?>
-                            <?php foreach ($bankAccounts as $bankAccount) : ?>
-                                <label class="ecoursity-checkout__payment">
-                                    <input
-                                        type="radio"
-                                        name="ecoursity_payment"
-                                        value="<?php echo esc_attr($bankAccount['payment']); ?>"
-                                        x-model="payment">
-                                    <span>
-                                        <strong><?php echo esc_html($bankAccount['bank']); ?></strong>
-                                        <dl class="ecoursity-checkout__bank-detail">
-                                            <div>
-                                                <dt><?php esc_html_e('Atas Nama', 'ecoursity'); ?></dt>
-                                                <dd><?php echo esc_html($bankAccount['atasnama']); ?></dd>
-                                            </div>
-                                            <div>
-                                                <dt><?php esc_html_e('No. Rekening', 'ecoursity'); ?></dt>
-                                                <dd><?php echo esc_html($bankAccount['norek']); ?></dd>
-                                            </div>
-                                        </dl>
-                                    </span>
-                                </label>
-                            <?php endforeach; ?>
+                        <?php if ($hasBankTransfer) : ?>
+                            <label class="ecoursity-checkout__payment">
+                                <input
+                                    type="radio"
+                                    name="ecoursity_payment"
+                                    value="transfer_bank"
+                                    x-model="payment">
+                                <span>
+                                    <strong><?php esc_html_e('Transfer Bank', 'ecoursity'); ?></strong>
+                                </span>
+                            </label>
                         <?php endif; ?>
 
-                        <?php if ($qrisImage !== '') : ?>
+                        <?php if ($hasQris) : ?>
                             <label class="ecoursity-checkout__payment">
                                 <input
                                     type="radio"
@@ -196,23 +184,11 @@ $defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 
                                     x-model="payment">
                                 <span>
                                     <strong><?php esc_html_e('QRIS', 'ecoursity'); ?></strong>
-                                    <small><?php esc_html_e('Scan QRIS berikut untuk melakukan pembayaran.', 'ecoursity'); ?></small>
-                                    <?php if ($qrisNmid !== '') : ?>
-                                        <dl class="ecoursity-checkout__bank-detail ecoursity-checkout__qris-detail">
-                                            <div>
-                                                <dt><?php esc_html_e('NMID', 'ecoursity'); ?></dt>
-                                                <dd><?php echo esc_html($qrisNmid); ?></dd>
-                                            </div>
-                                        </dl>
-                                    <?php endif; ?>
-                                    <span class="ecoursity-checkout__qris">
-                                        <img src="<?php echo esc_url($qrisImage); ?>" alt="<?php echo esc_attr__('QRIS Pembayaran', 'ecoursity'); ?>">
-                                    </span>
                                 </span>
                             </label>
                         <?php endif; ?>
 
-                        <?php if (empty($bankAccounts) && $qrisImage === '') : ?>
+                        <?php if (!$hasBankTransfer && !$hasQris) : ?>
                             <div class="ecoursity-checkout__payment-empty">
                                 <?php esc_html_e('Metode pembayaran belum tersedia. Silakan hubungi admin untuk instruksi pembayaran.', 'ecoursity'); ?>
                             </div>
@@ -266,6 +242,46 @@ $defaultPayment = (string) ($bankAccounts[0]['payment'] ?? ($qrisImage !== '' ? 
                     <div class="ecoursity-checkout__success" x-show="order" x-cloak>
                         <span><?php esc_html_e('Nomor Pesanan', 'ecoursity'); ?></span>
                         <strong x-text="order?.order_number || ''"></strong>
+
+                        <div
+                            class="ecoursity-checkout__instruction"
+                            x-show="order?.payment_instructions?.type"
+                            x-cloak>
+                            <h3 x-text="order?.payment_instructions?.label || ''"></h3>
+                            <template x-if="order?.payment_instructions?.type === 'transfer_bank'">
+                                <div class="ecoursity-checkout__instruction-list">
+                                    <template x-for="bank in (order?.payment_instructions?.banks || [])" x-bind:key="`${bank.bank}-${bank.norek}`">
+                                        <dl class="ecoursity-checkout__bank-detail">
+                                            <div>
+                                                <dt><?php esc_html_e('Bank', 'ecoursity'); ?></dt>
+                                                <dd x-text="bank.bank || '-'"></dd>
+                                            </div>
+                                            <div>
+                                                <dt><?php esc_html_e('Atas Nama', 'ecoursity'); ?></dt>
+                                                <dd x-text="bank.atasnama || '-'"></dd>
+                                            </div>
+                                            <div>
+                                                <dt><?php esc_html_e('No. Rekening', 'ecoursity'); ?></dt>
+                                                <dd x-text="bank.norek || '-'"></dd>
+                                            </div>
+                                        </dl>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="order?.payment_instructions?.type === 'qris'">
+                                <div>
+                                    <dl class="ecoursity-checkout__bank-detail ecoursity-checkout__qris-detail" x-show="order?.payment_instructions?.qris_nmid">
+                                        <div>
+                                            <dt><?php esc_html_e('NMID', 'ecoursity'); ?></dt>
+                                            <dd x-text="order?.payment_instructions?.qris_nmid || ''"></dd>
+                                        </div>
+                                    </dl>
+                                    <span class="ecoursity-checkout__qris" x-show="order?.payment_instructions?.qris_image">
+                                        <img x-bind:src="order?.payment_instructions?.qris_image || ''" alt="<?php echo esc_attr__('QRIS Pembayaran', 'ecoursity'); ?>">
+                                    </span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </aside>

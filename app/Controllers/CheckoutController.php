@@ -60,6 +60,7 @@ class CheckoutController
             'order_items' => $order->order_items,
             'order_subtotal' => (float) $order->order_subtotal,
             'order_total' => (float) $order->order_total,
+            'payment_instructions' => $this->checkoutService->paymentInstructions($order->order_payment),
         ];
     }
 }
