@@ -14,6 +14,12 @@ Daftar shortcode yang tersedia di Ecoursity.
 - Deskripsi: Menampilkan layout checkout publik.
 - Dokumentasi detail: `documents/shortcodes/ecoursity-checkout.md`
 
+## `[ecoursity-cart-icon]`
+
+- Lokasi: `app/Shortcodes/CartIconShortcode.php`
+- Deskripsi: Menampilkan icon cart dengan jumlah item cart.
+- Dokumentasi detail: `documents/shortcodes/ecoursity-cart-icon.md`
+
 ## `[ecoursity-course-card]`
 
 - Lokasi: `app/Shortcodes/CourseCardShortcode.php`

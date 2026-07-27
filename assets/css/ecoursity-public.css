@@ -27,6 +27,57 @@
     text-decoration: none;
 }
 
+.ecoursity-cart-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: #1f2937;
+    text-decoration: none;
+}
+
+.ecoursity-cart-icon:hover,
+.ecoursity-cart-icon:focus {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.ecoursity-cart-icon__glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.ecoursity-cart-icon__glyph svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.ecoursity-cart-icon__count {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+
 .ecoursity-course-archive {
     --ecoursity-text: #1f2937;
     --ecoursity-muted: #6b7280;
