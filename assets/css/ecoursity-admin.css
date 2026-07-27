@@ -759,6 +759,46 @@
     gap: 10px;
 }
 
+.ecoursity-settings__repeater {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.ecoursity-settings__repeater-table-wrap {
+    width: 100%;
+}
+
+.ecoursity-settings__repeater-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.ecoursity-settings__repeater-table th,
+.ecoursity-settings__repeater-table td {
+    padding: 8px;
+    vertical-align: middle;
+}
+
+.ecoursity-settings__repeater-table input.regular-text {
+    min-height: 34px;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.ecoursity-settings__repeater-actions {
+    width: 74px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.ecoursity-settings__repeater-empty {
+    margin: 0;
+}
+
 @media (max-width: 782px) {
     .ecoursity-settings__tabs {
         display: flex;
@@ -778,5 +818,34 @@
 
     .ecoursity-settings__table th {
         width: auto;
+    }
+
+    .ecoursity-settings__repeater {
+        max-width: 100%;
+    }
+
+    .ecoursity-settings__repeater-table,
+    .ecoursity-settings__repeater-table thead,
+    .ecoursity-settings__repeater-table tbody,
+    .ecoursity-settings__repeater-table tr,
+    .ecoursity-settings__repeater-table th,
+    .ecoursity-settings__repeater-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .ecoursity-settings__repeater-table thead {
+        display: none;
+    }
+
+    .ecoursity-settings__repeater-table tr {
+        margin-bottom: 10px;
+        border: 1px solid #dcdcde;
+        background: #ffffff;
+    }
+
+    .ecoursity-settings__repeater-actions {
+        width: 100%;
     }
 }

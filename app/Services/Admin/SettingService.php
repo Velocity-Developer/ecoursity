@@ -46,6 +46,7 @@ class SettingService
             'email' => sanitize_email((string) $value),
             'image' => esc_url_raw((string) $value),
             'number' => $this->sanitizeNumber($field, $value),
+            'repeater' => $this->sanitizeRepeater($field, $value),
             'select' => $this->sanitizeSelect($field, $value),
             'textarea' => sanitize_textarea_field((string) $value),
             default => sanitize_text_field((string) $value),
@@ -77,5 +78,43 @@ class SettingService
         }
 
         return (string) ($field['default'] ?? '');
+    }
+
+    private function sanitizeRepeater(array $field, mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $subFields = $field['fields'] ?? [];
+
+        if (!is_array($subFields)) {
+            return [];
+        }
+
+        $rows = [];
+
+        foreach ($value as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $sanitizedRow = [];
+
+            foreach ($subFields as $subField) {
+                if (!is_array($subField) || empty($subField['key'])) {
+                    continue;
+                }
+
+                $key = (string) $subField['key'];
+                $sanitizedRow[$key] = sanitize_text_field((string) ($row[$key] ?? ''));
+            }
+
+            if (array_filter($sanitizedRow, static fn (string $item): bool => $item !== '')) {
+                $rows[] = $sanitizedRow;
+            }
+        }
+
+        return array_values($rows);
     }
 }

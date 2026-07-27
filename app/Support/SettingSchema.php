@@ -78,6 +78,35 @@ class SettingSchema
                             'after' => __('Setelah harga', 'ecoursity'),
                         ],
                     ],
+                    [
+                        'key' => 'bank_transfer_accounts',
+                        'label' => __('Daftar Bank Transfer', 'ecoursity'),
+                        'type' => 'repeater',
+                        'default' => [],
+                        'description' => __('Rekening bank yang ditampilkan untuk metode pembayaran transfer bank.', 'ecoursity'),
+                        'button_label' => __('Tambah Bank', 'ecoursity'),
+                        'empty_label' => __('Belum ada rekening bank.', 'ecoursity'),
+                        'fields' => [
+                            [
+                                'key' => 'bank',
+                                'label' => __('Bank', 'ecoursity'),
+                                'type' => 'text',
+                                'placeholder' => __('BCA', 'ecoursity'),
+                            ],
+                            [
+                                'key' => 'atasnama',
+                                'label' => __('Atas Nama', 'ecoursity'),
+                                'type' => 'text',
+                                'placeholder' => __('PT Ecoursity Indonesia', 'ecoursity'),
+                            ],
+                            [
+                                'key' => 'norek',
+                                'label' => __('No. Rekening', 'ecoursity'),
+                                'type' => 'text',
+                                'placeholder' => __('1234567890', 'ecoursity'),
+                            ],
+                        ],
+                    ],
                 ],
             ],
             'email' => [

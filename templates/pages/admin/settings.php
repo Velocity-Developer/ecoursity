@@ -106,6 +106,92 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
                                     ]);
                                     ?>
                                 </div>
+                            <?php elseif ($type === 'repeater') : ?>
+                                <?php
+                                $rows = is_array($value) ? array_values($value) : [];
+                                $subFields = is_array($field['fields'] ?? null) ? $field['fields'] : [];
+                                $templateIndex = '__INDEX__';
+                                ?>
+                                <div
+                                    class="ecoursity-settings__repeater"
+                                    data-ecoursity-repeater
+                                    data-field-key="<?php echo esc_attr($key); ?>"
+                                >
+                                    <div class="ecoursity-settings__repeater-table-wrap">
+                                        <table class="widefat striped ecoursity-settings__repeater-table">
+                                            <thead>
+                                                <tr>
+                                                    <?php foreach ($subFields as $subField) : ?>
+                                                        <th><?php echo esc_html((string) ($subField['label'] ?? '')); ?></th>
+                                                    <?php endforeach; ?>
+                                                    <th class="ecoursity-settings__repeater-actions">
+                                                        <?php echo esc_html__('Aksi', 'ecoursity'); ?>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-ecoursity-repeater-rows>
+                                                <?php foreach ($rows as $rowIndex => $row) : ?>
+                                                    <?php $row = is_array($row) ? $row : []; ?>
+                                                    <tr data-ecoursity-repeater-row>
+                                                        <?php foreach ($subFields as $subField) : ?>
+                                                            <?php
+                                                            $subKey = (string) ($subField['key'] ?? '');
+                                                            $subType = (string) ($subField['type'] ?? 'text');
+                                                            ?>
+                                                            <td>
+                                                                <input
+                                                                    type="<?php echo esc_attr($subType === 'number' ? 'number' : 'text'); ?>"
+                                                                    name="ecoursity_settings[<?php echo esc_attr($key); ?>][<?php echo esc_attr((string) $rowIndex); ?>][<?php echo esc_attr($subKey); ?>]"
+                                                                    value="<?php echo esc_attr((string) ($row[$subKey] ?? '')); ?>"
+                                                                    placeholder="<?php echo esc_attr((string) ($subField['placeholder'] ?? '')); ?>"
+                                                                    class="regular-text"
+                                                                >
+                                                            </td>
+                                                        <?php endforeach; ?>
+                                                        <td class="ecoursity-settings__repeater-actions">
+                                                            <button type="button" class="button button-link-delete" data-ecoursity-repeater-remove>
+                                                                <?php echo esc_html__('Hapus', 'ecoursity'); ?>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <p class="description ecoursity-settings__repeater-empty" data-ecoursity-repeater-empty <?php echo empty($rows) ? '' : 'hidden'; ?>>
+                                        <?php echo esc_html((string) ($field['empty_label'] ?? __('Belum ada data.', 'ecoursity'))); ?>
+                                    </p>
+
+                                    <button type="button" class="button button-secondary" data-ecoursity-repeater-add>
+                                        <?php echo esc_html((string) ($field['button_label'] ?? __('Tambah', 'ecoursity'))); ?>
+                                    </button>
+
+                                    <template data-ecoursity-repeater-template>
+                                        <tr data-ecoursity-repeater-row>
+                                            <?php foreach ($subFields as $subField) : ?>
+                                                <?php
+                                                $subKey = (string) ($subField['key'] ?? '');
+                                                $subType = (string) ($subField['type'] ?? 'text');
+                                                ?>
+                                                <td>
+                                                    <input
+                                                        type="<?php echo esc_attr($subType === 'number' ? 'number' : 'text'); ?>"
+                                                        name="ecoursity_settings[<?php echo esc_attr($key); ?>][<?php echo esc_attr($templateIndex); ?>][<?php echo esc_attr($subKey); ?>]"
+                                                        value=""
+                                                        placeholder="<?php echo esc_attr((string) ($subField['placeholder'] ?? '')); ?>"
+                                                        class="regular-text"
+                                                    >
+                                                </td>
+                                            <?php endforeach; ?>
+                                            <td class="ecoursity-settings__repeater-actions">
+                                                <button type="button" class="button button-link-delete" data-ecoursity-repeater-remove>
+                                                    <?php echo esc_html__('Hapus', 'ecoursity'); ?>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </div>
                             <?php elseif ($type === 'image') : ?>
                                 <div class="ecoursity-settings__image" data-ecoursity-image-field>
                                     <input
@@ -158,6 +244,54 @@ $fieldValue = static function (array $values, string $key, mixed $default = ''):
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-ecoursity-repeater]').forEach((repeater) => {
+            const rows = repeater.querySelector('[data-ecoursity-repeater-rows]');
+            const template = repeater.querySelector('[data-ecoursity-repeater-template]');
+            const addButton = repeater.querySelector('[data-ecoursity-repeater-add]');
+            const empty = repeater.querySelector('[data-ecoursity-repeater-empty]');
+
+            if (!rows || !template || !addButton) {
+                return;
+            }
+
+            const syncEmptyState = () => {
+                if (!empty) {
+                    return;
+                }
+
+                empty.hidden = rows.querySelectorAll('[data-ecoursity-repeater-row]').length > 0;
+            };
+
+            const nextIndex = () => String(Date.now() + rows.querySelectorAll('[data-ecoursity-repeater-row]').length);
+
+            addButton.addEventListener('click', () => {
+                const wrapper = document.createElement('tbody');
+
+                wrapper.innerHTML = template.innerHTML.replaceAll('__INDEX__', nextIndex());
+                rows.append(...wrapper.children);
+                syncEmptyState();
+            });
+
+            rows.addEventListener('click', (event) => {
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const removeButton = target.closest('[data-ecoursity-repeater-remove]');
+
+                if (!removeButton) {
+                    return;
+                }
+
+                removeButton.closest('[data-ecoursity-repeater-row]')?.remove();
+                syncEmptyState();
+            });
+
+            syncEmptyState();
+        });
+
         document.querySelectorAll('[data-ecoursity-image-field]').forEach((field) => {
             const input = field.querySelector('[data-ecoursity-image-input]');
             const preview = field.querySelector('[data-ecoursity-image-preview]');
