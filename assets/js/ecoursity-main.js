@@ -1,4 +1,112 @@
 (() => {
+    const getAuthHeaders = (includeJson = false) => {
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+        };
+
+        if (includeJson) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        if (window.ecoursity?.restNonce) {
+            headers['X-WP-Nonce'] = window.ecoursity.restNonce;
+        }
+
+        return headers;
+    };
+
+    const registerCheckoutFunction = () => {
+        if (window.__ecoursityCheckoutFunctionRegistered) {
+            return;
+        }
+
+        window.__ecoursityCheckoutFunctionRegistered = true;
+
+        const state = {
+            processing: false,
+            message: '',
+            messageType: 'success',
+            order: null,
+        };
+
+        const fail = (message) => {
+            state.message = message;
+            state.messageType = 'error';
+
+            window.dispatchEvent(new CustomEvent('ecoursity:checkout-failed', {
+                detail: {
+                    message,
+                },
+            }));
+        };
+
+        const succeed = (message, order) => {
+            state.message = message;
+            state.messageType = 'success';
+            state.order = order;
+
+            window.dispatchEvent(new CustomEvent('ecoursity:checkout-created', {
+                detail: {
+                    order,
+                },
+            }));
+        };
+
+        const checkout = async (payment = '') => {
+            if (state.processing) {
+                return false;
+            }
+
+            state.processing = true;
+            state.message = '';
+            state.order = null;
+
+            window.dispatchEvent(new CustomEvent('ecoursity:checkout-started'));
+
+            try {
+                const response = await fetch(`${window.ecoursity?.restUrl || '/wp-json/ecoursity/v1/'}checkout/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({
+                        payment: String(payment || ''),
+                    }),
+                    credentials: 'same-origin',
+                });
+                const json = await response.json();
+
+                if (!response.ok || json.success === false) {
+                    throw new Error(json.message || 'Checkout gagal.');
+                }
+
+                if (window.Alpine?.store('EcoursityCart')) {
+                    window.Alpine.store('EcoursityCart').sync({
+                        items: [],
+                        courses: [],
+                        count: 0,
+                    });
+                }
+
+                succeed(json.message || 'Checkout berhasil dibuat.', json.data || null);
+
+                return json.data || true;
+            } catch (error) {
+                fail(error.message || 'Checkout gagal.');
+
+                return false;
+            } finally {
+                state.processing = false;
+            }
+        };
+
+        window.EcoursityCheckout = state;
+        window.ecoursityCheckout = checkout;
+        window.chekout = checkout;
+
+        if (!window.checkout) {
+            window.checkout = checkout;
+        }
+    };
+
     const registerCartStore = () => {
         if (!window.Alpine) {
             return;
@@ -191,19 +299,7 @@
             },
 
             getAuthHeaders(includeJson = false) {
-                const headers = {
-                    'X-Requested-With': 'XMLHttpRequest',
-                };
-
-                if (includeJson) {
-                    headers['Content-Type'] = 'application/json';
-                }
-
-                if (window.ecoursity?.restNonce) {
-                    headers['X-WP-Nonce'] = window.ecoursity.restNonce;
-                }
-
-                return headers;
+                return getAuthHeaders(includeJson);
             },
         });
     };
@@ -251,19 +347,7 @@
                 this.lesson.section_id = parseInt(this.lesson.section_id, 10) || 0;
             },
             getAuthHeaders(includeJson = false) {
-                const headers = {
-                    'X-Requested-With': 'XMLHttpRequest',
-                };
-
-                if (includeJson) {
-                    headers['Content-Type'] = 'application/json';
-                }
-
-                if (window.ecoursity?.restNonce) {
-                    headers['X-WP-Nonce'] = window.ecoursity.restNonce;
-                }
-
-                return headers;
+                return getAuthHeaders(includeJson);
             },
             initTinyMce() {
                 const id = 'ecoursity_lesson_content';
@@ -371,8 +455,10 @@
         }));
     };
 
+    registerCheckoutFunction();
     registerCartStore();
     registerLessonForm();
+    document.addEventListener('alpine:init', registerCheckoutFunction);
     document.addEventListener('alpine:init', registerCartStore);
     document.addEventListener('alpine:init', registerLessonForm);
 })();
