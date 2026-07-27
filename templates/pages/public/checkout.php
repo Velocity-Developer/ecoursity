@@ -12,13 +12,42 @@ defined('ABSPATH') || exit;
 
 $coursesUrl = get_post_type_archive_link('ecoursity_course') ?: home_url('/');
 $loginUrl = wp_login_url(get_permalink());
+$bankAccounts = \Ecoursity\App\Models\Setting::get('bank_transfer_accounts', []);
+
+if (!is_array($bankAccounts)) {
+    $bankAccounts = [];
+}
+
+$bankAccounts = array_values(array_filter(array_map(static function (mixed $account): array {
+    if (!is_array($account)) {
+        return [];
+    }
+
+    return [
+        'bank' => sanitize_text_field((string) ($account['bank'] ?? '')),
+        'atasnama' => sanitize_text_field((string) ($account['atasnama'] ?? '')),
+        'norek' => sanitize_text_field((string) ($account['norek'] ?? '')),
+    ];
+}, $bankAccounts), static function (array $account): bool {
+    return $account['bank'] !== '' || $account['atasnama'] !== '' || $account['norek'] !== '';
+}));
+
+foreach ($bankAccounts as $index => $bankAccount) {
+    $bankAccounts[$index]['payment'] = sanitize_text_field(sprintf(
+        'Transfer Bank - %s%s',
+        $bankAccount['bank'],
+        $bankAccount['norek'] !== '' ? ' - ' . $bankAccount['norek'] : ''
+    ));
+}
+
+$defaultPayment = (string) ($bankAccounts[0]['payment'] ?? '');
 
 ?>
 
 <div
     class="ecoursity-checkout"
     x-data="{
-        payment: 'bank_transfer',
+        payment: '<?php echo esc_js($defaultPayment); ?>',
         processing: false,
         message: '',
         messageType: 'success',
@@ -40,7 +69,7 @@ $loginUrl = wp_login_url(get_permalink());
             return this.cart.courses.reduce((total, course) => total + this.coursePrice(course), 0);
         },
         get canCheckout() {
-            return !this.processing && !this.cart.loading && this.cart.count > 0;
+            return !this.processing && !this.cart.loading && this.cart.count > 0 && this.payment !== '';
         },
         coursePrice(course) {
             const sale = Number(course.price_sale || 0);
@@ -131,21 +160,34 @@ $loginUrl = wp_login_url(get_permalink());
                     </div>
 
                     <div class="ecoursity-checkout__payments">
-                        <label class="ecoursity-checkout__payment">
-                            <input type="radio" name="ecoursity_payment" value="bank_transfer" x-model="payment">
-                            <span>
-                                <strong><?php esc_html_e('Transfer Bank', 'ecoursity'); ?></strong>
-                                <small><?php esc_html_e('Pesanan dibuat dengan status pending untuk dikonfirmasi admin.', 'ecoursity'); ?></small>
-                            </span>
-                        </label>
-
-                        <label class="ecoursity-checkout__payment">
-                            <input type="radio" name="ecoursity_payment" value="manual_confirmation" x-model="payment">
-                            <span>
-                                <strong><?php esc_html_e('Konfirmasi Manual', 'ecoursity'); ?></strong>
-                                <small><?php esc_html_e('Gunakan pilihan ini jika pembayaran akan diatur di luar sistem.', 'ecoursity'); ?></small>
-                            </span>
-                        </label>
+                        <?php if (!empty($bankAccounts)) : ?>
+                            <?php foreach ($bankAccounts as $bankAccount) : ?>
+                                <label class="ecoursity-checkout__payment">
+                                    <input
+                                        type="radio"
+                                        name="ecoursity_payment"
+                                        value="<?php echo esc_attr($bankAccount['payment']); ?>"
+                                        x-model="payment">
+                                    <span>
+                                        <strong><?php echo esc_html($bankAccount['bank']); ?></strong>
+                                        <dl class="ecoursity-checkout__bank-detail">
+                                            <div>
+                                                <dt><?php esc_html_e('Atas Nama', 'ecoursity'); ?></dt>
+                                                <dd><?php echo esc_html($bankAccount['atasnama']); ?></dd>
+                                            </div>
+                                            <div>
+                                                <dt><?php esc_html_e('No. Rekening', 'ecoursity'); ?></dt>
+                                                <dd><?php echo esc_html($bankAccount['norek']); ?></dd>
+                                            </div>
+                                        </dl>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <div class="ecoursity-checkout__bank-empty">
+                                <?php esc_html_e('Rekening bank belum tersedia. Silakan hubungi admin untuk instruksi pembayaran.', 'ecoursity'); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

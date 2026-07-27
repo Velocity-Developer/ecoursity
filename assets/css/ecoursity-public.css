@@ -993,6 +993,46 @@
     line-height: 1.55;
 }
 
+.ecoursity-checkout__bank-empty {
+    padding: 14px;
+    border: 1px solid var(--ecoursity-line);
+    background: #f8fafc;
+}
+
+.ecoursity-checkout__bank-detail {
+    display: grid;
+    gap: 8px;
+    margin: 6px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--ecoursity-line);
+}
+
+.ecoursity-checkout__bank-detail div {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.ecoursity-checkout__bank-detail dt,
+.ecoursity-checkout__bank-detail dd {
+    margin: 0;
+}
+
+.ecoursity-checkout__bank-detail dt,
+.ecoursity-checkout__bank-empty {
+    color: var(--ecoursity-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ecoursity-checkout__bank-detail dd {
+    color: var(--ecoursity-text);
+    font-weight: 800;
+    text-align: right;
+    word-break: break-word;
+}
+
 .ecoursity-checkout__summary {
     position: sticky;
     top: 32px;
