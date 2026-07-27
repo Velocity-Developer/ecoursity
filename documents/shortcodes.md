@@ -8,6 +8,12 @@ Daftar shortcode yang tersedia di Ecoursity.
 - Deskripsi: Menampilkan tombol beli atau ambil course.
 - Dokumentasi detail: `documents/shortcodes/ecoursity-button-buy-course.md`
 
+## `[ecoursity-checkout]`
+
+- Lokasi: `app/Shortcodes/CheckoutShortcode.php`
+- Deskripsi: Menampilkan layout checkout publik.
+- Dokumentasi detail: `documents/shortcodes/ecoursity-checkout.md`
+
 ## `[ecoursity-course-card]`
 
 - Lokasi: `app/Shortcodes/CourseCardShortcode.php`
