@@ -706,17 +706,375 @@
     text-align: right;
 }
 
+.ecoursity-checkout {
+    --ecoursity-text: #1f2937;
+    --ecoursity-muted: #6b7280;
+    --ecoursity-line: #e5e7eb;
+    --ecoursity-soft: #f8fafc;
+    --ecoursity-primary: #2563eb;
+    --ecoursity-primary-dark: #1d4ed8;
+    --ecoursity-accent: #059669;
+    color: var(--ecoursity-text);
+    background: #ffffff;
+    font-family: inherit;
+}
+
+.ecoursity-checkout__hero {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.ecoursity-checkout__hero-inner,
+.ecoursity-checkout__content {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.ecoursity-checkout__hero-inner {
+    padding: 48px 0 56px;
+}
+
+.ecoursity-checkout__eyebrow {
+    margin: 0 0 12px;
+    color: #93c5fd;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.ecoursity-checkout__title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 46px;
+    line-height: 1.12;
+    letter-spacing: 0;
+}
+
+.ecoursity-checkout__description {
+    max-width: 680px;
+    margin: 16px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.ecoursity-checkout__content {
+    padding: 42px 0 72px;
+}
+
+.ecoursity-checkout__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 30px;
+    align-items: start;
+}
+
+.ecoursity-checkout__main,
+.ecoursity-checkout__summary-box {
+    border: 1px solid var(--ecoursity-line);
+    background: #ffffff;
+}
+
+.ecoursity-checkout__section + .ecoursity-checkout__section {
+    border-top: 1px solid var(--ecoursity-line);
+}
+
+.ecoursity-checkout__section {
+    padding: 28px;
+}
+
+.ecoursity-checkout__section-heading {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ecoursity-checkout__section-heading h2,
+.ecoursity-checkout__summary-box h2 {
+    margin: 0;
+    color: var(--ecoursity-text);
+    font-size: 24px;
+    line-height: 1.25;
+    letter-spacing: 0;
+}
+
+.ecoursity-checkout__section-heading span {
+    color: var(--ecoursity-muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ecoursity-checkout__notice,
+.ecoursity-checkout__empty {
+    padding: 26px;
+    border: 1px solid var(--ecoursity-line);
+    background: var(--ecoursity-soft);
+}
+
+.ecoursity-checkout__empty {
+    text-align: center;
+}
+
+.ecoursity-checkout__empty h2 {
+    margin: 0 0 10px;
+    color: var(--ecoursity-text);
+    font-size: 24px;
+    line-height: 1.25;
+}
+
+.ecoursity-checkout__empty p {
+    margin: 0 0 18px;
+    color: var(--ecoursity-muted);
+}
+
+.ecoursity-checkout__link-button,
+.ecoursity-checkout__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 20px;
+    border: 1px solid var(--ecoursity-primary);
+    border-radius: 6px;
+    background: var(--ecoursity-primary);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ecoursity-checkout__link-button:hover,
+.ecoursity-checkout__button:hover {
+    background: var(--ecoursity-primary-dark);
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.ecoursity-checkout__button {
+    width: 100%;
+    margin-top: 22px;
+}
+
+.ecoursity-checkout__button[disabled] {
+    border-color: #94a3b8;
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.ecoursity-checkout__items {
+    display: grid;
+    gap: 14px;
+}
+
+.ecoursity-checkout__item {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid var(--ecoursity-line);
+    background: #ffffff;
+}
+
+.ecoursity-checkout__item-media {
+    display: block;
+    overflow: hidden;
+    background: var(--ecoursity-soft);
+}
+
+.ecoursity-checkout__item-media img,
+.ecoursity-checkout__item-media span {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+}
+
+.ecoursity-checkout__item-media span {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(5, 150, 105, 0.14));
+}
+
+.ecoursity-checkout__item-body {
+    min-width: 0;
+}
+
+.ecoursity-checkout__item-body h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    line-height: 1.35;
+    letter-spacing: 0;
+}
+
+.ecoursity-checkout__item-body a {
+    color: var(--ecoursity-text);
+    text-decoration: none;
+}
+
+.ecoursity-checkout__item-body a:hover,
+.ecoursity-checkout__item-body a:focus {
+    color: var(--ecoursity-primary);
+}
+
+.ecoursity-checkout__item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.ecoursity-checkout__item-meta strong {
+    color: var(--ecoursity-text);
+    font-size: 17px;
+}
+
+.ecoursity-checkout__item-meta del {
+    color: var(--ecoursity-muted);
+    font-size: 14px;
+}
+
+.ecoursity-checkout__remove {
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #b91c1c;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ecoursity-checkout__remove:hover {
+    background: #fef2f2;
+}
+
+.ecoursity-checkout__payments {
+    display: grid;
+    gap: 12px;
+}
+
+.ecoursity-checkout__payment {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 16px;
+    border: 1px solid var(--ecoursity-line);
+    cursor: pointer;
+}
+
+.ecoursity-checkout__payment:has(input:checked) {
+    border-color: var(--ecoursity-primary);
+    background: #eff6ff;
+}
+
+.ecoursity-checkout__payment input {
+    margin-top: 4px;
+}
+
+.ecoursity-checkout__payment span {
+    display: grid;
+    gap: 5px;
+}
+
+.ecoursity-checkout__payment strong {
+    color: var(--ecoursity-text);
+}
+
+.ecoursity-checkout__payment small {
+    color: var(--ecoursity-muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.ecoursity-checkout__summary {
+    position: sticky;
+    top: 32px;
+}
+
+.ecoursity-checkout__summary-box {
+    padding: 24px;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
+}
+
+.ecoursity-checkout__summary-box h2 {
+    margin-bottom: 18px;
+}
+
+.ecoursity-checkout__summary-row,
+.ecoursity-checkout__summary-total {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-top: 1px solid var(--ecoursity-line);
+}
+
+.ecoursity-checkout__summary-row span,
+.ecoursity-checkout__summary-total span {
+    color: var(--ecoursity-muted);
+}
+
+.ecoursity-checkout__summary-total strong {
+    font-size: 24px;
+}
+
+.ecoursity-checkout__message {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.ecoursity-checkout__message.is-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.ecoursity-checkout__success {
+    display: grid;
+    gap: 5px;
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+}
+
+.ecoursity-checkout__success span {
+    color: #166534;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.ecoursity-checkout__success strong {
+    color: #14532d;
+    font-size: 18px;
+}
+
 @media (max-width: 960px) {
     .ecoursity-course-archive__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .ecoursity-course-layout {
+    .ecoursity-course-layout,
+    .ecoursity-checkout__layout {
         grid-template-columns: 1fr;
         margin-top: 0;
     }
 
-    .ecoursity-course-sidebar {
+    .ecoursity-course-sidebar,
+    .ecoursity-checkout__summary {
         position: static;
         order: -1;
     }
@@ -724,15 +1082,19 @@
 
 @media (max-width: 640px) {
     .ecoursity-course-archive__hero-inner,
-    .ecoursity-course-archive__content {
+    .ecoursity-course-archive__content,
+    .ecoursity-checkout__hero-inner,
+    .ecoursity-checkout__content {
         width: min(100% - 22px, 1180px);
     }
 
-    .ecoursity-course-archive__hero-inner {
+    .ecoursity-course-archive__hero-inner,
+    .ecoursity-checkout__hero-inner {
         padding: 38px 0 44px;
     }
 
-    .ecoursity-course-archive__title {
+    .ecoursity-course-archive__title,
+    .ecoursity-checkout__title {
         font-size: 34px;
     }
 
@@ -792,5 +1154,25 @@
 
     .ecoursity-instructor {
         flex-direction: column;
+    }
+
+    .ecoursity-checkout__section,
+    .ecoursity-checkout__summary-box {
+        padding: 20px 16px;
+    }
+
+    .ecoursity-checkout__section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .ecoursity-checkout__item {
+        grid-template-columns: 86px minmax(0, 1fr);
+    }
+
+    .ecoursity-checkout__remove {
+        grid-column: 1 / -1;
+        width: 100%;
     }
 }
