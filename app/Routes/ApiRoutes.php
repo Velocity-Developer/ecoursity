@@ -3,6 +3,7 @@
 namespace Ecoursity\App\Routes;
 
 use Ecoursity\App\Controllers\CartController;
+use Ecoursity\App\Controllers\CheckoutController;
 use Ecoursity\App\Controllers\CourseController;
 use Ecoursity\App\Controllers\FileController;
 use Ecoursity\App\Controllers\LessonController;
@@ -83,6 +84,12 @@ class ApiRoutes
                 'route' => '/cart/(?P<course_id>\d+)',
                 'callback' => [CartController::class, 'delete'],
                 'methods' => 'DELETE',
+                'permission_callback' => '__return_true',
+            ],
+            [
+                'route' => '/checkout/',
+                'callback' => [CheckoutController::class, 'store'],
+                'methods' => 'POST',
                 'permission_callback' => '__return_true',
             ],
             [

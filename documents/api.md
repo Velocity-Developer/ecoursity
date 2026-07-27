@@ -44,6 +44,12 @@ Daftar API yang tersedia di Ecoursity.
 - Deskripsi: Hapus satu course dari cart.
 - Dokumentasi detail: `documents/api/cart.md`
 
+## `POST /wp-json/ecoursity/v1/checkout/`
+
+- Lokasi: `app/Routes/ApiRoutes.php`
+- Deskripsi: Buat order checkout dari isi cart user login.
+- Dokumentasi detail: `documents/api/checkout.md`
+
 ## `GET /wp-json/ecoursity/v1/courses/`
 
 - Lokasi: `app/Routes/ApiRoutes.php`
