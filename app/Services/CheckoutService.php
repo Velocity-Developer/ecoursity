@@ -17,6 +17,7 @@ class CheckoutService
 {
     public const PAYMENT_TRANSFER_BANK = 'transfer_bank';
     public const PAYMENT_QRIS = 'qris';
+    private const CHECKOUT_NONCE_TRANSIENT_PREFIX = 'ecoursity_checkout_nonce_';
 
     public function paymentOptions(): array
     {
@@ -44,7 +45,25 @@ class CheckoutService
         ));
     }
 
-    public function checkout(int $userId, string $payment = ''): Order
+    public function checkoutNonce(int $userId): string
+    {
+        if ($userId < 1) {
+            return '';
+        }
+
+        $nonce = wp_generate_password(32, false, false);
+        $lifetime = (int) apply_filters('ecoursity_checkout_nonce_lifetime', 30 * MINUTE_IN_SECONDS);
+
+        set_transient(
+            $this->checkoutNonceTransientKey($userId),
+            wp_hash($nonce),
+            max(MINUTE_IN_SECONDS, $lifetime)
+        );
+
+        return $nonce;
+    }
+
+    public function checkout(int $userId, string $payment = '', string $checkoutNonce = ''): Order
     {
         if ($userId < 1) {
             throw new InvalidArgumentException('You must login before checkout.');
@@ -57,6 +76,7 @@ class CheckoutService
         }
 
         $payment = $this->normalizePayment($payment);
+        $this->verifyAndConsumeCheckoutNonce($userId, $checkoutNonce);
         $subtotal = $this->calculateSubtotal($items);
         $order = new Order([
             'order_method' => Order::METHOD_CHECKOUT,
@@ -132,6 +152,24 @@ class CheckoutService
         }
 
         return $payment;
+    }
+
+    private function verifyAndConsumeCheckoutNonce(int $userId, string $nonce): void
+    {
+        $nonce = sanitize_text_field($nonce);
+        $transientKey = $this->checkoutNonceTransientKey($userId);
+        $storedHash = get_transient($transientKey);
+
+        if (!is_string($storedHash) || $storedHash === '' || $nonce === '' || !hash_equals($storedHash, wp_hash($nonce))) {
+            throw new InvalidArgumentException('Checkout session is expired. Please reload the checkout page.');
+        }
+
+        delete_transient($transientKey);
+    }
+
+    private function checkoutNonceTransientKey(int $userId): string
+    {
+        return self::CHECKOUT_NONCE_TRANSIENT_PREFIX . absint($userId);
     }
 
     private function availablePayments(): array

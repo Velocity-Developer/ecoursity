@@ -15,6 +15,7 @@ $loginUrl = wp_login_url(get_permalink());
 $checkoutService = new \Ecoursity\App\Services\CheckoutService();
 $paymentOptions = $checkoutService->paymentOptions();
 $defaultPayment = (string) array_key_first($paymentOptions);
+$checkoutNonce = is_user_logged_in() ? $checkoutService->checkoutNonce(get_current_user_id()) : '';
 
 ?>
 
@@ -22,6 +23,7 @@ $defaultPayment = (string) array_key_first($paymentOptions);
     class="ecoursity-checkout"
     x-data="{
         payment: '<?php echo esc_js($defaultPayment); ?>',
+        checkoutNonce: '<?php echo esc_js($checkoutNonce); ?>',
         processing: false,
         message: '',
         messageType: 'success',
@@ -67,7 +69,7 @@ $defaultPayment = (string) array_key_first($paymentOptions);
             this.message = '';
             this.order = null;
 
-            const order = await chekout(this.payment);
+            const order = await chekout(this.payment, this.checkoutNonce);
 
             this.processing = false;
             this.message = window.EcoursityCheckout?.message || '';

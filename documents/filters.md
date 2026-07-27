@@ -19,3 +19,8 @@ Daftar filter yang tersedia di Ecoursity.
 - Lokasi: `app/Services/CheckoutService.php`
 - Deskripsi: Mengubah instruksi pembayaran yang dikirim setelah checkout berhasil diproses.
 - Dokumentasi detail: `documents/filters/ecoursity_checkout_payment_options.md`
+
+## `ecoursity_checkout_nonce_lifetime`
+
+- Lokasi: `app/Services/CheckoutService.php`
+- Deskripsi: Mengubah durasi valid one-time checkout nonce dalam satuan detik.

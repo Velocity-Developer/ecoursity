@@ -20,13 +20,15 @@ Membuat order dengan metode `checkout`, status awal `pending`, dan item dari car
 
 ```json
 {
-  "payment": "transfer_bank"
+  "payment": "transfer_bank",
+  "checkout_nonce": "one-time-checkout-token"
 }
 ```
 
 `payment` menerima key metode pembayaran yang tersedia dari `CheckoutService::paymentOptions()`.
 Default bawaan adalah `transfer_bank` dan `qris` jika masing-masing sudah dikonfigurasi.
 Jika dikosongkan, service memakai metode pertama yang tersedia dari pengaturan pembayaran.
+`checkout_nonce` wajib dikirim dari halaman checkout dan hanya dapat digunakan satu kali untuk mencegah checkout ganda.
 
 ### Response sukses
 
@@ -90,6 +92,16 @@ Cart kosong:
 {
   "success": false,
   "message": "Cart is empty.",
+  "errors": {}
+}
+```
+
+Nonce checkout tidak valid atau sudah terpakai:
+
+```json
+{
+  "success": false,
+  "message": "Checkout session is expired. Please reload the checkout page.",
   "errors": {}
 }
 ```

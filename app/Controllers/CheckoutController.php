@@ -24,7 +24,8 @@ class CheckoutController
         try {
             $order = $this->checkoutService->checkout(
                 get_current_user_id(),
-                sanitize_text_field((string) ($request->get_param('payment') ?? ''))
+                sanitize_text_field((string) ($request->get_param('payment') ?? '')),
+                sanitize_text_field((string) ($request->get_param('checkout_nonce') ?? ''))
             );
 
             return new WP_REST_Response([

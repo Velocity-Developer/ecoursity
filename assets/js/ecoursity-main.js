@@ -52,7 +52,7 @@
             }));
         };
 
-        const checkout = async (payment = '') => {
+        const checkout = async (payment = '', checkoutNonce = '') => {
             if (state.processing) {
                 return false;
             }
@@ -69,6 +69,7 @@
                     headers: getAuthHeaders(true),
                     body: JSON.stringify({
                         payment: String(payment || ''),
+                        checkout_nonce: String(checkoutNonce || ''),
                     }),
                     credentials: 'same-origin',
                 });
