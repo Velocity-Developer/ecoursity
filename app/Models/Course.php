@@ -148,9 +148,9 @@ class Course
     /**
      * Thumbnail.
      */
-    public function thumbnail(): string
+    public function thumbnail($size = 'large'): string
     {
-        return get_the_post_thumbnail_url($this->id, 'large') ?: '';
+        return get_the_post_thumbnail_url($this->id, $size) ?: '';
     }
 
     /**

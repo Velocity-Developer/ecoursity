@@ -125,7 +125,7 @@ class CartController
             'slug' => (string) $course->slug,
             'price' => (string) $course->price,
             'price_sale' => (string) $course->price_sale,
-            'thumbnail' => $course->thumbnail(),
+            'thumbnail' => $course->thumbnail('thumbnail'),
             'permalink' => (string) get_permalink((int) $course->id),
         ];
     }

@@ -18,6 +18,32 @@ class CheckoutService
     public const PAYMENT_TRANSFER_BANK = 'transfer_bank';
     public const PAYMENT_QRIS = 'qris';
 
+    public function paymentOptions(): array
+    {
+        $options = [];
+
+        if ($this->bankAccounts() !== []) {
+            $options[self::PAYMENT_TRANSFER_BANK] = [
+                'key' => self::PAYMENT_TRANSFER_BANK,
+                'label' => __('Transfer Bank', 'ecoursity'),
+                'description' => __('Detail rekening akan ditampilkan setelah checkout diproses.', 'ecoursity'),
+            ];
+        }
+
+        if (esc_url_raw((string) Setting::get('qris_image', '')) !== '') {
+            $options[self::PAYMENT_QRIS] = [
+                'key' => self::PAYMENT_QRIS,
+                'label' => __('QRIS', 'ecoursity'),
+                'description' => __('Gambar QRIS akan ditampilkan setelah checkout diproses.', 'ecoursity'),
+            ];
+        }
+
+        return $this->sanitizePaymentOptions((array) apply_filters(
+            'ecoursity_checkout_payment_options',
+            $options
+        ));
+    }
+
     public function checkout(int $userId, string $payment = ''): Order
     {
         if ($userId < 1) {
@@ -57,23 +83,39 @@ class CheckoutService
         $payment = sanitize_key($payment);
 
         if ($payment === self::PAYMENT_TRANSFER_BANK) {
-            return [
+            $instructions = [
                 'type' => self::PAYMENT_TRANSFER_BANK,
                 'label' => __('Transfer Bank', 'ecoursity'),
                 'banks' => $this->bankAccounts(),
             ];
+
+            return (array) apply_filters(
+                'ecoursity_checkout_payment_instructions',
+                $instructions,
+                $payment
+            );
         }
 
         if ($payment === self::PAYMENT_QRIS) {
-            return [
+            $instructions = [
                 'type' => self::PAYMENT_QRIS,
                 'label' => __('QRIS', 'ecoursity'),
                 'qris_image' => esc_url_raw((string) Setting::get('qris_image', '')),
                 'qris_nmid' => sanitize_text_field((string) Setting::get('qris_nmid', '')),
             ];
+
+            return (array) apply_filters(
+                'ecoursity_checkout_payment_instructions',
+                $instructions,
+                $payment
+            );
         }
 
-        return [];
+        return (array) apply_filters(
+            'ecoursity_checkout_payment_instructions',
+            [],
+            $payment
+        );
     }
 
     private function normalizePayment(string $payment): string
@@ -94,17 +136,38 @@ class CheckoutService
 
     private function availablePayments(): array
     {
-        $payments = [];
+        return array_keys($this->paymentOptions());
+    }
 
-        if ($this->bankAccounts() !== []) {
-            $payments[] = self::PAYMENT_TRANSFER_BANK;
+    private function sanitizePaymentOptions(array $options): array
+    {
+        $sanitizedOptions = [];
+
+        foreach ($options as $key => $option) {
+            if (!is_array($option)) {
+                continue;
+            }
+
+            $paymentKey = sanitize_key((string) ($option['key'] ?? $key));
+
+            if ($paymentKey === '') {
+                continue;
+            }
+
+            $label = sanitize_text_field((string) ($option['label'] ?? $paymentKey));
+
+            if ($label === '') {
+                $label = $paymentKey;
+            }
+
+            $sanitizedOptions[$paymentKey] = [
+                'key' => $paymentKey,
+                'label' => $label,
+                'description' => sanitize_text_field((string) ($option['description'] ?? '')),
+            ];
         }
 
-        if (esc_url_raw((string) Setting::get('qris_image', '')) !== '') {
-            $payments[] = self::PAYMENT_QRIS;
-        }
-
-        return $payments;
+        return $sanitizedOptions;
     }
 
     private function bankAccounts(): array

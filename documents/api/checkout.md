@@ -24,7 +24,9 @@ Membuat order dengan metode `checkout`, status awal `pending`, dan item dari car
 }
 ```
 
-`payment` menerima `transfer_bank` atau `qris`. Jika dikosongkan, service memakai metode pertama yang tersedia dari pengaturan pembayaran.
+`payment` menerima key metode pembayaran yang tersedia dari `CheckoutService::paymentOptions()`.
+Default bawaan adalah `transfer_bank` dan `qris` jika masing-masing sudah dikonfigurasi.
+Jika dikosongkan, service memakai metode pertama yang tersedia dari pengaturan pembayaran.
 
 ### Response sukses
 
@@ -68,6 +70,7 @@ Membuat order dengan metode `checkout`, status awal `pending`, dan item dari car
 
 Setelah order berhasil dibuat, cart user akan dikosongkan.
 Daftar rekening bank atau gambar QRIS dikirim pada `payment_instructions` setelah checkout berhasil dibuat.
+Metode pembayaran dapat ditambah melalui filter `ecoursity_checkout_payment_options`, dan instruksi setelah checkout dapat diubah melalui `ecoursity_checkout_payment_instructions`.
 
 ### Response gagal
 
