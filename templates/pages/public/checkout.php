@@ -62,16 +62,6 @@ $loginUrl = wp_login_url(get_permalink());
             this.order = order || null;
         },
     }">
-    <section class="ecoursity-checkout__hero">
-        <div class="ecoursity-checkout__hero-inner">
-            <p class="ecoursity-checkout__eyebrow"><?php esc_html_e('Checkout', 'ecoursity'); ?></p>
-            <h1 class="ecoursity-checkout__title"><?php esc_html_e('Selesaikan Pembelian Kursus', 'ecoursity'); ?></h1>
-            <p class="ecoursity-checkout__description">
-                <?php esc_html_e('Periksa kembali kursus yang dipilih sebelum membuat pesanan.', 'ecoursity'); ?>
-            </p>
-        </div>
-    </section>
-
     <section class="ecoursity-checkout__content">
         <div class="ecoursity-checkout__layout">
             <div class="ecoursity-checkout__main">
