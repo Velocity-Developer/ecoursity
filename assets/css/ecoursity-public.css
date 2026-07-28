@@ -2,6 +2,117 @@
     display: none !important;
 }
 
+/* ── Login Form ── */
+.ecoursity-login-form {
+    width: 100%;
+    max-width: 400px;
+    font-family: inherit;
+}
+
+.ecoursity-login-form form {
+    display: grid;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.ecoursity-login-form label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ecoursity-ink);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.ecoursity-login-form input[type="text"],
+.ecoursity-login-form input[type="password"] {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--ecoursity-steel);
+    border-radius: var(--ecoursity-radius-md);
+    background: var(--ecoursity-canvas-light);
+    color: var(--ecoursity-ink);
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.5;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+}
+
+.ecoursity-login-form input[type="text"]:focus,
+.ecoursity-login-form input[type="password"]:focus {
+    border-color: var(--ecoursity-primary);
+    box-shadow: 0 0 0 3px var(--ecoursity-primary-soft);
+}
+
+.ecoursity-login-form input[type="text"]::placeholder,
+.ecoursity-login-form input[type="password"]::placeholder {
+    color: var(--ecoursity-graphite);
+}
+
+.ecoursity-login-form .login-username,
+.ecoursity-login-form .login-password {
+    display: grid;
+    gap: 0;
+    margin: 0;
+}
+
+.ecoursity-login-form .login-remember {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+    font-size: 14px;
+    color: var(--ecoursity-graphite);
+}
+
+.ecoursity-login-form input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--ecoursity-primary);
+}
+
+.ecoursity-login-form .login-submit {
+    display: grid;
+    gap: 0;
+    margin: 0;
+}
+
+.ecoursity-login-form input[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 24px;
+    border: 1px solid var(--ecoursity-primary);
+    border-radius: var(--ecoursity-radius-md);
+    background: var(--ecoursity-primary);
+    color: var(--ecoursity-on-primary);
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ecoursity-login-form input[type="submit"]:hover {
+    background: var(--ecoursity-primary-deep);
+    border-color: var(--ecoursity-primary-deep);
+}
+
+.ecoursity-login-form .login-username label,
+.ecoursity-login-form .login-password label {
+    display: none;
+}
+
 .ecoursity-buy-course-button {
     display: inline-flex;
     align-items: center;
