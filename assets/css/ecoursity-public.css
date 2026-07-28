@@ -1434,3 +1434,101 @@
         width: 100%;
     }
 }
+
+/* ── Instructor Card ── */
+.ecoursity-instructor-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 32px 24px;
+    border: 1px solid var(--ecoursity-line);
+    background: #ffffff;
+}
+
+.ecoursity-instructor-card__media {
+    margin-bottom: 18px;
+}
+
+.ecoursity-instructor-card__avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.ecoursity-instructor-card__avatar-fallback {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: var(--ecoursity-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ecoursity-instructor-card__avatar-initial {
+    color: var(--ecoursity-muted);
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.ecoursity-instructor-card__name {
+    margin: 0 0 18px;
+    color: var(--ecoursity-text);
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.ecoursity-instructor-card__stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 20px;
+    padding: 16px 0;
+    border-top: 1px solid var(--ecoursity-line);
+    border-bottom: 1px solid var(--ecoursity-line);
+    width: 100%;
+    justify-content: center;
+}
+
+.ecoursity-instructor-card__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.ecoursity-instructor-card__stat-value {
+    color: var(--ecoursity-text);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.ecoursity-instructor-card__stat-label {
+    color: var(--ecoursity-muted);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ecoursity-instructor-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: 1px solid var(--ecoursity-primary);
+    background: var(--ecoursity-primary);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.ecoursity-instructor-card__link:hover {
+    background: var(--ecoursity-primary-dark);
+    border-color: var(--ecoursity-primary-dark);
+    color: #ffffff;
+}
