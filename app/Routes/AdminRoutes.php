@@ -12,6 +12,7 @@ class AdminRoutes
 
     public function register()
     {
+        add_action('parent_file', [$this, 'setParentFile']);
 
         add_action('admin_menu', function () {
             foreach ($this->routes() as $route) {
@@ -84,6 +85,28 @@ class AdminRoutes
                 'edit-tags.php?taxonomy=ecoursity_course_tag'
             );
         });
+    }
+
+    public function setParentFile($parent_file)
+    {
+        if (!is_admin()) {
+            return $parent_file;
+        }
+
+        $screen = get_current_screen();
+        if (!$screen) {
+            return $parent_file;
+        }
+
+        $taxonomies = ['ecoursity_course_category', 'ecoursity_course_tag'];
+        $post_type = $screen->post_type ?? '';
+        $taxonomy = $screen->taxonomy ?? '';
+
+        if ($post_type === 'ecoursity_order' || in_array($taxonomy, $taxonomies, true)) {
+            return 'ecoursity-dashboard';
+        }
+
+        return $parent_file;
     }
 
     public function routes(): array
