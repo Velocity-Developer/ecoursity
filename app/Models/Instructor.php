@@ -7,6 +7,7 @@ namespace Ecoursity\App\Models;
 defined('ABSPATH') || exit;
 
 use Ecoursity\App\Models\Course;
+use WP_Query;
 
 class Instructor extends User
 {

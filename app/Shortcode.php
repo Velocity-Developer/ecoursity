@@ -22,6 +22,7 @@ use Ecoursity\App\Shortcodes\CourseTabsShortcode;
 use Ecoursity\App\Shortcodes\CourseTitleShortcode;
 use Ecoursity\App\Shortcodes\CourseUrlShortcode;
 use Ecoursity\App\Shortcodes\InstructorCardShortcode;
+use Ecoursity\App\Shortcodes\InstructorsArchiveShortcode;
 use Ecoursity\App\Shortcodes\LoginFormShortcode;
 
 class Shortcode
@@ -52,5 +53,6 @@ class Shortcode
         add_shortcode('ecoursity-form-login', [LoginFormShortcode::class, 'render']);
         add_shortcode('ecoursity-course-sidebar', [CourseSidebarShortcode::class, 'render']);
         add_shortcode('ecoursity-instructor-card', [InstructorCardShortcode::class, 'render']);
+        add_shortcode('ecoursity-instructors', [InstructorsArchiveShortcode::class, 'render']);
     }
 }
