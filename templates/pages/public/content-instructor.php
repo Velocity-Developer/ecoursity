@@ -27,31 +27,9 @@ $fullName     = $displayName ?: trim($firstName . ' ' . $lastName);
 $avatarUrl = get_avatar_url($instructorId, ['size' => 160]);
 $profileUrl = get_author_posts_url($instructorId);
 
-// Course count
-$courseQuery = new WP_Query([
-    'post_type'      => 'ecoursity_course',
-    'post_status'    => 'publish',
-    'author'         => $instructorId,
-    'posts_per_page' => -1,
-    'fields'         => 'ids',
-]);
-$courseCount = (int) $courseQuery->found_posts;
-
-// Student count: sum _ecoursity_enrolled_count across all courses
-$studentCount = 0;
-if (!empty($courseQuery->posts)) {
-    global $wpdb;
-    $ids  = implode(',', array_map('intval', $courseQuery->posts));
-    $meta = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id IN ({$ids}) AND meta_key = %s",
-            '_ecoursity_enrolled_count'
-        )
-    );
-    foreach ($meta as $row) {
-        $studentCount += (int) $row->meta_value;
-    }
-}
+// Get counts from Instructor model
+$courseCount = Instructor::countCourses($instructorId);
+$studentCount = Instructor::countStudents($instructorId);
 ?>
 
 <article class="ecoursity-instructor-card" itemscope itemtype="https://schema.org/Person">
