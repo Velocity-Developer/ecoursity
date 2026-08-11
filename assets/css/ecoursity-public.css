@@ -2,6 +2,297 @@
     display: none !important;
 }
 
+.ecoursity-profile {
+    --ecoursity-profile-text: #1f2937;
+    --ecoursity-profile-muted: #6b7280;
+    --ecoursity-profile-line: #e5e7eb;
+    --ecoursity-profile-soft: #f8fafc;
+    --ecoursity-profile-primary: #2563eb;
+    --ecoursity-profile-primary-dark: #1d4ed8;
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 42px 0 72px;
+    color: var(--ecoursity-profile-text);
+    font-family: inherit;
+}
+
+.ecoursity-profile__hero,
+.ecoursity-profile__stats,
+.ecoursity-profile__layout {
+    display: grid;
+    gap: 24px;
+}
+
+.ecoursity-profile__hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: 32px;
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.ecoursity-profile__identity {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    min-width: 0;
+}
+
+.ecoursity-profile__avatar {
+    width: 96px;
+    height: 96px;
+    border: 3px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.ecoursity-profile__eyebrow {
+    margin: 0 0 8px;
+    color: #93c5fd;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.ecoursity-profile h1,
+.ecoursity-profile h2,
+.ecoursity-profile p {
+    letter-spacing: 0;
+}
+
+.ecoursity-profile h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 38px;
+    line-height: 1.15;
+}
+
+.ecoursity-profile__identity p:last-child,
+.ecoursity-profile__auth p:last-of-type {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.6;
+}
+
+.ecoursity-profile__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.ecoursity-profile__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--ecoursity-profile-primary);
+    border-radius: 6px;
+    background: var(--ecoursity-profile-primary);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.ecoursity-profile__button:hover,
+.ecoursity-profile__button:focus {
+    border-color: var(--ecoursity-profile-primary-dark);
+    background: var(--ecoursity-profile-primary-dark);
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.ecoursity-profile__button--secondary {
+    border-color: rgba(255, 255, 255, 0.42);
+    background: transparent;
+}
+
+.ecoursity-profile__button--secondary:hover,
+.ecoursity-profile__button--secondary:focus {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.ecoursity-profile__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ecoursity-profile__stat,
+.ecoursity-profile__panel {
+    border: 1px solid var(--ecoursity-profile-line);
+    background: #ffffff;
+}
+
+.ecoursity-profile__stat {
+    padding: 22px;
+}
+
+.ecoursity-profile__stat span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ecoursity-profile-muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.ecoursity-profile__stat strong {
+    color: var(--ecoursity-profile-text);
+    font-size: 30px;
+    line-height: 1.1;
+}
+
+.ecoursity-profile__layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+}
+
+.ecoursity-profile__panel {
+    padding: 24px;
+}
+
+.ecoursity-profile__panel h2 {
+    margin: 0 0 18px;
+    color: var(--ecoursity-profile-text);
+    font-size: 24px;
+    line-height: 1.25;
+}
+
+.ecoursity-profile__panel-heading {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ecoursity-profile__panel-heading h2 {
+    margin: 0;
+}
+
+.ecoursity-profile__panel-heading span {
+    color: var(--ecoursity-profile-muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ecoursity-profile__empty {
+    padding: 24px;
+    border: 1px solid var(--ecoursity-profile-line);
+    background: var(--ecoursity-profile-soft);
+}
+
+.ecoursity-profile__empty p {
+    margin: 0 0 14px;
+    color: var(--ecoursity-profile-muted);
+    line-height: 1.7;
+}
+
+.ecoursity-profile__empty a {
+    color: var(--ecoursity-profile-primary);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.ecoursity-profile__details {
+    display: grid;
+    gap: 0;
+    margin: 0;
+}
+
+.ecoursity-profile__details div {
+    display: grid;
+    gap: 5px;
+    padding: 14px 0;
+    border-top: 1px solid var(--ecoursity-profile-line);
+}
+
+.ecoursity-profile__details dt,
+.ecoursity-profile__details dd {
+    margin: 0;
+}
+
+.ecoursity-profile__details dt {
+    color: var(--ecoursity-profile-muted);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.ecoursity-profile__details dd {
+    color: var(--ecoursity-profile-text);
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.ecoursity-profile__auth {
+    padding: 34px;
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.ecoursity-profile__auth h2 {
+    max-width: 720px;
+    margin: 0;
+    color: #ffffff;
+    font-size: 34px;
+    line-height: 1.2;
+}
+
+.ecoursity-profile__auth .ecoursity-profile__actions {
+    margin-top: 22px;
+}
+
+@media (max-width: 960px) {
+    .ecoursity-profile__hero,
+    .ecoursity-profile__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ecoursity-profile__hero {
+        align-items: start;
+    }
+
+    .ecoursity-profile__stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .ecoursity-profile {
+        width: min(100% - 22px, 1180px);
+        padding: 32px 0 52px;
+    }
+
+    .ecoursity-profile__hero,
+    .ecoursity-profile__panel,
+    .ecoursity-profile__auth {
+        padding: 22px 16px;
+    }
+
+    .ecoursity-profile__identity {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ecoursity-profile h1,
+    .ecoursity-profile__auth h2 {
+        font-size: 30px;
+    }
+
+    .ecoursity-profile__stats {
+        grid-template-columns: 1fr;
+    }
+
+    .ecoursity-profile__panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+
 /* ── Login Form ── */
 .ecoursity-login-form {
     width: 100%;

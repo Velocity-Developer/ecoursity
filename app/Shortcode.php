@@ -26,6 +26,7 @@ use Ecoursity\App\Shortcodes\InstructorCoursesShortcode;
 use Ecoursity\App\Shortcodes\InstructorHeroShortcode;
 use Ecoursity\App\Shortcodes\InstructorsArchiveShortcode;
 use Ecoursity\App\Shortcodes\LoginFormShortcode;
+use Ecoursity\App\Shortcodes\ProfileShortcode;
 
 class Shortcode
 {
@@ -58,5 +59,6 @@ class Shortcode
         add_shortcode('ecoursity-instructors', [InstructorsArchiveShortcode::class, 'render']);
         add_shortcode('ecoursity-instructor-hero', [InstructorHeroShortcode::class, 'render']);
         add_shortcode('ecoursity-instructor-courses', [InstructorCoursesShortcode::class, 'render']);
+        add_shortcode('ecoursity-profile', [ProfileShortcode::class, 'render']);
     }
 }
