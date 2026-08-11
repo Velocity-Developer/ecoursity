@@ -153,9 +153,42 @@ abstract class CourseSingleShortcodeSupport
 
     protected static function authorName(Course $course): string
     {
-        $author = get_userdata((int) $course->author);
+        $authorId = self::authorId($course);
 
-        return $author ? $author->display_name : get_the_author();
+        if ($authorId < 1) {
+            $fallbackName = trim((string) get_the_author());
+
+            return $fallbackName !== '' ? $fallbackName : __('Instruktur Ecoursity', 'ecoursity');
+        }
+
+        $name = trim((string) get_the_author_meta('display_name', $authorId));
+
+        if ($name !== '') {
+            return $name;
+        }
+
+        $firstName = trim((string) get_the_author_meta('first_name', $authorId));
+        $lastName = trim((string) get_the_author_meta('last_name', $authorId));
+        $name = trim($firstName . ' ' . $lastName);
+
+        if ($name !== '') {
+            return $name;
+        }
+
+        $userLogin = trim((string) get_the_author_meta('user_login', $authorId));
+
+        return $userLogin !== '' ? $userLogin : __('Instruktur Ecoursity', 'ecoursity');
+    }
+
+    protected static function authorId(Course $course): int
+    {
+        $authorId = (int) $course->author;
+
+        if ($authorId < 1 && $course->id) {
+            $authorId = (int) get_post_field('post_author', (int) $course->id);
+        }
+
+        return $authorId;
     }
 
     protected static function faqs(Course $course): array

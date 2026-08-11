@@ -17,12 +17,13 @@ class CourseHeroShortcode extends CourseSingleShortcodeSupport
         }
 
         $categoryLabel = self::categoryLabel($course);
+        $authorId = self::authorId($course);
         $authorName = self::authorName($course);
-        $avatar = get_avatar_url((int) $course->author, ['size' => 96]);
-        $lessonCount = self::lessonCount($course);
+        $avatar = $authorId > 0 ? get_avatar_url($authorId, ['size' => 96]) : '';
+        $lastUpdated = get_the_modified_date('', (int) $course->id);
 
         ob_start();
-        ?>
+?>
         <section class="ecoursity-course-hero">
             <div class="ecoursity-course-hero__inner">
                 <div class="ecoursity-course-hero__content">
@@ -32,7 +33,6 @@ class CourseHeroShortcode extends CourseSingleShortcodeSupport
                         <span><?php echo esc_html($categoryLabel); ?></span>
                     </div>
 
-                    <p class="ecoursity-course-hero__category"><?php echo esc_html($categoryLabel); ?></p>
                     <h1 class="ecoursity-course-hero__title"><?php echo esc_html(get_the_title((int) $course->id)); ?></h1>
 
                     <?php if ($course->excerpt !== '') : ?>
@@ -46,14 +46,14 @@ class CourseHeroShortcode extends CourseSingleShortcodeSupport
                             <?php endif; ?>
                             <span><?php echo esc_html(sprintf(__('Oleh %s', 'ecoursity'), $authorName)); ?></span>
                         </div>
-                        <span><?php echo esc_html(self::formatLevel($course->level)); ?></span>
-                        <span><?php echo esc_html(self::formatDuration($course->duration)); ?></span>
-                        <span><?php echo esc_html(self::formatLessonCount($lessonCount)); ?></span>
+                        <span>
+                            <?php echo esc_html(sprintf(__('Terakhir diperbarui %s', 'ecoursity'), $lastUpdated)); ?>
+                        </span>
                     </div>
                 </div>
             </div>
         </section>
-        <?php
+<?php
 
         return (string) ob_get_clean();
     }

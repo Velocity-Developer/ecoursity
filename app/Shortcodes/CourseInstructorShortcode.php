@@ -16,8 +16,10 @@ class CourseInstructorShortcode extends CourseSingleShortcodeSupport
             return '';
         }
 
+        $authorId = self::authorId($course);
         $authorName = self::authorName($course);
-        $avatar = get_avatar_url((int) $course->author, ['size' => 96]);
+        $avatar = $authorId > 0 ? get_avatar_url($authorId, ['size' => 96]) : '';
+        $description = $authorId > 0 ? get_the_author_meta('description', $authorId) : '';
 
         ob_start();
         ?>
@@ -27,7 +29,7 @@ class CourseInstructorShortcode extends CourseSingleShortcodeSupport
             <?php endif; ?>
             <div>
                 <h3><?php echo esc_html($authorName); ?></h3>
-                <p><?php echo esc_html(get_the_author_meta('description', (int) $course->author) ?: __('Instruktur kursus ini.', 'ecoursity')); ?></p>
+                <p><?php echo esc_html($description ?: __('Instruktur kursus ini.', 'ecoursity')); ?></p>
             </div>
         </div>
         <?php
