@@ -8,6 +8,7 @@ use Ecoursity\App\Providers\EnqueueProvider;
 use Ecoursity\App\Providers\UserServiceProvider;
 use Ecoursity\App\Providers\MetaboxPostProvider;
 use Ecoursity\App\Providers\TemplateProvider;
+use Ecoursity\App\Providers\LoginProvider;
 use Ecoursity\App\Routes\AdminRoutes;
 use Ecoursity\App\Routes\ApiRoutes;
 use Ecoursity\App\Shortcode;
@@ -24,6 +25,7 @@ class Init
         (new MetaboxPostProvider())->boot();
         (new ApiRoutes())->boot();
         (new TemplateProvider())->boot();
+        (new LoginProvider())->boot();
         (new Shortcode())->boot();
     }
 }
