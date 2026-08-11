@@ -55,6 +55,21 @@ class TemplateProvider
             }
         }
 
+        // Single instructor author page
+        if (is_author()) {
+            $author = get_queried_object();
+
+            if ($author instanceof \WP_User
+                && in_array('ecoursity_instructor', $author->roles, true)
+            ) {
+                $instructorTemplate = Template::get('pages/public/single-instructor');
+
+                if ($instructorTemplate !== false) {
+                    return $instructorTemplate;
+                }
+            }
+        }
+
         return $template;
     }
 }
