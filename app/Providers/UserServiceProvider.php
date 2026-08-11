@@ -13,6 +13,8 @@ class UserServiceProvider
         add_filter('registration_errors', [$this, 'validateRegistrationPasswordFields'], 10, 3);
         add_filter('random_password', [$this, 'useSubmittedRegistrationPassword'], 10, 4);
         add_filter('pre_option_default_role', [$this, 'useStudentRoleForRegistration'], 10, 3);
+        add_action('admin_init', [$this, 'redirectEcoursityUsersFromAdmin']);
+        add_filter('show_admin_bar', [$this, 'hideAdminBarForNonAdmins']);
         add_action('wp_login', [$this, 'syncCartSessionToUser'], 10, 2);
     }
 
@@ -127,6 +129,31 @@ class UserServiceProvider
         return 'ecoursity_student';
     }
 
+    public function redirectEcoursityUsersFromAdmin(): void
+    {
+        if ($this->isDoingAjax() || current_user_can('manage_options')) {
+            return;
+        }
+
+        $user = wp_get_current_user();
+
+        if (! $this->hasEcoursityLearnerRole($user)) {
+            return;
+        }
+
+        wp_safe_redirect(home_url('/'));
+        exit;
+    }
+
+    public function hideAdminBarForNonAdmins(bool $showAdminBar): bool
+    {
+        if (current_user_can('manage_options')) {
+            return $showAdminBar;
+        }
+
+        return false;
+    }
+
     public function syncCartSessionToUser(string $userLogin, \WP_User $user): void
     {
         Cart::syncSessionToUser((int) $user->ID);
@@ -146,5 +173,18 @@ class UserServiceProvider
         $action = isset($_REQUEST['action']) ? sanitize_key(wp_unslash($_REQUEST['action'])) : '';
 
         return $action === 'register';
+    }
+
+    private function isDoingAjax(): bool
+    {
+        return defined('DOING_AJAX') && DOING_AJAX;
+    }
+
+    private function hasEcoursityLearnerRole(\WP_User $user): bool
+    {
+        return count(array_intersect(
+            ['ecoursity_student', 'ecoursity_instructor'],
+            (array) $user->roles
+        )) > 0;
     }
 }
